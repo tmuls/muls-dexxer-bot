@@ -12,12 +12,13 @@
 # - Optimized Combat Loop
 # - Optimized barding
 # - Removed support for tamer archetype
+# - Tracking moved outside of main loop, restart the script to refresh tracking
 #
 ################################################################
 #
 # Jaseowns Premium Bot Comparison
 # 46% smaller file size
-# 65.5% fewer main loop branches -- 851 -> 294 branches (557 removed)
+# 65.7% fewer main loop branches -- 851 -> 292 branches (559 removed)
 #
 ################################################################
 
@@ -198,11 +199,17 @@ settimer mbot_UsedSkillTimer mbot_UsedSkillTimerCD
 if mconfig_Weapon_ForceAbilitiesHotBarToShow = 1 and not gumpexists 3954121934
     say "[abilitieshotbar"
     waitforgump 3954121934 1000
+    if not gumpexists 3954121934
+        overhead "!!!!!!!!!! ABILITIES HOTBAR GUMP NOT FOUND !!!!!!!!!!" 34
+    endif
 endif
 
 if mconfig_Weapon_ForceCodexHotBarToShow = 1 and not gumpexists 2016719803
     say "[codexhotbar"
     waitforgump 2016719803 1000
+    if not gumpexists 2016719803
+        overhead "!!!!!!!!!! CODEX HOTBAR GUMP NOT FOUND !!!!!!!!!!" 34
+    endif
 endif
 
 settimer mbot_UseAbilityTimer mconfig_Weapon_UseAbilityTimerCD
@@ -350,6 +357,37 @@ if not timerexists mbot_BandageTimer
 endif
 
 @setvar! mbot_RedPouchCountTotal 0
+
+##### Tracking
+if skill "Tracking" > 0
+    if not findbuff "tracking"
+        while insysmsg "You will now hunt all hostile players."
+        endwhile
+
+        settimer mbot_TrackingGumpTimer 0
+        while not gumpexists 4267467659 and timer mbot_TrackingGumpTimer < 1000
+            useskill 'tracking'
+            getlabel backpack mbot_PingCheck
+        endwhile
+
+        if gumpexists 4267467659
+            settimer mbot_TrackingGumpTimer 0
+            while not insysmsg "You will now hunt all hostile players." and timer mbot_TrackingGumpTimer < 1000
+                gumpresponse 8 4267467659
+                waitforgump 4267467659 1000
+            endwhile
+            if insysmsg "You will now hunt all hostile players."
+                gumpresponse 6 4267467659
+                getlabel backpack mbot_PingCheck
+            else
+                overhead "!!!!!!!!!! TRACKING GUMP TIMED OUT - GIVING UP !!!!!!!!!!" 34
+            endif
+        else
+            overhead "!!!!!!!!!! TRACKING GUMP NEVER APPEARED - GIVING UP !!!!!!!!!!" 34
+        endif
+        gumpclose 4267467659
+    endif
+endif
 
 while not dead
     ##### Out of Combat: Sysmsg Cleanup & Self-Bandaging
@@ -616,33 +654,14 @@ while not dead
         endif
     endif
     
-    ##### Out of Combat: Tracking
-    if skill "Tracking" > 0
-        if not findbuff "tracking"
-            while insysmsg "You will now hunt all hostile players."
-            endwhile
-            while not gumpexists 4267467659
-                useskill 'tracking'
-                getlabel backpack mbot_PingCheck
-            endwhile
-            if gumpexists 4267467659
-                while not insysmsg "You will now hunt all hostile players."
-                    gumpresponse 8 4267467659
-                    waitforgump 4267467659 5000
-                endwhile
-                gumpresponse 6 4267467659
-                getlabel backpack mbot_PingCheck
-            endif
-            gumpclose 4267467659
-        endif
-    endif
-    
-    
     ##### Out of Combat: Chivalry Symbol Count Detection
     if timer mbot_Chiv_SymbolCheckTimer >= mbot_Chiv_SymbolCheckTimerCD
         if not gumpexists 1387930325 and skill "chivalry" >= 50
             say '[chivalryhotbar'
             waitforgump 1387930325 500
+            if not gumpexists 1387930325
+                overhead "!!!!!!!!!! CHIVALRY HOTBAR GUMP NOT FOUND !!!!!!!!!!" 34
+            endif
         endif
         if gumpexists 1387930325
             if cooldown PVP
