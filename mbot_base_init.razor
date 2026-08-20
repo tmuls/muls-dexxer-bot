@@ -44,102 +44,102 @@ pushlist jaseowns_PreviousScript "Play Script: Combat\Dexxer\Dexxerbase"
 #   10/31/2024 = 1.0 - Initial Script
 #    
 
-@setvar! jaseowns_ShowVersion 0
+@setvar! mconfig_General_ShowVersion 0
 
 # NEW IN 3.0 - 10/27/2025
 ###########################
 # AUTO FIGHT / AUTO TARGET TOGGLE
-# - jaseowns_BOT_FIGHT_AUTO_TARGET 1 = Auto target (original behavior)
-# - jaseowns_BOT_FIGHT_AUTO_TARGET 0 = Do not auto target
+# - mconfig_Bot_FightAutoTarget 1 = Auto target (original behavior)
+# - mconfig_Bot_FightAutoTarget 0 = Do not auto target
 #  -- If you use 0, make sure to set a hotkey in Razor for
 #  -- Set Last Target and/or Target Closest Non-Friendly Monster
 #  -- The script needs to see the target in RAZOR to use pots and abilities.
-@setvar! jaseowns_BOT_FIGHT_AUTO_TARGET 1
+@setvar! mconfig_Bot_FightAutoTarget 1
 
 # Peace mode vs war mode 0 = war  1 = peace to fight mobs automatically
-@setvar! jaseowns_BOT_FIGHT_IN_PEACEMODE 0
+@setvar! mconfig_Bot_FightInPeaceMode 0
 
 # Animal Taming
-@setvar! jaseowns_TamingEnabled 0
-@setvar! jaseowns_Tamer_SayAllGuard 0
-@setvar! jaseowns_Tamer_SayAllGuardTimerCD 15000
+@setvar! mconfig_Taming_Enabled 0
+@setvar! mconfig_Taming_SayAllGuard 0
+@setvar! mconfig_Taming_SayAllGuardTimerCD 15000
 
 # Vet
-@setvar! jaseowns_VET_UseVetKitsAutomatically 1
-@setvar! jaseowns_VET_UseVetSuppliesTimerCD 8000
+@setvar! mconfig_Vet_UseKitsAutomatically 1
+@setvar! mconfig_Vet_UseSuppliesTimerCD 8000
 
 # Boating
-@setvar! jaseowns_BOAT_UseSpyGlassAutomatically 1
-@setvar! jaseowns_BOAT_UseSpyGlassAutomaticallyTimerCD 10000
+@setvar! mconfig_Boat_UseSpyGlassAutomatically 1
+@setvar! mconfig_Boat_UseSpyGlassAutomaticallyTimerCD 10000
 
 # Drop gold when overweight
-@setvar! jaseowns_Weight_GoldToDropIfOverweight 1500
+@setvar! mconfig_Weight_GoldToDropIfOverweight 1500
 
 # Warning overhead if pouch popped
-@setvar! jaseowns_Thief_AlertRedPouchPop 1
+@setvar! mconfig_Thief_AlertRedPouchPop 1
 
 # Skinning
-@setvar! jaseowns_UseSkinningKnifeAutomatically 0
+@setvar! mconfig_Skinning_UseKnifeAutomatically 0
 
 # Potions
-@setvar! jaseowns_Potion_UseMagicResistAgainIfDebuffedAutomatically 1
-@setvar! jaseowns_Potion_UseMagicResistAutomatically 1
-@setvar! jaseowns_Potion_UseStrengthAutomatically 1
-@setvar! jaseowns_Potion_UseAgilityAutomatically 1
+@setvar! mconfig_Potion_UseMagicResistAgainIfDebuffedAutomatically 1
+@setvar! mconfig_Potion_UseMagicResistAutomatically 1
+@setvar! mconfig_Potion_UseStrengthAutomatically 1
+@setvar! mconfig_Potion_UseAgilityAutomatically 1
 # Heal Pot
-@setvar! jaseowns_Potion_UseHealAutomatically 1
-@setvar! jaseowns_Potion_HealHpDiffTrigger 20
+@setvar! mconfig_Potion_UseHealAutomatically 1
+@setvar! mconfig_Potion_HealHpDiffTrigger 20
 # Cure Pot
-@setvar! jaseowns_HasPanacea 1
-@setvar! jaseowns_Potion_UseCureAutomatically 1
-@setvar! jaseowns_Potion_CureHpDiffTrigger 5
+@setvar! mconfig_Potion_HasPanacea 1
+@setvar! mconfig_Potion_UseCureAutomatically 1
+@setvar! mconfig_Potion_CureHpDiffTrigger 5
 # Refresh Pot
-@setvar! jaseowns_Potion_UseRefreshAutomatically 1
-@setvar! jaseowns_Potion_RefreshStamDiffTrigger 20
+@setvar! mconfig_Potion_UseRefreshAutomatically 1
+@setvar! mconfig_Potion_RefreshStamDiffTrigger 20
 # Potions Overhead
-@setvar! jaseowns_Potion_ShowOverheads 0
-@setvar! jaseowns_Potion_Cure_Overhead_IfCountIsLessThan 5
-@setvar! jaseowns_Potion_Cure_Overhead_IfCountIsLessThan_TimerCD 5000
-@setvar! jaseowns_Potion_Heal_Overhead_IfCountIsLessThan 5
-@setvar! jaseowns_Potion_Heal_Overhead_IfCountIsLessThan_TimerCD 5000
-@setvar! jaseowns_Potion_Explosion_Overhead_IfCountIsLessThan 5
-@setvar! jaseowns_Potion_Explosion_Overhead_IfCountIsLessThan_TimerCD 5000
+@setvar! mconfig_Potion_ShowOverheads 0
+@setvar! mconfig_Potion_CureOverheadIfCountIsLessThan 5
+@setvar! mconfig_Potion_CureOverheadIfCountIsLessThanTimerCD 5000
+@setvar! mconfig_Potion_HealOverheadIfCountIsLessThan 5
+@setvar! mconfig_Potion_HealOverheadIfCountIsLessThanTimerCD 5000
+@setvar! mconfig_Potion_ExplosionOverheadIfCountIsLessThan 5
+@setvar! mconfig_Potion_ExplosionOverheadIfCountIsLessThanTimerCD 5000
 
 # Explosion Potions - use at your own risk
-@setvar! jaseowns_AutoExplodePot 1
+@setvar! mconfig_Potion_AutoExplodePot 1
 
 # Cleansing Brew
-@setvar! jaseowns_Potion_UseCleansingBrewAutomatically 0
-@setvar! jaseowns_Potion_UseCleansingBrewHpDiffTrigger 60
+@setvar! mconfig_Potion_UseCleansingBrewAutomatically 0
+@setvar! mconfig_Potion_CleansingBrewHpDiffTrigger 60
 
 # Weapon Abilities
-@setvar! jaseowns_UseAbility1 0
-@setvar! jaseowns_UseAbility2 0
-@setvar! jaseowns_UseAbility3 0
-@setvar! jaseowns_UseAbilityTimerCD 5000
-@setvar! jaseowns_ForceAbilitiesHotBarToShow 0
-@setvar! jaseowns_ForceCodexHotBarToShow 1
+@setvar! mconfig_Weapon_UseAbility1 0
+@setvar! mconfig_Weapon_UseAbility2 0
+@setvar! mconfig_Weapon_UseAbility3 0
+@setvar! mconfig_Weapon_UseAbilityTimerCD 5000
+@setvar! mconfig_Weapon_ForceAbilitiesHotBarToShow 0
+@setvar! mconfig_Weapon_ForceCodexHotBarToShow 1
 
 # Poison
-@setvar! jaseowns_Poison_AutomaticallyApply 1
-@setvar! jaseowns_Poison_AutomaticallyApplyAtSingleCharge 1
+@setvar! mconfig_Poison_AutomaticallyApply 1
+@setvar! mconfig_Poison_AutomaticallyApplyAtSingleCharge 1
 
 # Parry
-@setvar! jaseowns_AutoTaunting 1
-@setvar! jaseowns_AutoAOETaunting 0
-@setvar! jaseowns_TauntingTimerCD 15000
-@setvar! jaseowns_Parry_AutoTauntHpDiffTrigger 20
-@setvar! jaseowns_Parry_CodexMinMana 13
-@setvar! jaseowns_Parry_SwitchToWardingIfBleeding 0
-@setvar! jaseowns_Parry_SwitchToWardingIfDisease 1
-@setvar! jaseowns_Parry_SwitchToWardingIfPoison 1
-@setvar! jaseowns_Parry_SwitchToBulwarkIfStandingStill 0
-@setvar! jaseowns_Parry_SwitchToShieldBashWhileMoving 0
-@setvar! jaseowns_Parry_SwitchToWardingIfBleedingHpDiff 25
-@setvar! jaseowns_Parry_SwitchToWardingIfDiseaseHpDiff 25
-@setvar! jaseowns_Parry_SwitchToWardingIfPoisonHpDiff 25
+@setvar! mconfig_Parry_AutoTaunting 1
+@setvar! mconfig_Parry_AutoAoeTaunting 0
+@setvar! mconfig_Parry_TauntingTimerCD 15000
+@setvar! mconfig_Parry_AutoTauntHpDiffTrigger 20
+@setvar! mconfig_Parry_CodexMinMana 13
+@setvar! mconfig_Parry_SwitchToWardingIfBleeding 0
+@setvar! mconfig_Parry_SwitchToWardingIfDisease 1
+@setvar! mconfig_Parry_SwitchToWardingIfPoison 1
+@setvar! mconfig_Parry_SwitchToBulwarkIfStandingStill 0
+@setvar! mconfig_Parry_SwitchToShieldBashWhileMoving 0
+@setvar! mconfig_Parry_SwitchToWardingIfBleedingHpDiff 25
+@setvar! mconfig_Parry_SwitchToWardingIfDiseaseHpDiff 25
+@setvar! mconfig_Parry_SwitchToWardingIfPoisonHpDiff 25
 # 1 = Shield Bash, 2 = Warding, 3 = Testudo, 4 = Mirror, 5 = Bulwark
-@setvar! jaseowns_Parry_SwitchToDefaultStance 1
+@setvar! mconfig_Parry_SwitchToDefaultStance 1
 
 #####  DiffTrigger Explansion  #######
 # Trigger HP = your max hp - init value
@@ -147,72 +147,72 @@ pushlist jaseowns_PreviousScript "Play Script: Combat\Dexxer\Dexxerbase"
 # 120 Health - 31 HP DIFF = 89 HEALTH TRIGGER
 
 # Healing - Bandages
-@setvar! jaseowns_AutoBandageHpDiffTrigger 1
+@setvar! mconfig_Healing_AutoBandageHpDiffTrigger 1
 
 # Healing - Chiv
-@setvar! jaseowns_Chiv_AutoHolyLightHpDiffTrigger 60
-@setvar! jaseowns_Chiv_UseHolyLightAutomatically 1
-@setvar! jaseowns_Chiv_AutoUseNobleSacrificeHpDiffTrigger 80
-@setvar! jaseowns_Chiv_UseNobleSacrificeAutomatically 1
+@setvar! mconfig_Chiv_AutoHolyLightHpDiffTrigger 60
+@setvar! mconfig_Chiv_UseHolyLightAutomatically 1
+@setvar! mconfig_Chiv_AutoUseNobleSacrificeHpDiffTrigger 80
+@setvar! mconfig_Chiv_UseNobleSacrificeAutomatically 1
 
 # Other Chiv Abilities
-@setvar! jaseowns_Chiv_UseDivineFuryAutomatically 1
-@setvar! jaseowns_Chiv_UseConsecrateWeaponAutomatically 1
-@setvar! jaseowns_Chiv_UseEnemyOfOneAutomatically 1
-@setvar! jaseowns_Chiv_UseCleanseByFireAutomatically 1
-@setvar! jaseowns_Chiv_UseCloseWoundsAutomatically 1
-@setvar! jaseowns_Chiv_AutoCloseWoundHpDiffTrigger 20
+@setvar! mconfig_Chiv_UseDivineFuryAutomatically 1
+@setvar! mconfig_Chiv_UseConsecrateWeaponAutomatically 1
+@setvar! mconfig_Chiv_UseEnemyOfOneAutomatically 1
+@setvar! mconfig_Chiv_UseCleanseByFireAutomatically 1
+@setvar! mconfig_Chiv_UseCloseWoundsAutomatically 1
+@setvar! mconfig_Chiv_AutoCloseWoundHpDiffTrigger 20
 
 # Chivalry Minimum Symbols Config
-@setvar! jaseowns_Chiv_MinSymbols_NobleSacrifice 4
-@setvar! jaseowns_Chiv_MinSymbols_HolyLight 5
-@setvar! jaseowns_Chiv_MinSymbols_CloseWounds 7
-@setvar! jaseowns_Chiv_MinSymbols_CleanseByFire 6
-@setvar! jaseowns_Chiv_MinSymbols_DivineFury 8
-@setvar! jaseowns_Chiv_MinSymbols_EnemyOfOne 7
-@setvar! jaseowns_Chiv_MinSymbols_ConsecrateWeapon 6
+@setvar! mconfig_Chiv_MinSymbolsNobleSacrifice 4
+@setvar! mconfig_Chiv_MinSymbolsHolyLight 5
+@setvar! mconfig_Chiv_MinSymbolsCloseWounds 7
+@setvar! mconfig_Chiv_MinSymbolsCleanseByFire 6
+@setvar! mconfig_Chiv_MinSymbolsDivineFury 8
+@setvar! mconfig_Chiv_MinSymbolsEnemyOfOne 7
+@setvar! mconfig_Chiv_MinSymbolsConsecrateWeapon 6
 
 # Bard Abilities
-@setvar! jaseowns_Bard_UsePeaceFirst 1
-@setvar! jaseowns_Bard_DiscordAutomatically 1
-@setvar! jaseowns_Bard_PeaceAutomatically 1
-@setvar! jaseowns_Bard_ProvoAutomatically 1
-@setvar! jaseowns_Bard_AutoUseAOEPeaceWhenLowHealthCheck 40
+@setvar! mconfig_Bard_UsePeaceFirst 1
+@setvar! mconfig_Bard_DiscordAutomatically 1
+@setvar! mconfig_Bard_PeaceAutomatically 1
+@setvar! mconfig_Bard_ProvoAutomatically 1
+@setvar! mconfig_Bard_AutoUseAoePeaceWhenLowHealthCheck 40
 
-@setvar! jaseowns_Healing_AidCountAlertLessThan20 1
+@setvar! mconfig_Healing_AidCountAlertLessThan20 1
 
 # General Target Overheads
-@setvar! jaseowns_CurrentBotTargetOverheadTimerCD 3000000
-@setvar! jaseowns_CurrentBotTargetOverheadHue 89
+@setvar! mconfig_Target_CurrentOverheadTimerCD 3000000
+@setvar! mconfig_Target_CurrentOverheadHue 89
 
-@setvar! jaseowns_CurrentBotTargetUnableToAttackOverheadTimerCD 3000000
-@setvar! jaseowns_CurrentBotTargetUnableToAttackOverheadHue 34
+@setvar! mconfig_Target_UnableToAttackOverheadTimerCD 3000000
+@setvar! mconfig_Target_UnableToAttackOverheadHue 34
 
-@setvar! jaseowns_IgnoreMobOverheadTimerCD 3000000
-@setvar! jaseowns_IgnoreMobOverheadHue 77
+@setvar! mconfig_Target_IgnoreMobOverheadTimerCD 3000000
+@setvar! mconfig_Target_IgnoreMobOverheadHue 77
 
 # Custom Target Overhead Messages
-removelist jaseowns_CurrentBotTargetOverheadText
-createlist jaseowns_CurrentBotTargetOverheadText
-pushlist jaseowns_CurrentBotTargetOverheadText "▼"
+removelist mconfig_Target_CurrentOverheadText
+createlist mconfig_Target_CurrentOverheadText
+pushlist mconfig_Target_CurrentOverheadText "▼"
 
-removelist jaseowns_CurrentBotTargetUnableToAttackOverheadText
-createlist jaseowns_CurrentBotTargetUnableToAttackOverheadText
-pushlist jaseowns_CurrentBotTargetUnableToAttackOverheadText "●"
+removelist mconfig_Target_UnableToAttackOverheadText
+createlist mconfig_Target_UnableToAttackOverheadText
+pushlist mconfig_Target_UnableToAttackOverheadText "●"
 
-removelist jaseowns_IgnoreMobOverheadText
-createlist jaseowns_IgnoreMobOverheadText
-pushlist jaseowns_IgnoreMobOverheadText "-"
+removelist mconfig_Target_IgnoreMobOverheadText
+createlist mconfig_Target_IgnoreMobOverheadText
+pushlist mconfig_Target_IgnoreMobOverheadText "-"
 
 # Custom ignore list
-removelist jaseowns_IgnoreMobList
-createlist jaseowns_IgnoreMobList
-pushlist jaseowns_IgnoreMobList "a sheep"
-pushlist jaseowns_IgnoreMobList "a kingfisher"
-pushlist jaseowns_IgnoreMobList "a raven"
-pushlist jaseowns_IgnoreMobList "a goat"
-pushlist jaseowns_IgnoreMobList "a black bear"
-//pushlist jaseowns_IgnoreMobList "an eagle"
+removelist mconfig_Target_IgnoreMobList
+createlist mconfig_Target_IgnoreMobList
+pushlist mconfig_Target_IgnoreMobList "a sheep"
+pushlist mconfig_Target_IgnoreMobList "a kingfisher"
+pushlist mconfig_Target_IgnoreMobList "a raven"
+pushlist mconfig_Target_IgnoreMobList "a goat"
+pushlist mconfig_Target_IgnoreMobList "a black bear"
+//pushlist mconfig_Target_IgnoreMobList "an eagle"
 
 //unsetvar jaseowns_BOT_CurrentRightHandWeapon
 //unsetvar jaseowns_BOT_CurrentLeftHandWeapon
