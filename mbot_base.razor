@@ -230,6 +230,9 @@ if jaseowns_BardDetected = 1
 
     settimer jaseowns_BOT_BardBuffTimer 10000
 
+    @setvar! mbot_instrumentCheckTimerCD 10000
+    settimer mbot_instrumentCheckTimer mbot_instrumentCheckTimerCD
+
 endif
 
 if mconfig_Potion_AutoExplodePot = 1
@@ -302,10 +305,10 @@ endif
 ### Taming (crook activation, "all guard me" timer setup)
 if jaseowns_TamerDetected = 1
 
-    if not varexist myAwesomeCrookThatIsActivated
-        @setvar! myAwesomeCrookThatIsActivated 0
+    if not varexist mbot_activeCrook
+        @setvar! mbot_activeCrook 0
     endif
-    if not find myAwesomeCrookThatIsActivated self
+    if not find mbot_activeCrook self
         if skill "Herding" > 0 and findtype 3713 self as firstJrook
             @setvar! isHerdingActive 0
             while isHerdingActive = 0
@@ -336,7 +339,7 @@ if jaseowns_TamerDetected = 1
                     endif
                 endif
             endwhile
-            @setvar! myAwesomeCrookThatIsActivated isHerdingActive
+            @setvar! mbot_activeCrook isHerdingActive
         endif
     endif
 
@@ -1010,6 +1013,17 @@ while not dead
                     ##### Bard section start - the attack decision below runs independently after this,
                     ##### not as elseif alternatives to these branches.
                     if jaseowns_BardDetected = 1
+                        if timer mbot_instrumentCheckTimer >= mbot_instrumentCheckTimerCD
+                            if not find mbot_activeInstrument backpack
+                                if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as mbot_activeInstrument
+                                    // found it
+                                else
+                                    overhead "I do not have an instrument" 34
+                                endif
+                            endif
+                            settimer mbot_instrumentCheckTimer 0
+                        endif
+
                         @setvar! jaseowns_Bard_SkipPeace 0
                         if "pacified" in jaseowns_CurrentBotTargetDesc
                             @setvar! jaseowns_Bard_SkipPeace 1
@@ -1091,12 +1105,7 @@ while not dead
                                         useskill "Provocation" 
                                         wft 500
                                         if insysmsg "What instrument"
-                                            if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as jaseowns_Instrument 
-                                                target jaseowns_Instrument
-                                                @setvar! jase_MyInny jaseowns_Instrument
-                                            else
-                                                overhead "I do not have an instrument" 34
-                                            endif
+                                            target mbot_activeInstrument
                                             wft 500
                                         endif
                                         if targetexists
@@ -1223,12 +1232,7 @@ while not dead
                             useskill 'Discordance'
                             wft 500
                             if insysmsg "What instrument"
-                                if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as jaseowns_Instrument 
-                                    target jaseowns_Instrument
-                                    @setvar! jase_MyInny jaseowns_Instrument
-                                else
-                                    overhead "I do not have an instrument" 34
-                                endif
+                                target mbot_activeInstrument
                                 wft 500
                             endif
                             if targetexists 
@@ -1258,12 +1262,7 @@ while not dead
                             useskill 'Discordance'
                             wft 500
                             if insysmsg "What instrument"
-                                if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as jaseowns_Instrument 
-                                    target jaseowns_Instrument
-                                    @setvar! jase_MyInny jaseowns_Instrument
-                                else
-                                    overhead "I do not have an instrument" 34
-                                endif
+                                target mbot_activeInstrument
                                 wft 500
                             endif
                             if targetexists 
@@ -1293,12 +1292,7 @@ while not dead
                             useskill 'Discordance'
                             wft 500
                             if insysmsg "What instrument"
-                                if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as jaseowns_Instrument 
-                                    target jaseowns_Instrument
-                                    @setvar! jase_MyInny jaseowns_Instrument
-                                else
-                                    overhead "I do not have an instrument" 34
-                                endif
+                                target mbot_activeInstrument
                                 wft 500
                             endif
                             if targetexists 
@@ -1328,12 +1322,7 @@ while not dead
                             useskill 'Peacemaking'
                             wft 500
                             if insysmsg "What instrument"
-                                if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as jaseowns_Instrument 
-                                    target jaseowns_Instrument
-                                    @setvar! jase_MyInny jaseowns_Instrument
-                                else
-                                    overhead "I do not have an instrument" 34
-                                endif
+                                target mbot_activeInstrument
                                 wft 500
                             endif
                             if targetexists 
@@ -1389,12 +1378,7 @@ while not dead
         useskill 'Peacemaking'
         wft 500
         if insysmsg "What instrument"
-            if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as jaseowns_Instrument 
-                target jaseowns_Instrument
-                @setvar! jase_MyInny jaseowns_Instrument
-            else
-                overhead "I do not have an instrument" 34
-            endif
+            target mbot_activeInstrument
             wft 500
         endif
         if targetexists 
@@ -1655,12 +1639,7 @@ while not dead
                 useskill 'Discordance'
                 wft 500
                 if insysmsg "What instrument"
-                    if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as jaseowns_Instrument
-                        target jaseowns_Instrument
-                        @setvar! jase_MyInny jaseowns_Instrument
-                    else
-                        overhead "I do not have an instrument" 34
-                    endif
+                    target mbot_activeInstrument
                     wft 500
                 endif
                 target backpack
@@ -1675,12 +1654,7 @@ while not dead
                 useskill 'Provocation'
                 wft 500
                 if insysmsg "What instrument"
-                    if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as jaseowns_Instrument
-                        target jaseowns_Instrument
-                        @setvar! jase_MyInny jaseowns_Instrument
-                    else
-                        overhead "I do not have an instrument" 34
-                    endif
+                    target mbot_activeInstrument
                     wft 500
                 endif
                 target backpack
@@ -1695,12 +1669,7 @@ while not dead
                 useskill 'Peacemaking'
                 wft 500
                 if insysmsg "What instrument"
-                    if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as jaseowns_Instrument
-                        target jaseowns_Instrument
-                        @setvar! jase_MyInny jaseowns_Instrument
-                    else
-                        overhead "I do not have an instrument" 34
-                    endif
+                    target mbot_activeInstrument
                     wft 500
                 endif
                 target backpack
