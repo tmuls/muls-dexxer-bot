@@ -45,10 +45,11 @@ bot's actual logic.
   remembered weapon/shield, or finds a quality replacement from your bags
   (aspect/exceptional/supremely/exceedingly/vanquishing/power/invuln)
 - Early poison reapplication - comfortably play at 100 poison skill
-- Optimized Chivalry
-- Optimized Barding
-- Optimized combat loop
 - Configurable weapon hotbar display for both ability hotbar and codex hotbar
+- Optimized Chivalry
+- Optimized Barding (testing needed)
+- Optimized main run loop (moved several init-once items outside of the main run loop)
+- PVP detection + automatically stop PVM combat when engaged in PVP (testing needed)
 
 ## Subtractions
 - Tamer support has been removed
