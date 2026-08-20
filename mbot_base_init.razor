@@ -1,6 +1,6 @@
-removelist jaseowns_PreviousScript
-createlist jaseowns_PreviousScript
-pushlist jaseowns_PreviousScript "Play Script: Combat\Dexxer\Dexxerbase"
+removelist mbot_PreviousScript
+createlist mbot_PreviousScript
+pushlist mbot_PreviousScript "Play Script: Combat\Dexxer\Dexxerbase"
 
 #######
 # Ultimate Dexxer Bot Rewrite 2024-2025 by Jaseowns
@@ -213,11 +213,11 @@ pushlist mconfig_Target_IgnoreMobList "a goat"
 pushlist mconfig_Target_IgnoreMobList "a black bear"
 //pushlist mconfig_Target_IgnoreMobList "an eagle"
 
-//unsetvar jaseowns_BOT_CurrentRightHandWeapon
-//unsetvar jaseowns_BOT_CurrentLeftHandWeapon
+//unsetvar mbot_BOT_CurrentRightHandWeapon
+//unsetvar mbot_BOT_CurrentLeftHandWeapon
 
-if listexists jaseowns_PreviousScript
-    foreach myScript in jaseowns_PreviousScript
+if listexists mbot_PreviousScript
+    foreach myScript in mbot_PreviousScript
         hotkey myScript
     endfor
 endif

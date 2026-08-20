@@ -11,14 +11,14 @@ endif
 
 # Premium Dexxer Bot- BASE
 
-@setvar! jaseowns_TamerDetected 0
+@setvar! mbot_TamerDetected 0
 if skill "Animal Taming" >= 80
-    @setvar! jaseowns_TamerDetected 1
+    @setvar! mbot_TamerDetected 1
 endif
 
-@setvar! jaseowns_BardDetected 0
+@setvar! mbot_BardDetected 0
 if skill "Discordance" > 0 or skill "Peacemaking" > 0 or skill "Provocation" > 0
-    @setvar! jaseowns_BardDetected 1
+    @setvar! mbot_BardDetected 1
 endif
 
 @setvar! poison_display_timer_cd 120000
@@ -38,8 +38,8 @@ pushlist poison_check_list " (2."
 pushlist poison_check_list " (1."
 pushlist poison_check_list " (0."
 
-@setvar! jaseowns_CurrentBotTarget 0
-@setvar! jaseowns_FightingRangeCheck 12
+@setvar! mbot_CurrentBotTarget 0
+@setvar! mbot_FightingRangeCheck 12
 
 if not varexist mconfig_Bard_AutoUseAoePeaceWhenLowHealthCheck
     @setvar! mconfig_Bard_AutoUseAoePeaceWhenLowHealthCheck 50
@@ -57,51 +57,51 @@ if not varexist mconfig_Target_IgnoreMobOverheadTimerCD
     @setvar! mconfig_Target_IgnoreMobOverheadTimerCD 2000
 endif
 
-settimer jaseowns_CurrentBotTargetOverheadTimer mconfig_Target_CurrentOverheadTimerCD
-settimer jaseowns_CurrentBotTargetUnableToAttackOverheadTimer mconfig_Target_UnableToAttackOverheadTimerCD
-settimer jaseowns_IgnoreMobOverheadTimer mconfig_Target_IgnoreMobOverheadTimerCD
+settimer mbot_CurrentBotTargetOverheadTimer mconfig_Target_CurrentOverheadTimerCD
+settimer mbot_CurrentBotTargetUnableToAttackOverheadTimer mconfig_Target_UnableToAttackOverheadTimerCD
+settimer mbot_IgnoreMobOverheadTimer mconfig_Target_IgnoreMobOverheadTimerCD
 
-@setvar! jaseowns_HolyLightTimerCD 30000
-if not timerexists jaseowns_HolyLightTimer
-    settimer jaseowns_HolyLightTimer jaseowns_HolyLightTimerCD
+@setvar! mbot_HolyLightTimerCD 30000
+if not timerexists mbot_HolyLightTimer
+    settimer mbot_HolyLightTimer mbot_HolyLightTimerCD
 endif
-@setvar! jaseowns_NobleSacrificeTimerCD 30000
-if not timerexists jaseowns_NobleSacrificeTimer
-    settimer jaseowns_NobleSacrificeTimer jaseowns_NobleSacrificeTimerCD
+@setvar! mbot_NobleSacrificeTimerCD 30000
+if not timerexists mbot_NobleSacrificeTimer
+    settimer mbot_NobleSacrificeTimer mbot_NobleSacrificeTimerCD
 endif
-@setvar! jaseowns_DivineFuryTimerCD 30000
-if not timerexists jaseowns_DivineFuryTimer
-    settimer jaseowns_DivineFuryTimer jaseowns_DivineFuryTimerCD
+@setvar! mbot_DivineFuryTimerCD 30000
+if not timerexists mbot_DivineFuryTimer
+    settimer mbot_DivineFuryTimer mbot_DivineFuryTimerCD
 endif
-@setvar! jaseowns_ConsecrateWeaponTimerCD 30000
-if not timerexists jaseowns_ConsecrateWeaponTimer
-    settimer jaseowns_ConsecrateWeaponTimer jaseowns_ConsecrateWeaponTimerCD
+@setvar! mbot_ConsecrateWeaponTimerCD 30000
+if not timerexists mbot_ConsecrateWeaponTimer
+    settimer mbot_ConsecrateWeaponTimer mbot_ConsecrateWeaponTimerCD
 endif
-@setvar! jaseowns_CleanseByFireTimerCD 30000
-if not timerexists jaseowns_CleanseByFireTimer
-    settimer jaseowns_CleanseByFireTimer jaseowns_CleanseByFireTimerCD
+@setvar! mbot_CleanseByFireTimerCD 30000
+if not timerexists mbot_CleanseByFireTimer
+    settimer mbot_CleanseByFireTimer mbot_CleanseByFireTimerCD
 endif
-@setvar! jaseowns_CloseWoundsTimerCD 30000
-if not timerexists jaseowns_CloseWoundsTimer
-    settimer jaseowns_CloseWoundsTimer jaseowns_CloseWoundsTimerCD
+@setvar! mbot_CloseWoundsTimerCD 30000
+if not timerexists mbot_CloseWoundsTimer
+    settimer mbot_CloseWoundsTimer mbot_CloseWoundsTimerCD
 endif
-@setvar! jaseowns_EnemyOfOneTimerCD 30000
-if not timerexists jaseowns_EnemyOfOneTimer
-    settimer jaseowns_EnemyOfOneTimer jaseowns_EnemyOfOneTimerCD
-endif
-
-@setvar! jaseowns_Chiv_SymbolCheckTimerCD 1000
-if not timerexists jaseowns_Chiv_SymbolCheckTimer
-    settimer jaseowns_Chiv_SymbolCheckTimer jaseowns_Chiv_SymbolCheckTimerCD
+@setvar! mbot_EnemyOfOneTimerCD 30000
+if not timerexists mbot_EnemyOfOneTimer
+    settimer mbot_EnemyOfOneTimer mbot_EnemyOfOneTimerCD
 endif
 
-@setvar! jaseowns_LOSCheckTimerCD 500
-if not timerexists jaseowns_LOSCheckTimer
-    settimer jaseowns_LOSCheckTimer jaseowns_LOSCheckTimerCD
+@setvar! mbot_Chiv_SymbolCheckTimerCD 1000
+if not timerexists mbot_Chiv_SymbolCheckTimer
+    settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
 endif
 
-@setvar! jaseowns_UseItemTimerCD 650
-settimer jaseowns_UseItemTimer jaseowns_UseItemTimerCD
+@setvar! mbot_LOSCheckTimerCD 500
+if not timerexists mbot_LOSCheckTimer
+    settimer mbot_LOSCheckTimer mbot_LOSCheckTimerCD
+endif
+
+@setvar! mbot_UseItemTimerCD 650
+settimer mbot_UseItemTimer mbot_UseItemTimerCD
 
 if not varexist mconfig_Potion_HealHpDiffTrigger
     @setvar! mconfig_Potion_HealHpDiffTrigger 40
@@ -117,14 +117,14 @@ if mconfig_Potion_ShowOverheads = 1
     if not varexist mconfig_Potion_CureOverheadIfCountIsLessThanTimerCD
         @setvar! mconfig_Potion_CureOverheadIfCountIsLessThanTimerCD 5000
     endif
-    settimer jaseowns_Potion_Cure_Overhead_IfCountIsLessThan_Timer mconfig_Potion_CureOverheadIfCountIsLessThanTimerCD
+    settimer mbot_Potion_Cure_Overhead_IfCountIsLessThan_Timer mconfig_Potion_CureOverheadIfCountIsLessThanTimerCD
     if not varexist mconfig_Potion_HealOverheadIfCountIsLessThan
         @setvar! mconfig_Potion_HealOverheadIfCountIsLessThan 5
     endif
     if not varexist mconfig_Potion_HealOverheadIfCountIsLessThanTimerCD
         @setvar! mconfig_Potion_HealOverheadIfCountIsLessThanTimerCD 5000
     endif
-    settimer jaseowns_Potion_Heal_Overhead_IfCountIsLessThan_Timer mconfig_Potion_HealOverheadIfCountIsLessThanTimerCD
+    settimer mbot_Potion_Heal_Overhead_IfCountIsLessThan_Timer mconfig_Potion_HealOverheadIfCountIsLessThanTimerCD
 
     if not varexist mconfig_Potion_ExplosionOverheadIfCountIsLessThan
         @setvar! mconfig_Potion_ExplosionOverheadIfCountIsLessThan 5
@@ -132,7 +132,7 @@ if mconfig_Potion_ShowOverheads = 1
     if not varexist mconfig_Potion_ExplosionOverheadIfCountIsLessThanTimerCD
         @setvar! mconfig_Potion_ExplosionOverheadIfCountIsLessThanTimerCD 5000
     endif
-    settimer jaseowns_Potion_Explosion_Overhead_IfCountIsLessThan_Timer mconfig_Potion_ExplosionOverheadIfCountIsLessThanTimerCD
+    settimer mbot_Potion_Explosion_Overhead_IfCountIsLessThan_Timer mconfig_Potion_ExplosionOverheadIfCountIsLessThanTimerCD
     
 endif
 
@@ -157,7 +157,7 @@ else
         cooldown "Bulwark" 0
     endif
 
-    @setvar! jaseowns_Parry_SwitchCodexTimerCD 1000
+    @setvar! mbot_Parry_SwitchCodexTimerCD 1000
     
     if not varexist mconfig_Parry_CodexMinMana
         @setvar! mconfig_Parry_CodexMinMana 3
@@ -175,16 +175,16 @@ else
         @setvar! mconfig_Parry_SwitchToWardingIfPoisonHpDiff 0
     endif
 
-    if not timerexists jaseowns_Parry_SwitchCodexTimer
-        settimer jaseowns_Parry_SwitchCodexTimer jaseowns_Parry_SwitchCodexTimerCD
+    if not timerexists mbot_Parry_SwitchCodexTimer
+        settimer mbot_Parry_SwitchCodexTimer mbot_Parry_SwitchCodexTimerCD
     endif
 
     if not varexist mconfig_Parry_TauntingTimerCD
         @setvar! mconfig_Parry_TauntingTimerCD 15000
     endif
     
-    if not timerexists jaseowns_TauntingTimer
-        settimer jaseowns_TauntingTimer mconfig_Parry_TauntingTimerCD
+    if not timerexists mbot_TauntingTimer
+        settimer mbot_TauntingTimer mconfig_Parry_TauntingTimerCD
     endif
 endif
 
@@ -192,43 +192,43 @@ if not varexist mconfig_Potion_RefreshStamDiffTrigger
     @setvar! mconfig_Potion_RefreshStamDiffTrigger 5
 endif
 
-@setvar! jaseowns_PotionSatchel backpack
-if findlayer self Outerbody as jaseowns_MaybePotionSatchel
-    @setvar! jaseowns_PotionSatchel jaseowns_MaybePotionSatchel
+@setvar! mbot_PotionSatchel backpack
+if findlayer self Outerbody as mbot_MaybePotionSatchel
+    @setvar! mbot_PotionSatchel mbot_MaybePotionSatchel
 endif
 
 ##### Bard Config/Setup (only relevant if a bard archetype was detected)
-if jaseowns_BardDetected = 1
+if mbot_BardDetected = 1
 
     if skill "Discordance" >= 50 and mconfig_Bard_DiscordAutomatically = 1
-        @setvar! jaseowns_Bard_CanDiscord 1
+        @setvar! mbot_Bard_CanDiscord 1
     else
-        @setvar! jaseowns_Bard_CanDiscord 0
+        @setvar! mbot_Bard_CanDiscord 0
     endif
 
     if skill "Peacemaking" >= 50 and mconfig_Bard_PeaceAutomatically = 1
-        @setvar! jaseowns_Bard_CanPeacemake 1
+        @setvar! mbot_Bard_CanPeacemake 1
     else
-        @setvar! jaseowns_Bard_CanPeacemake 0
+        @setvar! mbot_Bard_CanPeacemake 0
     endif
 
     if skill "Provocation" >= 50 and mconfig_Bard_ProvoAutomatically = 1
-        @setvar! jaseowns_Bard_CanProvo 1
+        @setvar! mbot_Bard_CanProvo 1
     else
-        @setvar! jaseowns_Bard_CanProvo 0
+        @setvar! mbot_Bard_CanProvo 0
     endif
 
     # Bard Variables
-    if jaseowns_Bard_CanProvo = 1
-        @setvar! jaseowns_BARD_PROVO_COUNTER 0
-        @setvar! jaseowns_BARD_TARGET1 0
-        @setvar! jaseowns_BARD_TARGET2 0
-        @setvar! jaseowns_BARD_TARGET_RANGECHECK 8
-        @setvar! jaseowns_BARD_TARGET_RANGECHECK_TIMERCD 1000
-        settimer jaseowns_BARD_TARGET_RANGECHECK_TIMER jaseowns_BARD_TARGET_RANGECHECK_TIMERCD
+    if mbot_Bard_CanProvo = 1
+        @setvar! mbot_BARD_PROVO_COUNTER 0
+        @setvar! mbot_BARD_TARGET1 0
+        @setvar! mbot_BARD_TARGET2 0
+        @setvar! mbot_BARD_TARGET_RANGECHECK 8
+        @setvar! mbot_BARD_TARGET_RANGECHECK_TIMERCD 1000
+        settimer mbot_BARD_TARGET_RANGECHECK_TIMER mbot_BARD_TARGET_RANGECHECK_TIMERCD
     endif
 
-    settimer jaseowns_BOT_BardBuffTimer 10000
+    settimer mbot_BOT_BardBuffTimer 10000
 
     @setvar! mbot_instrumentCheckTimerCD 10000
     settimer mbot_instrumentCheckTimer mbot_instrumentCheckTimerCD
@@ -236,12 +236,12 @@ if jaseowns_BardDetected = 1
 endif
 
 if mconfig_Potion_AutoExplodePot = 1
-    @setvar! jaseowns_AutoExplodePotTimerCD 15000
-    settimer jaseowns_AutoExplodePotTimer jaseowns_AutoExplodePotTimerCD
+    @setvar! mbot_AutoExplodePotTimerCD 15000
+    settimer mbot_AutoExplodePotTimer mbot_AutoExplodePotTimerCD
 endif
 
-@setvar! jaseowns_UsedSkillTimerCD 10000
-settimer jaseowns_UsedSkillTimer jaseowns_UsedSkillTimerCD
+@setvar! mbot_UsedSkillTimerCD 10000
+settimer mbot_UsedSkillTimer mbot_UsedSkillTimerCD
 
 if mconfig_Weapon_ForceAbilitiesHotBarToShow = 1 and not gumpexists 3954121934
     say "[abilitieshotbar"
@@ -256,7 +256,7 @@ endif
 if not varexist mconfig_Weapon_UseAbilityTimerCD
     @setvar! mconfig_Weapon_UseAbilityTimerCD 30500
 endif
-settimer jaseowns_UseAbilityTimer mconfig_Weapon_UseAbilityTimerCD
+settimer mbot_UseAbilityTimer mconfig_Weapon_UseAbilityTimerCD
 
 if skill "Alchemy" < 80
     @setvar! mconfig_Potion_HasPanacea 0
@@ -266,7 +266,7 @@ endif
 if not varexist mconfig_Vet_UseSuppliesTimerCD
     @setvar! mconfig_Vet_UseSuppliesTimerCD 5000
 endif
-settimer jaseowns_VET_UseVetSuppliesTimer mconfig_Vet_UseSuppliesTimerCD
+settimer mbot_VET_UseVetSuppliesTimer mconfig_Vet_UseSuppliesTimerCD
 
 
 if skill "Veterinary" < 50
@@ -276,34 +276,34 @@ if skill "Veterinary" < 50
     # You or your nearby followers do not require healing
 endif
 
-@setvar! jaseowns_UsePanaceaTimerCD 30500
-if not timerexists jaseowns_UsePanaceaTimer
-    settimer jaseowns_UsePanaceaTimer jaseowns_UsePanaceaTimerCD
+@setvar! mbot_UsePanaceaTimerCD 30500
+if not timerexists mbot_UsePanaceaTimer
+    settimer mbot_UsePanaceaTimer mbot_UsePanaceaTimerCD
 endif
 
-@setvar! jaseowns_UseCleansingBrewTimerCD 120500
-if not timerexists jaseowns_UseCleansingBrewTimer
-    settimer jaseowns_UseCleansingBrewTimer jaseowns_UseCleansingBrewTimerCD
+@setvar! mbot_UseCleansingBrewTimerCD 120500
+if not timerexists mbot_UseCleansingBrewTimer
+    settimer mbot_UseCleansingBrewTimer mbot_UseCleansingBrewTimerCD
 endif
 
-if not varexist jaseowns_BOT_CurrentRightHandWeapon
-    @setvar! jaseowns_BOT_CurrentRightHandWeapon 0
+if not varexist mbot_BOT_CurrentRightHandWeapon
+    @setvar! mbot_BOT_CurrentRightHandWeapon 0
 endif
-if findlayer self righthand as jaseowns_RightHandWeapon
-    @setvar! jaseowns_BOT_CurrentRightHandWeapon jaseowns_RightHandWeapon
+if findlayer self righthand as mbot_RightHandWeapon
+    @setvar! mbot_BOT_CurrentRightHandWeapon mbot_RightHandWeapon
 endif
 
-if not varexist jaseowns_BOT_CurrentLeftHandWeapon
-    @setvar! jaseowns_BOT_CurrentLeftHandWeapon 0
+if not varexist mbot_BOT_CurrentLeftHandWeapon
+    @setvar! mbot_BOT_CurrentLeftHandWeapon 0
 endif
-if findlayer self lefthand as jaseowns_LeftHandWeapon
-    @setvar! jaseowns_BOT_CurrentLeftHandWeapon jaseowns_LeftHandWeapon
+if findlayer self lefthand as mbot_LeftHandWeapon
+    @setvar! mbot_BOT_CurrentLeftHandWeapon mbot_LeftHandWeapon
 endif
 
 
 #####
 ### Taming (crook activation, "all guard me" timer setup)
-if jaseowns_TamerDetected = 1
+if mbot_TamerDetected = 1
 
     if not varexist mbot_activeCrook
         @setvar! mbot_activeCrook 0
@@ -349,21 +349,21 @@ if jaseowns_TamerDetected = 1
             @setvar! mconfig_Taming_SayAllGuardTimerCD 9000
         endif
 
-        if not timerexists jaseowns_Tamer_SayAllGuardTimer
-            settimer jaseowns_Tamer_SayAllGuardTimer mconfig_Taming_SayAllGuardTimerCD
+        if not timerexists mbot_Tamer_SayAllGuardTimer
+            settimer mbot_Tamer_SayAllGuardTimer mconfig_Taming_SayAllGuardTimerCD
         endif
 
     endif
 
 endif
 
-@setvar! jaseowns_BandageTimerCD 20000
-if not timerexists jaseowns_BandageTimer
-    settimer jaseowns_BandageTimer jaseowns_BandageTimerCD
+@setvar! mbot_BandageTimerCD 20000
+if not timerexists mbot_BandageTimer
+    settimer mbot_BandageTimer mbot_BandageTimerCD
 endif
 
 
-@setvar! jaseowns_RedPouchCountTotal 0
+@setvar! mbot_RedPouchCountTotal 0
 
 
 while not dead
@@ -374,16 +374,16 @@ while not dead
 
     // Handle manual bandage
     while insysmsg "You begin applying" or insysmsg "You begin using veterinary supplies"
-        settimer jaseowns_BandageTimer 0
+        settimer mbot_BandageTimer 0
     endwhile
 
     // Reset the timer if we finished
     while insysmsg "You finish applying" or insysmsg "You heal what little" or insysmsg "barely help" or insysmsg "You fail to resurrect" or insysmsg "You are able to resurrect" or insysmsg "You finish using veterinary supplies" or insysmsg "You or your nearby followers do not require healing"
-        settimer jaseowns_BandageTimer jaseowns_BandageTimerCD
+        settimer mbot_BandageTimer mbot_BandageTimerCD
     endwhile
     
     if skill "Healing" > 0 and findtype 3617 self 
-        if timer jaseowns_BandageTimer >= jaseowns_BandageTimerCD and not targetexists
+        if timer mbot_BandageTimer >= mbot_BandageTimerCD and not targetexists
             // and not queued
             if poisoned or findbuff "disease" or findbuff "bleed"
                 hotkey "Bandage Self"
@@ -394,55 +394,55 @@ while not dead
             elseif diffhits > mconfig_Healing_AutoBandageHpDiffTrigger 
                 hotkey "Bandage Self"
             endif
-            getlabel backpack jaseowns_PingCheck
+            getlabel backpack mbot_PingCheck
             if insysmsg "You begin applying"
-                settimer jaseowns_BandageTimer 0
+                settimer mbot_BandageTimer 0
             endif
         endif
     endif
     
-    if mconfig_Thief_AlertRedPouchPop = 1 and counttype 3705 backpack 38 as jaseowns_RedPouchCount
-        if jaseowns_RedPouchCountTotal != 0 and jaseowns_RedPouchCountTotal != jaseowns_RedPouchCount
+    if mconfig_Thief_AlertRedPouchPop = 1 and counttype 3705 backpack 38 as mbot_RedPouchCount
+        if mbot_RedPouchCountTotal != 0 and mbot_RedPouchCountTotal != mbot_RedPouchCount
             overhead "Warning: THIEF we lost a pouch!" 34
         else
-            @setvar! jaseowns_RedPouchCountTotal jaseowns_RedPouchCount    
+            @setvar! mbot_RedPouchCountTotal mbot_RedPouchCount    
         endif
     endif
 
     if casting 
-        settimer jaseowns_UseItemTimer 0
+        settimer mbot_UseItemTimer 0
     endif
 
-    if not queued and find jaseowns_BOT_CurrentRightHandWeapon backpack and timer jaseowns_UseItemTimer >= jaseowns_UseItemTimerCD
-        if findlayer self righthand as jaseowns_RightHandWeapon
-            @setvar! jaseowns_BOT_CurrentRightHandWeapon jaseowns_RightHandWeapon
+    if not queued and find mbot_BOT_CurrentRightHandWeapon backpack and timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+        if findlayer self righthand as mbot_RightHandWeapon
+            @setvar! mbot_BOT_CurrentRightHandWeapon mbot_RightHandWeapon
         else
-            dclick jaseowns_BOT_CurrentRightHandWeapon
-            settimer jaseowns_UseItemTimer 0
+            dclick mbot_BOT_CurrentRightHandWeapon
+            settimer mbot_UseItemTimer 0
         endif
-    elseif not queued and find jaseowns_BOT_CurrentLeftHandWeapon backpack and timer jaseowns_UseItemTimer >= jaseowns_UseItemTimerCD
-        if findlayer self lefthand as jaseowns_LeftHandWeapon
-            @setvar! jaseowns_BOT_CurrentLeftHandWeapon jaseowns_LeftHandWeapon
+    elseif not queued and find mbot_BOT_CurrentLeftHandWeapon backpack and timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+        if findlayer self lefthand as mbot_LeftHandWeapon
+            @setvar! mbot_BOT_CurrentLeftHandWeapon mbot_LeftHandWeapon
         else
-            dclick jaseowns_BOT_CurrentLeftHandWeapon
-            settimer jaseowns_UseItemTimer 0
+            dclick mbot_BOT_CurrentLeftHandWeapon
+            settimer mbot_UseItemTimer 0
         endif
     endif
     
-    if jaseowns_TamerDetected = 1
+    if mbot_TamerDetected = 1
         if mconfig_Taming_SayAllGuard = 1 and followers > 0
-            if timer jaseowns_Tamer_SayAllGuardTimer >= mconfig_Taming_SayAllGuardTimerCD
+            if timer mbot_Tamer_SayAllGuardTimer >= mconfig_Taming_SayAllGuardTimerCD
                 say "all guard me" 89
-                settimer jaseowns_Tamer_SayAllGuardTimer 0
+                settimer mbot_Tamer_SayAllGuardTimer 0
             endif
         endif
     endif
     if skill "Poisoning" >= 50 and mconfig_Poison_AutomaticallyApply = 1
-        if counttype 3850 jaseowns_PotionSatchel or counttype 3850 backpack
+        if counttype 3850 mbot_PotionSatchel or counttype 3850 backpack
             @setvar! weapon_to_poison 0
-            if findlayer self righthand as jaseowns_RightHandWeapon
-                @setvar! weapon_to_poison jaseowns_RightHandWeapon
-                @setvar! jaseowns_BOT_CurrentRightHandWeapon jaseowns_RightHandWeapon
+            if findlayer self righthand as mbot_RightHandWeapon
+                @setvar! weapon_to_poison mbot_RightHandWeapon
+                @setvar! mbot_BOT_CurrentRightHandWeapon mbot_RightHandWeapon
             endif
             if weapon_to_poison != 0
                 getlabel weapon_to_poison weapon_to_poisonDesc
@@ -483,17 +483,17 @@ while not dead
         endif
     endif
 
-    if varexist mconfig_Weight_GoldToDropIfOverweight and weight > maxweight and timer jaseowns_UseItemTimer >= jaseowns_UseItemTimerCD
+    if varexist mconfig_Weight_GoldToDropIfOverweight and weight > maxweight and timer mbot_UseItemTimer >= mbot_UseItemTimerCD
         if findtype "gold coin" backpack as item
             while insysmsg "cannot drop anything"
             endwhile
             lift item mconfig_Weight_GoldToDropIfOverweight
             droprelloc 0 0
-            getlabel backpack jaseowns_PingCheck
+            getlabel backpack mbot_PingCheck
             if insysmsg "cannot drop anything"
                 drop backpack -1 -1 -1
             endif
-            settimer jaseowns_UseItemTimer 0
+            settimer mbot_UseItemTimer 0
         else
             overhead "We are overweight and cannot drop anything" 34
         endif
@@ -501,100 +501,100 @@ while not dead
     
     if mconfig_Potion_ShowOverheads = 1
     
-        if timer jaseowns_Potion_Cure_Overhead_IfCountIsLessThan_Timer >= mconfig_Potion_CureOverheadIfCountIsLessThanTimerCD
-            @setvar! jaseowns_BOT_CurePotionCount 0
-            if counttype 3847 jaseowns_PotionSatchel as jaseowns_TempPotionCount
-                @setvar! jaseowns_BOT_CurePotionCount jaseowns_TempPotionCount
-            elseif counttype 3847 backpack as jaseowns_TempPotionCount
-                @setvar! jaseowns_BOT_CurePotionCount jaseowns_TempPotionCount
+        if timer mbot_Potion_Cure_Overhead_IfCountIsLessThan_Timer >= mconfig_Potion_CureOverheadIfCountIsLessThanTimerCD
+            @setvar! mbot_BOT_CurePotionCount 0
+            if counttype 3847 mbot_PotionSatchel as mbot_TempPotionCount
+                @setvar! mbot_BOT_CurePotionCount mbot_TempPotionCount
+            elseif counttype 3847 backpack as mbot_TempPotionCount
+                @setvar! mbot_BOT_CurePotionCount mbot_TempPotionCount
             endif
-            if jaseowns_BOT_CurePotionCount < mconfig_Potion_CureOverheadIfCountIsLessThan
-                if jaseowns_BOT_CurePotionCount = 0
+            if mbot_BOT_CurePotionCount < mconfig_Potion_CureOverheadIfCountIsLessThan
+                if mbot_BOT_CurePotionCount = 0
                     overhead "Cure: Out of cures" 34
                 else
-                    overhead "Cures Remaining: {{jaseowns_BOT_CurePotionCount}}"
+                    overhead "Cures Remaining: {{mbot_BOT_CurePotionCount}}"
                 endif
             endif
-            settimer jaseowns_Potion_Cure_Overhead_IfCountIsLessThan_Timer 0
+            settimer mbot_Potion_Cure_Overhead_IfCountIsLessThan_Timer 0
         endif
         
-        if timer jaseowns_Potion_Heal_Overhead_IfCountIsLessThan_Timer >= mconfig_Potion_HealOverheadIfCountIsLessThanTimerCD
-            @setvar! jaseowns_BOT_HealPotionCount 0
-            if counttype 3852 jaseowns_PotionSatchel as jaseowns_TempPotionCount
-                @setvar! jaseowns_BOT_HealPotionCount jaseowns_TempPotionCount
-            elseif counttype 3852 backpack as jaseowns_TempPotionCount
-                @setvar! jaseowns_BOT_HealPotionCount jaseowns_TempPotionCount
+        if timer mbot_Potion_Heal_Overhead_IfCountIsLessThan_Timer >= mconfig_Potion_HealOverheadIfCountIsLessThanTimerCD
+            @setvar! mbot_BOT_HealPotionCount 0
+            if counttype 3852 mbot_PotionSatchel as mbot_TempPotionCount
+                @setvar! mbot_BOT_HealPotionCount mbot_TempPotionCount
+            elseif counttype 3852 backpack as mbot_TempPotionCount
+                @setvar! mbot_BOT_HealPotionCount mbot_TempPotionCount
             endif
-            if jaseowns_BOT_HealPotionCount < mconfig_Potion_HealOverheadIfCountIsLessThan
-                if jaseowns_BOT_HealPotionCount = 0
+            if mbot_BOT_HealPotionCount < mconfig_Potion_HealOverheadIfCountIsLessThan
+                if mbot_BOT_HealPotionCount = 0
                     overhead "Heal: Out of heals" 34
                 else
-                    overhead "Heal Remaining: {{jaseowns_BOT_HealPotionCount}}"
+                    overhead "Heal Remaining: {{mbot_BOT_HealPotionCount}}"
                 endif
             endif
-            settimer jaseowns_Potion_Heal_Overhead_IfCountIsLessThan_Timer 0
+            settimer mbot_Potion_Heal_Overhead_IfCountIsLessThan_Timer 0
         endif
         
-        if timer jaseowns_Potion_Explosion_Overhead_IfCountIsLessThan_Timer >= mconfig_Potion_ExplosionOverheadIfCountIsLessThanTimerCD
-            @setvar! jaseowns_BOT_ExplosionPotionCount 0
-            if counttype 3853 jaseowns_PotionSatchel as jaseowns_TempPotionCount
-                @setvar! jaseowns_BOT_ExplosionPotionCount jaseowns_TempPotionCount
-            elseif counttype 3853 backpack as jaseowns_TempPotionCount
-                @setvar! jaseowns_BOT_ExplosionPotionCount jaseowns_TempPotionCount
+        if timer mbot_Potion_Explosion_Overhead_IfCountIsLessThan_Timer >= mconfig_Potion_ExplosionOverheadIfCountIsLessThanTimerCD
+            @setvar! mbot_BOT_ExplosionPotionCount 0
+            if counttype 3853 mbot_PotionSatchel as mbot_TempPotionCount
+                @setvar! mbot_BOT_ExplosionPotionCount mbot_TempPotionCount
+            elseif counttype 3853 backpack as mbot_TempPotionCount
+                @setvar! mbot_BOT_ExplosionPotionCount mbot_TempPotionCount
             endif
-            if jaseowns_BOT_ExplosionPotionCount < mconfig_Potion_ExplosionOverheadIfCountIsLessThan
-                if jaseowns_BOT_ExplosionPotionCount = 0
+            if mbot_BOT_ExplosionPotionCount < mconfig_Potion_ExplosionOverheadIfCountIsLessThan
+                if mbot_BOT_ExplosionPotionCount = 0
                     overhead "Explosion: Out of explosions" 34
                 else
-                    overhead "Explosion Remaining: {{jaseowns_BOT_ExplosionPotionCount}}"
+                    overhead "Explosion Remaining: {{mbot_BOT_ExplosionPotionCount}}"
                 endif
             endif
-            settimer jaseowns_Potion_Explosion_Overhead_IfCountIsLessThan_Timer 0
+            settimer mbot_Potion_Explosion_Overhead_IfCountIsLessThan_Timer 0
         endif
         
     endif
 
-    if not queued and not findbuff "food" and findtype "tray" backpack as jaseowns_FoodItem
-        if timer jaseowns_UseItemTimer >= jaseowns_UseItemTimerCD
-            dclick jaseowns_FoodItem
-            settimer jaseowns_UseItemTimer 0
+    if not queued and not findbuff "food" and findtype "tray" backpack as mbot_FoodItem
+        if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+            dclick mbot_FoodItem
+            settimer mbot_UseItemTimer 0
         endif
     endif
     
-    if mconfig_Potion_HasPanacea = 1 and timer jaseowns_UsePanaceaTimer >= jaseowns_UsePanaceaTimerCD
+    if mconfig_Potion_HasPanacea = 1 and timer mbot_UsePanaceaTimer >= mbot_UsePanaceaTimerCD
         if findbuff "bleed" or findbuff "disease"
-            if findtype 3847 self 0 as jaseowns_UseItem
-                dclick jaseowns_UseItem
-                cooldown "Panacea" jaseowns_UsePanaceaTimerCD
-                settimer jaseowns_UsePanaceaTimer 0
+            if findtype 3847 self 0 as mbot_UseItem
+                dclick mbot_UseItem
+                cooldown "Panacea" mbot_UsePanaceaTimerCD
+                settimer mbot_UsePanaceaTimer 0
             endif
         endif
     endif
     
     # Potions
-    if not queued and mconfig_Potion_UseCureAutomatically = 1 and poisoned and diffhits >= mconfig_Potion_CureHpDiffTrigger and findtype 3847 self as jaseowns_Potion
-        if timer jaseowns_UseItemTimer >= jaseowns_UseItemTimerCD
-            dclick jaseowns_Potion
-            settimer jaseowns_UseItemTimer 0
+    if not queued and mconfig_Potion_UseCureAutomatically = 1 and poisoned and diffhits >= mconfig_Potion_CureHpDiffTrigger and findtype 3847 self as mbot_Potion
+        if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+            dclick mbot_Potion
+            settimer mbot_UseItemTimer 0
         endif
     endif
     
-    if mconfig_Potion_UseHealAutomatically = 1 and diffhits >= mconfig_Potion_HealHpDiffTrigger and findtype 3852 self as jaseowns_Potion
-        if timer jaseowns_UseItemTimer >= jaseowns_UseItemTimerCD
-            getlabel jaseowns_Potion jaseowns_PotionDesc
-            if "next usable in" in jaseowns_PotionDesc
+    if mconfig_Potion_UseHealAutomatically = 1 and diffhits >= mconfig_Potion_HealHpDiffTrigger and findtype 3852 self as mbot_Potion
+        if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+            getlabel mbot_Potion mbot_PotionDesc
+            if "next usable in" in mbot_PotionDesc
                 // do nothing
             else
-                dclick jaseowns_Potion
-                settimer jaseowns_UseItemTimer 0
+                dclick mbot_Potion
+                settimer mbot_UseItemTimer 0
             endif
         endif
     endif
 
-    if not queued and mconfig_Potion_UseRefreshAutomatically = 1 and diffstam >= mconfig_Potion_RefreshStamDiffTrigger and findtype 3851 self as jaseowns_Potion
-        if timer jaseowns_UseItemTimer >= jaseowns_UseItemTimerCD
-            dclick jaseowns_Potion
-            settimer jaseowns_UseItemTimer 0
+    if not queued and mconfig_Potion_UseRefreshAutomatically = 1 and diffstam >= mconfig_Potion_RefreshStamDiffTrigger and findtype 3851 self as mbot_Potion
+        if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+            dclick mbot_Potion
+            settimer mbot_UseItemTimer 0
         endif
     endif
     
@@ -602,25 +602,25 @@ while not dead
     if paralyzed and not queued 
         if findtype "pouch" backpack 38 
             yell "[pouch"
-            getlabel backpack jaseowns_PingCheck
+            getlabel backpack mbot_PingCheck
         else
             overhead "Out of Pouches!" 34
         endif
     endif
 
-    if not queued and mconfig_Skinning_UseKnifeAutomatically = 1 and findtype 11552 backpack as jaseowns_SkinningKnife
+    if not queued and mconfig_Skinning_UseKnifeAutomatically = 1 and findtype 11552 backpack as mbot_SkinningKnife
         if findbuff "Actively Meditating"
             //do nothing
-        elseif findtype 8198 ground -1 -1 2 as jaseowns_Corpse
+        elseif findtype 8198 ground -1 -1 2 as mbot_Corpse
             while not targetexists 
-                dclick jaseowns_SkinningKnife
+                dclick mbot_SkinningKnife
                 wft 500
             endwhile
             while targetexists 
                 hotkey "Target Self"
-                getlabel backpack jaseowns_PingCheck
+                getlabel backpack mbot_PingCheck
             endwhile
-            @ignore jaseowns_Corpse
+            @ignore mbot_Corpse
         endif
     endif
     
@@ -630,7 +630,7 @@ while not dead
             endwhile
             while not gumpexists 4267467659
                 useskill 'tracking'
-                getlabel backpack jaseowns_PingCheck
+                getlabel backpack mbot_PingCheck
             endwhile
             if gumpexists 4267467659
                 while not insysmsg "You will now hunt all hostile players."
@@ -638,102 +638,102 @@ while not dead
                     waitforgump 4267467659 5000
                 endwhile
                 gumpresponse 6 4267467659
-                getlabel backpack jaseowns_PingCheck
+                getlabel backpack mbot_PingCheck
             endif
             gumpclose 4267467659
         endif
     endif
     
-    if mconfig_Vet_UseKitsAutomatically = 1 and findtype 25750 backpack 0 as jaseowns_VetSupply
-        if timer jaseowns_VET_UseVetSuppliesTimer >= mconfig_Vet_UseSuppliesTimerCD or hp < maxhp
-            if timer jaseowns_UseItemTimer >= jaseowns_UseItemTimerCD and timer jaseowns_BandageTimer >= jaseowns_BandageTimerCD
+    if mconfig_Vet_UseKitsAutomatically = 1 and findtype 25750 backpack 0 as mbot_VetSupply
+        if timer mbot_VET_UseVetSuppliesTimer >= mconfig_Vet_UseSuppliesTimerCD or hp < maxhp
+            if timer mbot_UseItemTimer >= mbot_UseItemTimerCD and timer mbot_BandageTimer >= mbot_BandageTimerCD
                 while insysmsg "You begin using veterinary supplies" or insysmsg "You or your nearby followers do not require healing"
                 endwhile
-                dclick jaseowns_VetSupply
-                settimer jaseowns_UseItemTimer 0
-                getlabel backpack jaseowns_PingCheck
+                dclick mbot_VetSupply
+                settimer mbot_UseItemTimer 0
+                getlabel backpack mbot_PingCheck
                 if insysmsg "You begin using veterinary supplies"
                     cooldown "Use Vet Supply" mconfig_Vet_UseSuppliesTimerCD
-                    settimer jaseowns_VET_UseVetSuppliesTimer 0
-                    settimer jaseowns_BandageTimer 0
+                    settimer mbot_VET_UseVetSuppliesTimer 0
+                    settimer mbot_BandageTimer 0
                 elseif insysmsg "You or your nearby followers do not require healing"
                     cooldown "Use Vet Supply" mconfig_Vet_UseSuppliesTimerCD
-                    settimer jaseowns_VET_UseVetSuppliesTimer 0
+                    settimer mbot_VET_UseVetSuppliesTimer 0
                 endif
             endif
         endif
     endif
     
-    if timer jaseowns_Chiv_SymbolCheckTimer >= jaseowns_Chiv_SymbolCheckTimerCD
+    if timer mbot_Chiv_SymbolCheckTimer >= mbot_Chiv_SymbolCheckTimerCD
         if not gumpexists 1387930325 and skill "chivalry" >= 50
             say '[chivalryhotbar'
             waitforgump 1387930325 500
         endif
         if gumpexists 1387930325
             if cooldown PVP
-                unsetvar jaseowns_HolySymbols
+                unsetvar mbot_HolySymbols
             elseif ingump "21/" 1387930325 or ingump "20/" 1387930325 or ingump "19/" 1387930325 or ingump "18/" 1387930325 or ingump "17/" 1387930325 or ingump "16/" 1387930325 or ingump "15/" 1387930325 or ingump "14/" 1387930325 or ingump "13/" 1387930325 or ingump "12/" 1387930325
                 # 12+ symbols is always enough for these heals - cap here instead of tracking the exact count
-                @setvar! jaseowns_HolySymbols 12
+                @setvar! mbot_HolySymbols 12
             elseif ingump "11/" 1387930325
-                @setvar! jaseowns_HolySymbols 11
+                @setvar! mbot_HolySymbols 11
             elseif ingump "10/" 1387930325
-                @setvar! jaseowns_HolySymbols 10
+                @setvar! mbot_HolySymbols 10
             elseif ingump "9/" 1387930325
-                @setvar! jaseowns_HolySymbols 9
+                @setvar! mbot_HolySymbols 9
             elseif ingump "8/" 1387930325
-                @setvar! jaseowns_HolySymbols 8
+                @setvar! mbot_HolySymbols 8
             elseif ingump "7/" 1387930325
-                @setvar! jaseowns_HolySymbols 7
+                @setvar! mbot_HolySymbols 7
             elseif ingump "6/" 1387930325
-                @setvar! jaseowns_HolySymbols 6
+                @setvar! mbot_HolySymbols 6
             elseif ingump "5/" 1387930325
-                @setvar! jaseowns_HolySymbols 5
+                @setvar! mbot_HolySymbols 5
             elseif ingump "4/" 1387930325
-                @setvar! jaseowns_HolySymbols 4
+                @setvar! mbot_HolySymbols 4
             elseif ingump "3/" 1387930325
-                @setvar! jaseowns_HolySymbols 3
+                @setvar! mbot_HolySymbols 3
             elseif ingump "2/" 1387930325
-                @setvar! jaseowns_HolySymbols 2
+                @setvar! mbot_HolySymbols 2
             elseif ingump "1/" 1387930325
-                @setvar! jaseowns_HolySymbols 1
+                @setvar! mbot_HolySymbols 1
             elseif ingump "0/" 1387930325
-                @setvar! jaseowns_HolySymbols 0
+                @setvar! mbot_HolySymbols 0
             endif
         endif
-        settimer jaseowns_Chiv_SymbolCheckTimer 0
+        settimer mbot_Chiv_SymbolCheckTimer 0
     endif
 
     ##### Chivalry Gate A - Noble Sacrifice / Holy Light (emergency heals, no reserve)
-    if varexist jaseowns_HolySymbols
+    if varexist mbot_HolySymbols
 
-        @setvar! jaseowns_BOT_UseNobleSacrifice 0
-        if mconfig_Chiv_UseNobleSacrificeAutomatically = 1 and skill "chivalry" >= 80 and timer jaseowns_NobleSacrificeTimer >= jaseowns_NobleSacrificeTimerCD
-            if mconfig_Chiv_MinSymbolsNobleSacrifice <= jaseowns_HolySymbols
+        @setvar! mbot_BOT_UseNobleSacrifice 0
+        if mconfig_Chiv_UseNobleSacrificeAutomatically = 1 and skill "chivalry" >= 80 and timer mbot_NobleSacrificeTimer >= mbot_NobleSacrificeTimerCD
+            if mconfig_Chiv_MinSymbolsNobleSacrifice <= mbot_HolySymbols
                 if not varexist mconfig_Chiv_AutoUseNobleSacrificeHpDiffTrigger
                     if hp <= 30
-                        @setvar! jaseowns_BOT_UseNobleSacrifice 1
+                        @setvar! mbot_BOT_UseNobleSacrifice 1
                     endif
                 elseif diffhits >= mconfig_Chiv_AutoUseNobleSacrificeHpDiffTrigger
-                    @setvar! jaseowns_BOT_UseNobleSacrifice 1
+                    @setvar! mbot_BOT_UseNobleSacrifice 1
                 endif
             endif
         endif
 
-        @setvar! jaseowns_BOT_UseHolyLight 0
-        if mconfig_Chiv_UseHolyLightAutomatically = 1 and skill "chivalry" >= 95 and timer jaseowns_HolyLightTimer >= jaseowns_HolyLightTimerCD
-            if mconfig_Chiv_MinSymbolsHolyLight <= jaseowns_HolySymbols
+        @setvar! mbot_BOT_UseHolyLight 0
+        if mconfig_Chiv_UseHolyLightAutomatically = 1 and skill "chivalry" >= 95 and timer mbot_HolyLightTimer >= mbot_HolyLightTimerCD
+            if mconfig_Chiv_MinSymbolsHolyLight <= mbot_HolySymbols
                 if not varexist mconfig_Chiv_AutoHolyLightHpDiffTrigger
                     if hp <= 20
-                        @setvar! jaseowns_BOT_UseHolyLight 1
+                        @setvar! mbot_BOT_UseHolyLight 1
                     endif
                 elseif diffhits >= mconfig_Chiv_AutoHolyLightHpDiffTrigger
-                    @setvar! jaseowns_BOT_UseHolyLight 1
+                    @setvar! mbot_BOT_UseHolyLight 1
                 endif
             endif
         endif
 
-        if jaseowns_BOT_UseNobleSacrifice = 1
+        if mbot_BOT_UseNobleSacrifice = 1
 
             if targetexists
                 hotkey "Clear Current Target"
@@ -745,12 +745,12 @@ while not dead
                 while insysmsg "Holy symbols remaining"
                 endwhile
                 hotkey "Target Self"
-                getlabel backpack jaseowns_PingCheck
+                getlabel backpack mbot_PingCheck
                 if not targetexists
                     if insysmsg "Holy symbols remaining"
-                        cooldown "Noble Sacrifice" jaseowns_NobleSacrificeTimerCD
-                        settimer jaseowns_NobleSacrificeTimer 0
-                        settimer jaseowns_Chiv_SymbolCheckTimer jaseowns_Chiv_SymbolCheckTimerCD
+                        cooldown "Noble Sacrifice" mbot_NobleSacrificeTimerCD
+                        settimer mbot_NobleSacrificeTimer 0
+                        settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
                     endif
                 else
                     hotkey "Cancel Current Target"
@@ -760,81 +760,81 @@ while not dead
                 while insysmsg "You begin applying"
                 endwhile
                 hotkey "Bandage Self"
-                getlabel backpack jaseowns_PingCheck
+                getlabel backpack mbot_PingCheck
                 if insysmsg "You begin applying"
-                    settimer jaseowns_BandageTimer 0
+                    settimer mbot_BandageTimer 0
                 endif
             endif            
-        elseif jaseowns_BOT_UseHolyLight = 1
+        elseif mbot_BOT_UseHolyLight = 1
             while insysmsg "Holy symbols remaining"
             endwhile
             say "[HolyLight"
-            getlabel backpack jaseowns_PingCheck
+            getlabel backpack mbot_PingCheck
             if insysmsg "Holy symbols remaining"
-                cooldown "Holy Light" jaseowns_HolyLightTimerCD
-                settimer jaseowns_HolyLightTimer 0
-                settimer jaseowns_Chiv_SymbolCheckTimer jaseowns_Chiv_SymbolCheckTimerCD
+                cooldown "Holy Light" mbot_HolyLightTimerCD
+                settimer mbot_HolyLightTimer 0
+                settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
             endif
         endif
 
     endif
 
     ##### Chivalry Gate B - Close Wounds / Cleanse By Fire (respects reserve)
-    if varexist jaseowns_HolySymbols
+    if varexist mbot_HolySymbols
 
-        @setvar! jaseowns_BOT_UseCloseWounds 0
+        @setvar! mbot_BOT_UseCloseWounds 0
         if findbuff "disease" or findbuff "bleed"
-            if mconfig_Chiv_UseCloseWoundsAutomatically = 1 and mconfig_Chiv_MinSymbolsCloseWounds <= jaseowns_HolySymbols and skill "chivalry" >= 70 and timer jaseowns_CloseWoundsTimer >= jaseowns_CloseWoundsTimerCD
+            if mconfig_Chiv_UseCloseWoundsAutomatically = 1 and mconfig_Chiv_MinSymbolsCloseWounds <= mbot_HolySymbols and skill "chivalry" >= 70 and timer mbot_CloseWoundsTimer >= mbot_CloseWoundsTimerCD
                 if not varexist mconfig_Chiv_AutoCloseWoundHpDiffTrigger
                     if diffhits >= 5
-                        @setvar! jaseowns_BOT_UseCloseWounds 1
+                        @setvar! mbot_BOT_UseCloseWounds 1
                     endif
                 elseif diffhits >= mconfig_Chiv_AutoCloseWoundHpDiffTrigger
-                    @setvar! jaseowns_BOT_UseCloseWounds 1
+                    @setvar! mbot_BOT_UseCloseWounds 1
                 endif
             endif
         endif
 
-        @setvar! jaseowns_BOT_UseCleanseByFire 0
-        if poisoned and mconfig_Chiv_UseCleanseByFireAutomatically = 1 and mconfig_Chiv_MinSymbolsCleanseByFire <= jaseowns_HolySymbols and skill "chivalry" >= 60 and timer jaseowns_CleanseByFireTimer >= jaseowns_CleanseByFireTimerCD
-            @setvar! jaseowns_BOT_UseCleanseByFire 1
+        @setvar! mbot_BOT_UseCleanseByFire 0
+        if poisoned and mconfig_Chiv_UseCleanseByFireAutomatically = 1 and mconfig_Chiv_MinSymbolsCleanseByFire <= mbot_HolySymbols and skill "chivalry" >= 60 and timer mbot_CleanseByFireTimer >= mbot_CleanseByFireTimerCD
+            @setvar! mbot_BOT_UseCleanseByFire 1
         endif
 
-        if jaseowns_BOT_UseCloseWounds = 1
+        if mbot_BOT_UseCloseWounds = 1
             while insysmsg "Holy symbols remaining"
             endwhile
             say "[CloseWounds"
-            getlabel backpack jaseowns_PingCheck
+            getlabel backpack mbot_PingCheck
             if insysmsg "Holy symbols remaining"
-                cooldown "Close Wounds" jaseowns_CloseWoundsTimerCD
-                settimer jaseowns_CloseWoundsTimer 0
-                settimer jaseowns_Chiv_SymbolCheckTimer jaseowns_Chiv_SymbolCheckTimerCD
+                cooldown "Close Wounds" mbot_CloseWoundsTimerCD
+                settimer mbot_CloseWoundsTimer 0
+                settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
             endif
-        elseif jaseowns_BOT_UseCleanseByFire = 1
+        elseif mbot_BOT_UseCleanseByFire = 1
             while insysmsg "Holy symbols remaining"
             endwhile
             say "[CleanseByFire"
-            getlabel backpack jaseowns_PingCheck
+            getlabel backpack mbot_PingCheck
             if insysmsg "Holy symbols remaining"
-                cooldown "Cleanse By Fire" jaseowns_CleanseByFireTimerCD
-                settimer jaseowns_CleanseByFireTimer 0
-                settimer jaseowns_Chiv_SymbolCheckTimer jaseowns_Chiv_SymbolCheckTimerCD
+                cooldown "Cleanse By Fire" mbot_CleanseByFireTimerCD
+                settimer mbot_CleanseByFireTimer 0
+                settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
             endif
         endif
 
     endif
 
-    @setvar! jaseowns_CurrentBotTargetAttacked 0
+    @setvar! mbot_CurrentBotTargetAttacked 0
 
     
     if mconfig_Bot_FightAutoTarget = 1
-        @setvar! jaseowns_BOT_FIGHT 0
+        @setvar! mbot_BOT_FIGHT 0
         if mconfig_Bot_FightInPeaceMode = 1
             if not warmode
-                @setvar! jaseowns_BOT_FIGHT 1
+                @setvar! mbot_BOT_FIGHT 1
             endif
         elseif warmode
-            @setvar! jaseowns_BOT_FIGHT 1
+            @setvar! mbot_BOT_FIGHT 1
         endif
     else
         
@@ -843,11 +843,11 @@ while not dead
             while targetexists 
                 wait 50
             endwhile
-            getlabel backpack jaseowns_PingCheck
+            getlabel backpack mbot_PingCheck
             if insysmsg "Last Target set."
                 overhead "New target selected!" 89 lasttarget
-                @setvar! jaseowns_CurrentBotTarget lasttarget 
-                @setvar! jaseowns_BOT_FIGHT 1
+                @setvar! mbot_CurrentBotTarget lasttarget 
+                @setvar! mbot_BOT_FIGHT 1
             endif
         endif
     
@@ -855,164 +855,164 @@ while not dead
             while insysmsg "New Target Set"
             endwhile
             overhead "New target selected!" 89 lasttarget
-            @setvar! jaseowns_CurrentBotTarget lasttarget 
-            @setvar! jaseowns_BOT_FIGHT 1
+            @setvar! mbot_CurrentBotTarget lasttarget 
+            @setvar! mbot_BOT_FIGHT 1
         endif
         
-        if dead jaseowns_CurrentBotTarget
-            @setvar! jaseowns_BOT_FIGHT 0
+        if dead mbot_CurrentBotTarget
+            @setvar! mbot_BOT_FIGHT 0
         endif
     endif
 
-    if jaseowns_BOT_FIGHT = 1 and not cooldown PVP
+    if mbot_BOT_FIGHT = 1 and not cooldown PVP
         
         if insysmsg "Target a new 'Last Target'"
             overhead "Set your target"
             while targetexists 
                 wait 50
             endwhile
-            getlabel backpack jaseowns_PingCheck
+            getlabel backpack mbot_PingCheck
             if insysmsg "Last Target set."
                 overhead "New target selected!" 89 lasttarget
-                @setvar! jaseowns_CurrentBotTarget lasttarget 
+                @setvar! mbot_CurrentBotTarget lasttarget 
             endif
         endif
         
         // do fighting
-        if not find jaseowns_CurrentBotTarget and mconfig_Bot_FightAutoTarget = 1
-            @setvar! jaseowns_BARD_PROVO_COUNTER 0
+        if not find mbot_CurrentBotTarget and mconfig_Bot_FightAutoTarget = 1
+            @setvar! mbot_BARD_PROVO_COUNTER 0
             hotkey "target closest non-friendly monster"
-            @setvar! jaseowns_LastBotTarget lasttarget 
-            if jaseowns_CurrentBotTarget != jaseowns_LastBotTarget
-                @setvar! jaseowns_CurrentBotTarget jaseowns_LastBotTarget
+            @setvar! mbot_LastBotTarget lasttarget 
+            if mbot_CurrentBotTarget != mbot_LastBotTarget
+                @setvar! mbot_CurrentBotTarget mbot_LastBotTarget
             endif
         endif
         
-        if not dead jaseowns_CurrentBotTarget
-            if noto jaseowns_CurrentBotTarget = "friend" or noto jaseowns_CurrentBotTarget = "innocent" or noto jaseowns_CurrentBotTarget = "invulnerable"
-                @setvar! jaseowns_CurrentBotTarget 0
-            elseif noto jaseowns_CurrentBotTarget = "murderer" or noto jaseowns_CurrentBotTarget = "enemy"
+        if not dead mbot_CurrentBotTarget
+            if noto mbot_CurrentBotTarget = "friend" or noto mbot_CurrentBotTarget = "innocent" or noto mbot_CurrentBotTarget = "invulnerable"
+                @setvar! mbot_CurrentBotTarget 0
+            elseif noto mbot_CurrentBotTarget = "murderer" or noto mbot_CurrentBotTarget = "enemy"
                 // figure out if we want to change this
-                //@setvar! jaseowns_CurrentBotTarget 0
-            elseif noto jaseowns_CurrentBotTarget = "hostile" or noto jaseowns_CurrentBotTarget = "criminal"
+                //@setvar! mbot_CurrentBotTarget 0
+            elseif noto mbot_CurrentBotTarget = "hostile" or noto mbot_CurrentBotTarget = "criminal"
                 // good to go
             else
-                @setvar! jaseowns_CurrentBotTarget 0
+                @setvar! mbot_CurrentBotTarget 0
             endif
         endif
         
         # TODO: handle hidden mobs
-        if not dead jaseowns_CurrentBotTarget
+        if not dead mbot_CurrentBotTarget
             
         
-            if timer jaseowns_CurrentBotTargetOverheadTimer >= mconfig_Target_CurrentOverheadTimerCD and listexists mconfig_Target_CurrentOverheadText
-                foreach jaseowns_Overhead in mconfig_Target_CurrentOverheadText
-                    if find jaseowns_CurrentBotTarget
-                        overhead jaseowns_Overhead mconfig_Target_CurrentOverheadHue jaseowns_CurrentBotTarget
+            if timer mbot_CurrentBotTargetOverheadTimer >= mconfig_Target_CurrentOverheadTimerCD and listexists mconfig_Target_CurrentOverheadText
+                foreach mbot_Overhead in mconfig_Target_CurrentOverheadText
+                    if find mbot_CurrentBotTarget
+                        overhead mbot_Overhead mconfig_Target_CurrentOverheadHue mbot_CurrentBotTarget
                     endif
                 endfor
-                settimer jaseowns_CurrentBotTargetOverheadTimer 0
+                settimer mbot_CurrentBotTargetOverheadTimer 0
             endif
 
-            if find jaseowns_CurrentBotTarget ground -1 -1 jaseowns_FightingRangeCheck
+            if find mbot_CurrentBotTarget ground -1 -1 mbot_FightingRangeCheck
                 
                 for 3
-                    if dead jaseowns_CurrentBotTarget
+                    if dead mbot_CurrentBotTarget
                         break
                     endif
-                    getlabel jaseowns_CurrentBotTarget jaseowns_CurrentBotTargetDesc
-                    if "-" in jaseowns_CurrentBotTargetDesc
+                    getlabel mbot_CurrentBotTarget mbot_CurrentBotTargetDesc
+                    if "-" in mbot_CurrentBotTargetDesc
                         // do nothing - try again
                     else
                         break
                     endif
                 endfor
                 
-                @setvar! jaseowns_IgnoreCurrentBotTarget 0
+                @setvar! mbot_IgnoreCurrentBotTarget 0
                 
-                if "(summoned" in jaseowns_CurrentBotTargetDesc or "(bonded" in jaseowns_CurrentBotTargetDesc or "(tame" in jaseowns_CurrentBotTargetDesc
-                    overhead "▼ Player pet - IGNORE ▼" 77 jaseowns_CurrentBotTarget
-                    @setvar! jaseowns_IgnoreCurrentBotTarget 1
+                if "(summoned" in mbot_CurrentBotTargetDesc or "(bonded" in mbot_CurrentBotTargetDesc or "(tame" in mbot_CurrentBotTargetDesc
+                    overhead "▼ Player pet - IGNORE ▼" 77 mbot_CurrentBotTarget
+                    @setvar! mbot_IgnoreCurrentBotTarget 1
                 elseif listexists mconfig_Target_IgnoreMobList
-                    foreach jaseowns_IgnoreMob in mconfig_Target_IgnoreMobList
-                        if jaseowns_IgnoreMob in jaseowns_CurrentBotTargetDesc
-                            if timer jaseowns_IgnoreMobOverheadTimer >= mconfig_Target_IgnoreMobOverheadTimerCD and listexists mconfig_Target_IgnoreMobOverheadText
-                                foreach jaseowns_Overhead in mconfig_Target_IgnoreMobOverheadText
-                                    if find jaseowns_CurrentBotTarget
-                                        overhead jaseowns_Overhead mconfig_Target_IgnoreMobOverheadHue  jaseowns_CurrentBotTarget
+                    foreach mbot_IgnoreMob in mconfig_Target_IgnoreMobList
+                        if mbot_IgnoreMob in mbot_CurrentBotTargetDesc
+                            if timer mbot_IgnoreMobOverheadTimer >= mconfig_Target_IgnoreMobOverheadTimerCD and listexists mconfig_Target_IgnoreMobOverheadText
+                                foreach mbot_Overhead in mconfig_Target_IgnoreMobOverheadText
+                                    if find mbot_CurrentBotTarget
+                                        overhead mbot_Overhead mconfig_Target_IgnoreMobOverheadHue  mbot_CurrentBotTarget
                                     endif
                                 endfor
-                                settimer jaseowns_IgnoreMobOverheadTimer 0
+                                settimer mbot_IgnoreMobOverheadTimer 0
                             endif
-                            @setvar! jaseowns_IgnoreCurrentBotTarget 1
+                            @setvar! mbot_IgnoreCurrentBotTarget 1
                         endif
                     endfor
                 endif
 
-                if jaseowns_IgnoreCurrentBotTarget = 1 or dead jaseowns_CurrentBotTarget
-                    @setvar! jaseowns_CurrentBotTarget 0
+                if mbot_IgnoreCurrentBotTarget = 1 or dead mbot_CurrentBotTarget
+                    @setvar! mbot_CurrentBotTarget 0
                 else
                     
 
-                    attack jaseowns_CurrentBotTarget
+                    attack mbot_CurrentBotTarget
                 
                     if cooldown "Bard Reset"
-                        settimer jaseowns_UsedSkillTimer 5000
+                        settimer mbot_UsedSkillTimer 5000
                         cooldown "Bard Reset" 0
                     endif
                     
-                    @setvar! jaseowns_BOT_TargetPoisoned 0
-                    if "Ticks" in jaseowns_CurrentBotTargetDesc
-                        if "[3" in jaseowns_CurrentBotTargetDesc or "[4" in jaseowns_CurrentBotTargetDesc or "[5" in jaseowns_CurrentBotTargetDesc or "[6" in jaseowns_CurrentBotTargetDesc or "[7" in jaseowns_CurrentBotTargetDesc or "[8" in jaseowns_CurrentBotTargetDesc or "[9" in jaseowns_CurrentBotTargetDesc or "[10" in jaseowns_CurrentBotTargetDesc
-                            @setvar! jaseowns_BOT_TargetPoisoned 1
+                    @setvar! mbot_BOT_TargetPoisoned 0
+                    if "Ticks" in mbot_CurrentBotTargetDesc
+                        if "[3" in mbot_CurrentBotTargetDesc or "[4" in mbot_CurrentBotTargetDesc or "[5" in mbot_CurrentBotTargetDesc or "[6" in mbot_CurrentBotTargetDesc or "[7" in mbot_CurrentBotTargetDesc or "[8" in mbot_CurrentBotTargetDesc or "[9" in mbot_CurrentBotTargetDesc or "[10" in mbot_CurrentBotTargetDesc
+                            @setvar! mbot_BOT_TargetPoisoned 1
                         endif
                     endif
 
                     # TODO: longshot bro
                     if findtype 5117|3920|31184|31186|30993|31172|31169|9917 righthand or findtype 5117|3920|31184|31186|30993 lefthand
-                        @setvar! jaseowns_DynamicRangeCheck 8
+                        @setvar! mbot_DynamicRangeCheck 8
                     elseif findtype 30994|30990|30995|5042 lefthand
-                        @setvar! jaseowns_DynamicRangeCheck 10
+                        @setvar! mbot_DynamicRangeCheck 10
                     else
-                        @setvar! jaseowns_DynamicRangeCheck 2
+                        @setvar! mbot_DynamicRangeCheck 2
                     endif
 
                     ##### Shared line-of-sight probe - runs once, before both the bard section and the
                     ##### attack decision below, so neither has to run its own separate ArmsLore probe.
-                    ##### Throttled by jaseowns_LOSCheckTimer since useskill + wft 500 is a real wait.
-                    if not targetexists and jaseowns_CurrentBotTargetGoodLOS = 0 and timer jaseowns_LOSCheckTimer >= jaseowns_LOSCheckTimerCD
+                    ##### Throttled by mbot_LOSCheckTimer since useskill + wft 500 is a real wait.
+                    if not targetexists and mbot_CurrentBotTargetGoodLOS = 0 and timer mbot_LOSCheckTimer >= mbot_LOSCheckTimerCD
                         useskill "ArmsLore"
                         wft 500
                         if targetexists
                             while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
                             endwhile
-                            target jaseowns_CurrentBotTarget
-                            getlabel backpack jaseowns_PingCheck
+                            target mbot_CurrentBotTarget
+                            getlabel backpack mbot_PingCheck
                             if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                                if timer jaseowns_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
-                                    foreach jaseowns_Overhead in mconfig_Target_UnableToAttackOverheadText
-                                        if find jaseowns_CurrentBotTarget
-                                            overhead jaseowns_Overhead mconfig_Target_UnableToAttackOverheadHue jaseowns_CurrentBotTarget
+                                if timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
+                                    foreach mbot_Overhead in mconfig_Target_UnableToAttackOverheadText
+                                        if find mbot_CurrentBotTarget
+                                            overhead mbot_Overhead mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
                                         endif
                                     endfor
-                                    settimer jaseowns_CurrentBotTargetOverheadTimer 0
+                                    settimer mbot_CurrentBotTargetOverheadTimer 0
                                 endif
-                                @setvar! jaseowns_CurrentBotTarget 0
+                                @setvar! mbot_CurrentBotTarget 0
                             else
-                                @setvar! jaseowns_CurrentBotTargetGoodLOS 1
-                                settimer jaseowns_UsedSkillTimer 3000
-                                @setvar! jaseowns_CurrentBotTargetAttacked 1
+                                @setvar! mbot_CurrentBotTargetGoodLOS 1
+                                settimer mbot_UsedSkillTimer 3000
+                                @setvar! mbot_CurrentBotTargetAttacked 1
                             endif
                         endif
                         if targetexists
                             hotkey "Cancel Current Target"
                         endif
-                        settimer jaseowns_LOSCheckTimer 0
+                        settimer mbot_LOSCheckTimer 0
                     endif
 
                     ##### Bard section start - the attack decision below runs independently after this,
                     ##### not as elseif alternatives to these branches.
-                    if jaseowns_BardDetected = 1
+                    if mbot_BardDetected = 1
                         if timer mbot_instrumentCheckTimer >= mbot_instrumentCheckTimerCD
                             if not find mbot_activeInstrument backpack
                                 if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as mbot_activeInstrument
@@ -1024,52 +1024,52 @@ while not dead
                             settimer mbot_instrumentCheckTimer 0
                         endif
 
-                        @setvar! jaseowns_Bard_SkipPeace 0
-                        if "pacified" in jaseowns_CurrentBotTargetDesc
-                            @setvar! jaseowns_Bard_SkipPeace 1
+                        @setvar! mbot_Bard_SkipPeace 0
+                        if "pacified" in mbot_CurrentBotTargetDesc
+                            @setvar! mbot_Bard_SkipPeace 1
                         endif
 
-                        if "provo" in jaseowns_CurrentBotTargetDesc
-                            @setvar! jaseowns_Bard_SkipPeace 1
+                        if "provo" in mbot_CurrentBotTargetDesc
+                            @setvar! mbot_Bard_SkipPeace 1
                         endif
 
-                        @setvar! jaseowns_Bard_SkipDiscord 0
-                        if mconfig_Bard_UsePeaceFirst = 1 and jaseowns_Bard_SkipPeace = 0
-                            @setvar! jaseowns_Bard_SkipDiscord 1
-                        elseif "discord" in jaseowns_CurrentBotTargetDesc
-                            @setvar! jaseowns_Bard_SkipDiscord 1
+                        @setvar! mbot_Bard_SkipDiscord 0
+                        if mconfig_Bard_UsePeaceFirst = 1 and mbot_Bard_SkipPeace = 0
+                            @setvar! mbot_Bard_SkipDiscord 1
+                        elseif "discord" in mbot_CurrentBotTargetDesc
+                            @setvar! mbot_Bard_SkipDiscord 1
                         endif
 
-                        @setvar! jaseowns_Bard_DiscordCheckNextMob 0
+                        @setvar! mbot_Bard_DiscordCheckNextMob 0
 
                         # PROVO
-                        if jaseowns_Bard_CanProvo = 1 and timer jaseowns_UsedSkillTimer >= 5000
+                        if mbot_Bard_CanProvo = 1 and timer mbot_UsedSkillTimer >= 5000
 
-                            if jaseowns_BARD_PROVO_COUNTER = 4
+                            if mbot_BARD_PROVO_COUNTER = 4
                                 // do nothing
                             else
-                                @setvar! jaseowns_Bard_SkipDiscord 1
-                                @setvar! jaseowns_Bard_SkipPeace 1
+                                @setvar! mbot_Bard_SkipDiscord 1
+                                @setvar! mbot_Bard_SkipPeace 1
                             endif
                     
-                            if not targetexists and timer jaseowns_BARD_TARGET_RANGECHECK_TIMER >= jaseowns_BARD_TARGET_RANGECHECK_TIMERCD
+                            if not targetexists and timer mbot_BARD_TARGET_RANGECHECK_TIMER >= mbot_BARD_TARGET_RANGECHECK_TIMERCD
                                 
-                                if not find jaseowns_BARD_TARGET1 and find jaseowns_CurrentBotTarget ground -1 -1 jaseowns_BARD_TARGET_RANGECHECK
-                                    @setvar! jaseowns_BARD_TARGET1 jaseowns_CurrentBotTarget
+                                if not find mbot_BARD_TARGET1 and find mbot_CurrentBotTarget ground -1 -1 mbot_BARD_TARGET_RANGECHECK
+                                    @setvar! mbot_BARD_TARGET1 mbot_CurrentBotTarget
                                 endif
                             
-                                if jaseowns_BARD_TARGET1 = jaseowns_BARD_TARGET2
-                                    @setvar! jaseowns_BARD_TARGET2 0
+                                if mbot_BARD_TARGET1 = mbot_BARD_TARGET2
+                                    @setvar! mbot_BARD_TARGET2 0
                                 endif
                             
-                                if find jaseowns_BARD_TARGET1 ground -1 -1 jaseowns_BARD_TARGET_RANGECHECK and find jaseowns_BARD_TARGET2 ground -1 -1 jaseowns_BARD_TARGET_RANGECHECK
+                                if find mbot_BARD_TARGET1 ground -1 -1 mbot_BARD_TARGET_RANGECHECK and find mbot_BARD_TARGET2 ground -1 -1 mbot_BARD_TARGET_RANGECHECK
                                 
                                     for 3
-                                        if dead jaseowns_BARD_TARGET1
+                                        if dead mbot_BARD_TARGET1
                                             break
                                         endif
-                                        getlabel jaseowns_BARD_TARGET1 jaseowns_CurrentBotTargetDesc1
-                                        if "-" in jaseowns_CurrentBotTargetDesc1
+                                        getlabel mbot_BARD_TARGET1 mbot_CurrentBotTargetDesc1
+                                        if "-" in mbot_CurrentBotTargetDesc1
                                             // do nothing - try again
                                         else
                                             break
@@ -1077,11 +1077,11 @@ while not dead
                                     endfor
                                 
                                     for 3
-                                        if dead jaseowns_BARD_TARGET2
+                                        if dead mbot_BARD_TARGET2
                                             break
                                         endif
-                                        getlabel jaseowns_BARD_TARGET2 jaseowns_CurrentBotTargetDesc2
-                                        if "-" in jaseowns_CurrentBotTargetDesc2
+                                        getlabel mbot_BARD_TARGET2 mbot_CurrentBotTargetDesc2
+                                        if "-" in mbot_CurrentBotTargetDesc2
                                             // do nothing - try again
                                         else
                                             break
@@ -1091,15 +1091,15 @@ while not dead
                                     while insysmsg "Target cannot be seen"
                                     endwhile
                                 
-                                    if "provo" in jaseowns_CurrentBotTargetDesc1 and "provo" in jaseowns_CurrentBotTargetDesc2
-                                        if "discord" in jaseowns_CurrentBotTargetDesc2
+                                    if "provo" in mbot_CurrentBotTargetDesc1 and "provo" in mbot_CurrentBotTargetDesc2
+                                        if "discord" in mbot_CurrentBotTargetDesc2
                                             // do nothing
                                         else
-                                            @setvar! jaseowns_Bard_DiscordCheckNextMob jaseowns_BARD_TARGET2
+                                            @setvar! mbot_Bard_DiscordCheckNextMob mbot_BARD_TARGET2
                                         endif
-                                        @setvar! jaseowns_BARD_TARGET2 0
+                                        @setvar! mbot_BARD_TARGET2 0
                                     else
-                                        @setvar! jaseowns_BARD_PROVO_COUNTER 0
+                                        @setvar! mbot_BARD_PROVO_COUNTER 0
                                         while insysmsg "What instrument"
                                         endwhile
                                         useskill "Provocation" 
@@ -1109,16 +1109,16 @@ while not dead
                                             wft 500
                                         endif
                                         if targetexists
-                                            target jaseowns_BARD_TARGET1
-                                            getlabel backpack jaseowns_PingCheck
+                                            target mbot_BARD_TARGET1
+                                            getlabel backpack mbot_PingCheck
                                             if insysmsg "Target cannot be seen"
-                                                @setvar! jaseowns_BARD_TARGET1 0
+                                                @setvar! mbot_BARD_TARGET1 0
                                             else
                                                 wft 500
-                                                target jaseowns_BARD_TARGET2
-                                                getlabel backpack jaseowns_PingCheck                
+                                                target mbot_BARD_TARGET2
+                                                getlabel backpack mbot_PingCheck                
                                                 if insysmsg "Target cannot be seen"
-                                                    @setvar! jaseowns_BARD_TARGET2 0
+                                                    @setvar! mbot_BARD_TARGET2 0
                                                 endif
                                             endif
                                         endif
@@ -1127,108 +1127,108 @@ while not dead
                                 else
                                 
                     
-                                    if jaseowns_BARD_PROVO_COUNTER = 0
-                                        @setvar! jaseowns_BARD_PROVO_COUNTER 1
-                                    elseif jaseowns_BARD_PROVO_COUNTER = 1
-                                        @setvar! jaseowns_BARD_PROVO_COUNTER 2
-                                    elseif jaseowns_BARD_PROVO_COUNTER = 2
-                                        @setvar! jaseowns_BARD_PROVO_COUNTER 3
+                                    if mbot_BARD_PROVO_COUNTER = 0
+                                        @setvar! mbot_BARD_PROVO_COUNTER 1
+                                    elseif mbot_BARD_PROVO_COUNTER = 1
+                                        @setvar! mbot_BARD_PROVO_COUNTER 2
+                                    elseif mbot_BARD_PROVO_COUNTER = 2
+                                        @setvar! mbot_BARD_PROVO_COUNTER 3
                                     else
-                                        @setvar! jaseowns_BARD_PROVO_COUNTER 4
+                                        @setvar! mbot_BARD_PROVO_COUNTER 4
                                     endif
                             
-                                    if not find jaseowns_BARD_TARGET1 and find jaseowns_CurrentBotTarget ground -1 -1 jaseowns_BARD_TARGET_RANGECHECK
-                                        @setvar! jaseowns_BARD_TARGET1 jaseowns_CurrentBotTarget
+                                    if not find mbot_BARD_TARGET1 and find mbot_CurrentBotTarget ground -1 -1 mbot_BARD_TARGET_RANGECHECK
+                                        @setvar! mbot_BARD_TARGET1 mbot_CurrentBotTarget
                                     endif
                             
-                                    if find jaseowns_BARD_TARGET1 ground -1 -1 jaseowns_BARD_TARGET_RANGECHECK
+                                    if find mbot_BARD_TARGET1 ground -1 -1 mbot_BARD_TARGET_RANGECHECK
                                         // check for second one
                                         hotkey "target closest non-friendly monster"
-                                        @setvar! jaseowns_LastBotTarget lasttarget 
-                                        if jaseowns_BARD_TARGET1 != jaseowns_LastBotTarget
+                                        @setvar! mbot_LastBotTarget lasttarget 
+                                        if mbot_BARD_TARGET1 != mbot_LastBotTarget
                                             for 3
-                                                if dead jaseowns_BARD_TARGET2
+                                                if dead mbot_BARD_TARGET2
                                                     break
                                                 endif
-                                                getlabel jaseowns_BARD_TARGET2 jaseowns_CurrentBotTargetDesc
-                                                if "-" in jaseowns_CurrentBotTargetDesc
+                                                getlabel mbot_BARD_TARGET2 mbot_CurrentBotTargetDesc
+                                                if "-" in mbot_CurrentBotTargetDesc
                                                     // do nothing - try again
                                                 else
                                                     break
                                                 endif
                                             endfor
-                                            if find jaseowns_LastBotTarget
-                                                overhead "ATTEMPTING CLOSEST" 38 jaseowns_LastBotTarget
+                                            if find mbot_LastBotTarget
+                                                overhead "ATTEMPTING CLOSEST" 38 mbot_LastBotTarget
                                             endif
-                                            if "provo" in jaseowns_CurrentBotTargetDesc
+                                            if "provo" in mbot_CurrentBotTargetDesc
                                                 // do nothing
                                             else
-                                                @setvar! jaseowns_BARD_TARGET2 jaseowns_LastBotTarget    
+                                                @setvar! mbot_BARD_TARGET2 mbot_LastBotTarget    
                                             endif
                                         endif
                                     
-                                        if not find jaseowns_BARD_TARGET2 ground -1 -1 jaseowns_BARD_TARGET_RANGECHECK
+                                        if not find mbot_BARD_TARGET2 ground -1 -1 mbot_BARD_TARGET_RANGECHECK
                                         
-                                            @setvar! jaseowns_BARD_RANDOM_TARGET_OG 0
+                                            @setvar! mbot_BARD_RANDOM_TARGET_OG 0
                                             hotkey "next non-friendly monster target"
-                                            @setvar! jaseowns_BARD_RANDOM_TARGET lasttarget                     
+                                            @setvar! mbot_BARD_RANDOM_TARGET lasttarget                     
                                         
-                                            while find jaseowns_BARD_RANDOM_TARGET and jaseowns_BARD_RANDOM_TARGET != jaseowns_BARD_RANDOM_TARGET_OG
-                                                if jaseowns_BARD_RANDOM_TARGET_OG = 0
-                                                    @setvar! jaseowns_BARD_RANDOM_TARGET_OG jaseowns_BARD_RANDOM_TARGET
+                                            while find mbot_BARD_RANDOM_TARGET and mbot_BARD_RANDOM_TARGET != mbot_BARD_RANDOM_TARGET_OG
+                                                if mbot_BARD_RANDOM_TARGET_OG = 0
+                                                    @setvar! mbot_BARD_RANDOM_TARGET_OG mbot_BARD_RANDOM_TARGET
                                                 endif
-                                                if not find jaseowns_BARD_TARGET1
+                                                if not find mbot_BARD_TARGET1
                                                     break
                                                 endif
                                             
-                                                if jaseowns_BARD_TARGET1 != jaseowns_BARD_RANDOM_TARGET and find jaseowns_BARD_RANDOM_TARGET ground -1 -1 jaseowns_BARD_TARGET_RANGECHECK
+                                                if mbot_BARD_TARGET1 != mbot_BARD_RANDOM_TARGET and find mbot_BARD_RANDOM_TARGET ground -1 -1 mbot_BARD_TARGET_RANGECHECK
                                                     for 3
-                                                        if dead jaseowns_BARD_RANDOM_TARGET
+                                                        if dead mbot_BARD_RANDOM_TARGET
                                                             break
                                                         endif
-                                                        getlabel jaseowns_BARD_RANDOM_TARGET jaseowns_CurrentBotTargetDesc
-                                                        if "-" in jaseowns_CurrentBotTargetDesc
+                                                        getlabel mbot_BARD_RANDOM_TARGET mbot_CurrentBotTargetDesc
+                                                        if "-" in mbot_CurrentBotTargetDesc
                                                             // do nothing - try again
                                                         else
                                                             break
                                                         endif
                                                     endfor
                                                 
-                                                    if find jaseowns_BARD_RANDOM_TARGET
-                                                        overhead "ATTEMPTING RANDOM" 34 jaseowns_BARD_RANDOM_TARGET
+                                                    if find mbot_BARD_RANDOM_TARGET
+                                                        overhead "ATTEMPTING RANDOM" 34 mbot_BARD_RANDOM_TARGET
                                                     endif
                                                 
-                                                    if "provo" in jaseowns_CurrentBotTargetDesc
-                                                        if "discord" in jaseowns_CurrentBotTargetDesc
+                                                    if "provo" in mbot_CurrentBotTargetDesc
+                                                        if "discord" in mbot_CurrentBotTargetDesc
                                                             // do nothing
                                                         else
-                                                            @setvar! jaseowns_Bard_DiscordCheckNextMob jaseowns_BARD_RANDOM_TARGET
+                                                            @setvar! mbot_Bard_DiscordCheckNextMob mbot_BARD_RANDOM_TARGET
                                                         endif
                                                     else
-                                                        @setvar! jaseowns_BARD_TARGET2 jaseowns_BARD_RANDOM_TARGET    
+                                                        @setvar! mbot_BARD_TARGET2 mbot_BARD_RANDOM_TARGET    
                                                         break
                                                     endif
                                                 endif
                                                 hotkey "next non-friendly monster target"
-                                                @setvar! jaseowns_BARD_RANDOM_TARGET lasttarget                     
+                                                @setvar! mbot_BARD_RANDOM_TARGET lasttarget                     
                                             endwhile
                                         endif
-                                        settimer jaseowns_BARD_TARGET_RANGECHECK_TIMER 0
+                                        settimer mbot_BARD_TARGET_RANGECHECK_TIMER 0
                                     endif
                                 endif
                             endif
                         else
                             # TODO: logic for people without provo
-                            #  also do more discord checks (set a jaseowns_Bard_DiscordCheckNextMob)
+                            #  also do more discord checks (set a mbot_Bard_DiscordCheckNextMob)
                         endif
                     
                     
                         ### IN THE PROVO SECTION, TRY TO SET A LIST OF MOBS THAT ARE ALREADY PROVOED - SO YOU CAN KNOW WHAT TO DISCOR
 
-                        if jaseowns_Bard_CanDiscord = 1 and not dead jaseowns_Bard_DiscordCheckNextMob
+                        if mbot_Bard_CanDiscord = 1 and not dead mbot_Bard_DiscordCheckNextMob
                             while insysmsg "What instrument"
                             endwhile
-                            overhead "Discording Extra Mob: {{jaseowns_CurrentBotTargetDesc}}"
+                            overhead "Discording Extra Mob: {{mbot_CurrentBotTargetDesc}}"
                             useskill 'Discordance'
                             wft 500
                             if insysmsg "What instrument"
@@ -1238,27 +1238,27 @@ while not dead
                             if targetexists 
                                 while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
                                 endwhile
-                                target jaseowns_Bard_DiscordCheckNextMob
-                                getlabel backpack jaseowns_PingCheck
+                                target mbot_Bard_DiscordCheckNextMob
+                                getlabel backpack mbot_PingCheck
                                 if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                                    if timer jaseowns_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
-                                        foreach jaseowns_Overhead in mconfig_Target_UnableToAttackOverheadText
-                                            if find jaseowns_CurrentBotTarget
-                                                overhead jaseowns_Overhead mconfig_Target_UnableToAttackOverheadHue jaseowns_CurrentBotTarget
+                                    if timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
+                                        foreach mbot_Overhead in mconfig_Target_UnableToAttackOverheadText
+                                            if find mbot_CurrentBotTarget
+                                                overhead mbot_Overhead mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
                                             endif
                                         endfor
-                                        settimer jaseowns_CurrentBotTargetOverheadTimer 0
+                                        settimer mbot_CurrentBotTargetOverheadTimer 0
                                     endif
-                                    @setvar! jaseowns_Bard_DiscordCheckNextMob 0
+                                    @setvar! mbot_Bard_DiscordCheckNextMob 0
                                 else
-                                    settimer jaseowns_UsedSkillTimer 0
+                                    settimer mbot_UsedSkillTimer 0
                                 endif
                             endif
                     
-                        elseif jaseowns_Bard_CanDiscord = 1 and jaseowns_Bard_SkipDiscord = 0 and timer jaseowns_UsedSkillTimer >= 5000
+                        elseif mbot_Bard_CanDiscord = 1 and mbot_Bard_SkipDiscord = 0 and timer mbot_UsedSkillTimer >= 5000
                             while insysmsg "What instrument"
                             endwhile
-                            overhead "Discording: {{jaseowns_CurrentBotTargetDesc}}"
+                            overhead "Discording: {{mbot_CurrentBotTargetDesc}}"
                             useskill 'Discordance'
                             wft 500
                             if insysmsg "What instrument"
@@ -1268,27 +1268,27 @@ while not dead
                             if targetexists 
                                 while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
                                 endwhile
-                                target jaseowns_CurrentBotTarget
-                                getlabel backpack jaseowns_PingCheck
+                                target mbot_CurrentBotTarget
+                                getlabel backpack mbot_PingCheck
                                 if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                                    if timer jaseowns_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
-                                        foreach jaseowns_Overhead in mconfig_Target_UnableToAttackOverheadText
-                                            if find jaseowns_CurrentBotTarget
-                                                overhead jaseowns_Overhead mconfig_Target_UnableToAttackOverheadHue jaseowns_CurrentBotTarget
+                                    if timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
+                                        foreach mbot_Overhead in mconfig_Target_UnableToAttackOverheadText
+                                            if find mbot_CurrentBotTarget
+                                                overhead mbot_Overhead mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
                                             endif
                                         endfor
-                                        settimer jaseowns_CurrentBotTargetOverheadTimer 0
+                                        settimer mbot_CurrentBotTargetOverheadTimer 0
                                     endif
-                                    @setvar! jaseowns_CurrentBotTarget 0
+                                    @setvar! mbot_CurrentBotTarget 0
                                 else
-                                    settimer jaseowns_UsedSkillTimer 0
-                                    @setvar! jaseowns_CurrentBotTargetAttacked 1
+                                    settimer mbot_UsedSkillTimer 0
+                                    @setvar! mbot_CurrentBotTargetAttacked 1
                                 endif
                             endif
-                         elseif not dead jaseowns_Bard_DiscordCheckNextMob and timer jaseowns_UsedSkillTimer >= 5000
+                         elseif not dead mbot_Bard_DiscordCheckNextMob and timer mbot_UsedSkillTimer >= 5000
                             while insysmsg "What instrument"
                             endwhile
-                            overhead "Discording: {{jaseowns_CurrentBotTargetDesc}}"
+                            overhead "Discording: {{mbot_CurrentBotTargetDesc}}"
                             useskill 'Discordance'
                             wft 500
                             if insysmsg "What instrument"
@@ -1298,24 +1298,24 @@ while not dead
                             if targetexists 
                                 while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
                                 endwhile
-                                target jaseowns_CurrentBotTarget
-                                getlabel backpack jaseowns_PingCheck
+                                target mbot_CurrentBotTarget
+                                getlabel backpack mbot_PingCheck
                                 if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                                    if timer jaseowns_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
-                                        foreach jaseowns_Overhead in mconfig_Target_UnableToAttackOverheadText
-                                            if find jaseowns_CurrentBotTarget
-                                                overhead jaseowns_Overhead mconfig_Target_UnableToAttackOverheadHue jaseowns_CurrentBotTarget
+                                    if timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
+                                        foreach mbot_Overhead in mconfig_Target_UnableToAttackOverheadText
+                                            if find mbot_CurrentBotTarget
+                                                overhead mbot_Overhead mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
                                             endif
                                         endfor
-                                        settimer jaseowns_CurrentBotTargetOverheadTimer 0
+                                        settimer mbot_CurrentBotTargetOverheadTimer 0
                                     endif
-                                    @setvar! jaseowns_CurrentBotTarget 0
+                                    @setvar! mbot_CurrentBotTarget 0
                                 else
-                                    settimer jaseowns_UsedSkillTimer 0
-                                    @setvar! jaseowns_CurrentBotTargetAttacked 1
+                                    settimer mbot_UsedSkillTimer 0
+                                    @setvar! mbot_CurrentBotTargetAttacked 1
                                 endif
                             endif
-                        elseif jaseowns_Bard_CanPeacemake = 1 and jaseowns_Bard_SkipPeace = 0 and timer jaseowns_UsedSkillTimer >= 5000
+                        elseif mbot_Bard_CanPeacemake = 1 and mbot_Bard_SkipPeace = 0 and timer mbot_UsedSkillTimer >= 5000
                             while insysmsg "What instrument"
                             endwhile
                             overhead "Peacmking"
@@ -1328,51 +1328,51 @@ while not dead
                             if targetexists 
                                 while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
                                 endwhile
-                                target jaseowns_CurrentBotTarget
-                                getlabel backpack jaseowns_PingCheck
+                                target mbot_CurrentBotTarget
+                                getlabel backpack mbot_PingCheck
                                 if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                                    if timer jaseowns_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
-                                        foreach jaseowns_Overhead in mconfig_Target_UnableToAttackOverheadText
-                                            if find jaseowns_CurrentBotTarget
-                                                overhead jaseowns_Overhead mconfig_Target_UnableToAttackOverheadHue jaseowns_CurrentBotTarget
+                                    if timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
+                                        foreach mbot_Overhead in mconfig_Target_UnableToAttackOverheadText
+                                            if find mbot_CurrentBotTarget
+                                                overhead mbot_Overhead mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
                                             endif
                                         endfor
-                                        settimer jaseowns_CurrentBotTargetOverheadTimer 0
+                                        settimer mbot_CurrentBotTargetOverheadTimer 0
                                     endif
-                                    @setvar! jaseowns_CurrentBotTarget 0
+                                    @setvar! mbot_CurrentBotTarget 0
                                 else
-                                    settimer jaseowns_UsedSkillTimer 0
-                                    @setvar! jaseowns_CurrentBotTargetAttacked 1
-                                    @setvar! jaseowns_CurrentBotTargetGoodLOS 1
+                                    settimer mbot_UsedSkillTimer 0
+                                    @setvar! mbot_CurrentBotTargetAttacked 1
+                                    @setvar! mbot_CurrentBotTargetGoodLOS 1
                                 endif
                             endif
                         endif
                     endif
 
                     ##### Bard section end
-                    if find jaseowns_CurrentBotTarget ground -1 -1 jaseowns_DynamicRangeCheck
+                    if find mbot_CurrentBotTarget ground -1 -1 mbot_DynamicRangeCheck
                         // assume we got it
-                        @setvar! jaseowns_CurrentBotTargetAttacked 1
-                    elseif jaseowns_CurrentBotTargetGoodLOS = 1 and find jaseowns_CurrentBotTarget ground -1 -1 jaseowns_DynamicRangeCheck
-                        @setvar! jaseowns_CurrentBotTargetAttacked 1
+                        @setvar! mbot_CurrentBotTargetAttacked 1
+                    elseif mbot_CurrentBotTargetGoodLOS = 1 and find mbot_CurrentBotTarget ground -1 -1 mbot_DynamicRangeCheck
+                        @setvar! mbot_CurrentBotTargetAttacked 1
                     endif
                 endif
             else
-                @setvar! jaseowns_CurrentBotTarget 0
-                @setvar! jaseowns_CurrentBotTargetGoodLOS 0
+                @setvar! mbot_CurrentBotTarget 0
+                @setvar! mbot_CurrentBotTargetGoodLOS 0
             endif
         endif
     elseif mconfig_Bot_FightAutoTarget = 1
-        @setvar! jaseowns_CurrentBotTarget 0
-        @setvar! jaseowns_CurrentBotTargetGoodLOS 0
+        @setvar! mbot_CurrentBotTarget 0
+        @setvar! mbot_CurrentBotTargetGoodLOS 0
         // do nothing
-    elseif dead jaseowns_CurrentBotTarget
-        @setvar! jaseowns_BOT_FIGHT 0
-        @setvar! jaseowns_CurrentBotTarget 0
-        @setvar! jaseowns_CurrentBotTargetGoodLOS 0
+    elseif dead mbot_CurrentBotTarget
+        @setvar! mbot_BOT_FIGHT 0
+        @setvar! mbot_CurrentBotTarget 0
+        @setvar! mbot_CurrentBotTargetGoodLOS 0
     endif
     
-    if jaseowns_BOT_FIGHT = 0 and hp < mconfig_Bard_AutoUseAoePeaceWhenLowHealthCheck and skill "Peacemaking" > 0 and timer jaseowns_UsedSkillTimer >= 5000
+    if mbot_BOT_FIGHT = 0 and hp < mconfig_Bard_AutoUseAoePeaceWhenLowHealthCheck and skill "Peacemaking" > 0 and timer mbot_UsedSkillTimer >= 5000
         while insysmsg "What instrument"
         endwhile
         useskill 'Peacemaking'
@@ -1383,7 +1383,7 @@ while not dead
         endif
         if targetexists 
             hotkey "Target Self"
-            settimer jaseowns_UsedSkillTimer 0
+            settimer mbot_UsedSkillTimer 0
         endif
     endif
     
@@ -1392,216 +1392,216 @@ while not dead
     ## Parry Codex Options
     ###
     if skill "Parry" >= 80 
-        if mana >= mconfig_Parry_CodexMinMana and timer jaseowns_Parry_SwitchCodexTimer >= jaseowns_Parry_SwitchCodexTimerCD and findtype 11889 backpack as jaseowns_ParryCodex
-            getlabel jaseowns_ParryCodex jaseowns_ParryCodexDesc
+        if mana >= mconfig_Parry_CodexMinMana and timer mbot_Parry_SwitchCodexTimer >= mbot_Parry_SwitchCodexTimerCD and findtype 11889 backpack as mbot_ParryCodex
+            getlabel mbot_ParryCodex mbot_ParryCodexDesc
 
-            if "Shield Bash" in jaseowns_ParryCodexDesc
-                @setvar! jaseowns_ActiveParryCodex 1
-            elseif "Warding" in jaseowns_ParryCodexDesc
-                @setvar! jaseowns_ActiveParryCodex 2
-            elseif "Testudo" in jaseowns_ParryCodexDesc
-                @setvar! jaseowns_ActiveParryCodex 3
-            elseif "Mirror" in jaseowns_ParryCodexDesc
-                @setvar! jaseowns_ActiveParryCodex 4
-            elseif "Bulwark" in jaseowns_ParryCodexDesc
-                @setvar! jaseowns_ActiveParryCodex 5
+            if "Shield Bash" in mbot_ParryCodexDesc
+                @setvar! mbot_ActiveParryCodex 1
+            elseif "Warding" in mbot_ParryCodexDesc
+                @setvar! mbot_ActiveParryCodex 2
+            elseif "Testudo" in mbot_ParryCodexDesc
+                @setvar! mbot_ActiveParryCodex 3
+            elseif "Mirror" in mbot_ParryCodexDesc
+                @setvar! mbot_ActiveParryCodex 4
+            elseif "Bulwark" in mbot_ParryCodexDesc
+                @setvar! mbot_ActiveParryCodex 5
             endif
             
             if findbuff "bleed" and mconfig_Parry_SwitchToWardingIfBleeding = 1 and diffhits >= mconfig_Parry_SwitchToWardingIfBleedingHpDiff
-                @setvar! jaseowns_SwitchTo 2
+                @setvar! mbot_parryStanceTarget 2
             elseif findbuff "disease" and mconfig_Parry_SwitchToWardingIfDisease = 1 and diffhits >= mconfig_Parry_SwitchToWardingIfDiseaseHpDiff
-                @setvar! jaseowns_SwitchTo 2
+                @setvar! mbot_parryStanceTarget 2
             elseif poisoned and mconfig_Parry_SwitchToWardingIfPoison = 1 and diffhits >= mconfig_Parry_SwitchToWardingIfPoisonHpDiff
-                @setvar! jaseowns_SwitchTo 2
+                @setvar! mbot_parryStanceTarget 2
             elseif mconfig_Parry_SwitchToBulwarkIfStandingStill = 1 and not cooldown "Bulwark"
-                @setvar! jaseowns_SwitchTo 5
+                @setvar! mbot_parryStanceTarget 5
             elseif mconfig_Parry_SwitchToShieldBashWhileMoving = 1 and cooldown "Moving"
-                @setvar! jaseowns_SwitchTo 1
+                @setvar! mbot_parryStanceTarget 1
             elseif varexist mconfig_Parry_SwitchToDefaultStance
-                @setvar! jaseowns_SwitchTo mconfig_Parry_SwitchToDefaultStance
+                @setvar! mbot_parryStanceTarget mconfig_Parry_SwitchToDefaultStance
             else
-                @setvar! jaseowns_SwitchTo 0
+                @setvar! mbot_parryStanceTarget 0
             endif
             
-            if jaseowns_ActiveParryCodex != jaseowns_SwitchTo
-                if jaseowns_SwitchTo = 1
+            if mbot_ActiveParryCodex != mbot_parryStanceTarget
+                if mbot_parryStanceTarget = 1
                     say "[ShieldsStance1"
-                elseif jaseowns_SwitchTo = 2
+                elseif mbot_parryStanceTarget = 2
                     say "[ShieldsStance2"
-                elseif jaseowns_SwitchTo = 3
+                elseif mbot_parryStanceTarget = 3
                     say "[ShieldsStance3"
-                elseif jaseowns_SwitchTo = 4
+                elseif mbot_parryStanceTarget = 4
                     say "[ShieldsStance4"
-                elseif jaseowns_SwitchTo = 5
+                elseif mbot_parryStanceTarget = 5
                     say "[ShieldsStance5"
                 endif
-                settimer jaseowns_Parry_SwitchCodexTimer 0
+                settimer mbot_Parry_SwitchCodexTimer 0
             endif
         endif
     endif
 
     // Attacking stuff
-    if jaseowns_CurrentBotTargetAttacked = 1
+    if mbot_CurrentBotTargetAttacked = 1
         
-        if mconfig_Healing_AidCountAlertLessThan20 = 1 and skill "Healing" > 0 and counttype 3617 self as jaseowns_BOT_AidCount
-            if 20 > jaseowns_BOT_AidCount
-            overhead "We are low on aids {{jaseowns_BOT_AidCount}}" 34
+        if mconfig_Healing_AidCountAlertLessThan20 = 1 and skill "Healing" > 0 and counttype 3617 self as mbot_BOT_AidCount
+            if 20 > mbot_BOT_AidCount
+            overhead "We are low on aids {{mbot_BOT_AidCount}}" 34
             endif
         endif
     
-        if mconfig_Potion_UseCleansingBrewAutomatically = 1 and findtype 50675 backpack 2935 as jaseowns_UseItem
+        if mconfig_Potion_UseCleansingBrewAutomatically = 1 and findtype 50675 backpack 2935 as mbot_UseItem
             if findbuff "bleed" or findbuff "disease"
                 if not varexist mconfig_Potion_CleansingBrewHpDiffTrigger
                     if diffhits >= 5
-                        dclick jaseowns_UseItem
-                        cooldown "Cleansing Brew" jaseowns_UseCleansingBrewTimerCD
-                        settimer jaseowns_UseCleansingBrewTimer 0
+                        dclick mbot_UseItem
+                        cooldown "Cleansing Brew" mbot_UseCleansingBrewTimerCD
+                        settimer mbot_UseCleansingBrewTimer 0
                     endif
                 elseif diffhits >= mconfig_Potion_CleansingBrewHpDiffTrigger 
-                    dclick jaseowns_UseItem
-                    cooldown "Cleansing Brew" jaseowns_UseCleansingBrewTimerCD
-                    settimer jaseowns_UseCleansingBrewTimer 0
+                    dclick mbot_UseItem
+                    cooldown "Cleansing Brew" mbot_UseCleansingBrewTimerCD
+                    settimer mbot_UseCleansingBrewTimer 0
                 endif
             endif
         endif
     
-        if mconfig_Weapon_UseAbility1 = 1 and timer jaseowns_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
+        if mconfig_Weapon_UseAbility1 = 1 and timer mbot_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
             while insysmsg "You do cannot perform that ability yet." or insysmsg "You have not yet unlocked that weapon ability." or insysmsg "You do not have the required codex or skills to use that weapon ability."
             endwhile
             say "[WeaponAbility1"
-            settimer jaseowns_UseAbilityTimer 0 
-        elseif mconfig_Weapon_UseAbility2 = 1 and timer jaseowns_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
+            settimer mbot_UseAbilityTimer 0 
+        elseif mconfig_Weapon_UseAbility2 = 1 and timer mbot_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
             while insysmsg "You do cannot perform that ability yet." or insysmsg "You have not yet unlocked that weapon ability." or insysmsg "You do not have the required codex or skills to use that weapon ability."
             endwhile
             say "[WeaponAbility2"
-            settimer jaseowns_UseAbilityTimer 0 
-        elseif mconfig_Weapon_UseAbility3 = 1 and timer jaseowns_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
+            settimer mbot_UseAbilityTimer 0 
+        elseif mconfig_Weapon_UseAbility3 = 1 and timer mbot_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
             while insysmsg "You do cannot perform that ability yet." or insysmsg "You have not yet unlocked that weapon ability." or insysmsg "You do not have the required codex or skills to use that weapon ability."
             endwhile 
             say "[WeaponAbility3"
-            settimer jaseowns_UseAbilityTimer 0 
+            settimer mbot_UseAbilityTimer 0 
         endif   
             
-        if not queued and mconfig_Potion_AutoExplodePot = 1 and find jaseowns_CurrentBotTarget ground -1 -1 8 and findtype 3853 self 0 as jaseowns_Pot
-            if timer jaseowns_AutoExplodePotTimer >= jaseowns_AutoExplodePotTimerCD and timer jaseowns_UseItemTimer >= jaseowns_UseItemTimerCD
-                @ignore jaseowns_Pot
-                dclick jaseowns_Pot
-                settimer jaseowns_UseItemTimer 0
-                getlabel jaseowns_Pot jaseowns_PotDesc    
-                if "next" in jaseowns_PotDesc
-                    if "12 seconds" in jaseowns_PotDesc
-                        @setvar! jaseowns_AutoExplodePotTimerCD 12000
-                    elseif "13 seconds" in jaseowns_PotDesc
-                        @setvar! jaseowns_AutoExplodePotTimerCD 13000
-                    elseif "14 seconds" in jaseowns_PotDesc
-                        @setvar! jaseowns_AutoExplodePotTimerCD 14000
-                    elseif "15 seconds" in jaseowns_PotDesc
-                        @setvar! jaseowns_AutoExplodePotTimerCD 15000
+        if not queued and mconfig_Potion_AutoExplodePot = 1 and find mbot_CurrentBotTarget ground -1 -1 8 and findtype 3853 self 0 as mbot_explosionPot
+            if timer mbot_AutoExplodePotTimer >= mbot_AutoExplodePotTimerCD and timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+                @ignore mbot_explosionPot
+                dclick mbot_explosionPot
+                settimer mbot_UseItemTimer 0
+                getlabel mbot_explosionPot mbot_explosionPotDesc    
+                if "next" in mbot_explosionPotDesc
+                    if "12 seconds" in mbot_explosionPotDesc
+                        @setvar! mbot_AutoExplodePotTimerCD 12000
+                    elseif "13 seconds" in mbot_explosionPotDesc
+                        @setvar! mbot_AutoExplodePotTimerCD 13000
+                    elseif "14 seconds" in mbot_explosionPotDesc
+                        @setvar! mbot_AutoExplodePotTimerCD 14000
+                    elseif "15 seconds" in mbot_explosionPotDesc
+                        @setvar! mbot_AutoExplodePotTimerCD 15000
                     endif
-                    settimer jaseowns_AutoExplodePotTimer 0
-                    cooldown "Purple Pot" jaseowns_AutoExplodePotTimerCD
+                    settimer mbot_AutoExplodePotTimer 0
+                    cooldown "Purple Pot" mbot_AutoExplodePotTimerCD
                 endif
                 while insysmsg "Target cannot be seen"
                     overhead "clearing the target cannot be seen"
                 endwhile
                 wft 500
-                target jaseowns_CurrentBotTarget
-                getlabel backpack jaseowns_PingCheck
+                target mbot_CurrentBotTarget
+                getlabel backpack mbot_PingCheck
                 if insysmsg "Target cannot be seen"
-                    while timer jaseowns_UseItemTimer < jaseowns_UseItemTimerCD
+                    while timer mbot_UseItemTimer < mbot_UseItemTimerCD
                     endwhile
-                    dclick jaseowns_Pot
+                    dclick mbot_explosionPot
                     wft 500
                 endif
-                if targetexists and findtype 3853 backpack -1 1 1 as jaseowns_ThisOldPot
+                if targetexists and findtype 3853 backpack -1 1 1 as mbot_nextExplosionPot
                     overhead "YEETING POTION" 89
-                    target jaseowns_ThisOldPot
+                    target mbot_nextExplosionPot
                 endif
-                @unignore jaseowns_Pot
+                @unignore mbot_explosionPot
             endif
         endif
     
-        if not queued and mconfig_Potion_UseAgilityAutomatically = 1 and not findbuff "Agility" and findtype 3848 self as jaseowns_Potion
-            if timer jaseowns_UseItemTimer >= jaseowns_UseItemTimerCD
-                dclick jaseowns_Potion
-                settimer jaseowns_UseItemTimer 0
+        if not queued and mconfig_Potion_UseAgilityAutomatically = 1 and not findbuff "Agility" and findtype 3848 self as mbot_Potion
+            if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+                dclick mbot_Potion
+                settimer mbot_UseItemTimer 0
             endif
         endif
         
-        if not queued and mconfig_Potion_UseStrengthAutomatically = 1 and not findbuff "Strength" and findtype 3849 self as jaseowns_Potion
-            if timer jaseowns_UseItemTimer >= jaseowns_UseItemTimerCD
-                dclick jaseowns_Potion
-                settimer jaseowns_UseItemTimer 0
+        if not queued and mconfig_Potion_UseStrengthAutomatically = 1 and not findbuff "Strength" and findtype 3849 self as mbot_Potion
+            if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+                dclick mbot_Potion
+                settimer mbot_UseItemTimer 0
             endif
         endif
         
-        if not queued and mconfig_Potion_UseMagicResistAutomatically = 1 and not findbuff "Magic Resist" and findtype 3846 self as jaseowns_Potion
-            if timer jaseowns_UseItemTimer >= jaseowns_UseItemTimerCD
-                dclick jaseowns_Potion
-                settimer jaseowns_UseItemTimer 0
+        if not queued and mconfig_Potion_UseMagicResistAutomatically = 1 and not findbuff "Magic Resist" and findtype 3846 self as mbot_Potion
+            if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+                dclick mbot_Potion
+                settimer mbot_UseItemTimer 0
             endif
-        elseif not queued and mconfig_Potion_UseMagicResistAgainIfDebuffedAutomatically = 1 and findbuff "Magic Resist Decrease" and findtype 3846 self as jaseowns_Potion
-            if timer jaseowns_UseItemTimer >= jaseowns_UseItemTimerCD
-                dclick jaseowns_Potion
-                settimer jaseowns_UseItemTimer 0
+        elseif not queued and mconfig_Potion_UseMagicResistAgainIfDebuffedAutomatically = 1 and findbuff "Magic Resist Decrease" and findtype 3846 self as mbot_Potion
+            if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+                dclick mbot_Potion
+                settimer mbot_UseItemTimer 0
             endif
         endif
         
     
-        if varexist jaseowns_HolySymbols
+        if varexist mbot_HolySymbols
             
-            @setvar! jaseowns_Chiv_DiviveFuryIsUsed 0
+            @setvar! mbot_divineFuryIsUsed 0
             if mconfig_Chiv_UseDivineFuryAutomatically = 0
-                @setvar! jaseowns_Chiv_DiviveFuryIsUsed 1
-            elseif mconfig_Chiv_UseDivineFuryAutomatically = 1 and timer jaseowns_DivineFuryTimer < jaseowns_DivineFuryTimerCD
-                @setvar! jaseowns_Chiv_DiviveFuryIsUsed 1
+                @setvar! mbot_divineFuryIsUsed 1
+            elseif mconfig_Chiv_UseDivineFuryAutomatically = 1 and timer mbot_DivineFuryTimer < mbot_DivineFuryTimerCD
+                @setvar! mbot_divineFuryIsUsed 1
             endif
         
-            if mconfig_Chiv_UseDivineFuryAutomatically = 1 and mconfig_Chiv_MinSymbolsDivineFury <= jaseowns_HolySymbols and skill "chivalry" >= 85 and timer jaseowns_DivineFuryTimer >= jaseowns_DivineFuryTimerCD
+            if mconfig_Chiv_UseDivineFuryAutomatically = 1 and mconfig_Chiv_MinSymbolsDivineFury <= mbot_HolySymbols and skill "chivalry" >= 85 and timer mbot_DivineFuryTimer >= mbot_DivineFuryTimerCD
                 while insysmsg "Holy symbols remaining"
                 endwhile
                 say "[DivineFury"
-                getlabel backpack jaseowns_PingCheck
+                getlabel backpack mbot_PingCheck
                 if insysmsg "Holy symbols remaining"
-                    cooldown "Divine Fury" jaseowns_DivineFuryTimerCD
-                    settimer jaseowns_DivineFuryTimer 0
-                    settimer jaseowns_Chiv_SymbolCheckTimer jaseowns_Chiv_SymbolCheckTimerCD
+                    cooldown "Divine Fury" mbot_DivineFuryTimerCD
+                    settimer mbot_DivineFuryTimer 0
+                    settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
                 endif
-            elseif jaseowns_Chiv_DiviveFuryIsUsed = 1 and mconfig_Chiv_UseEnemyOfOneAutomatically = 1 and mconfig_Chiv_MinSymbolsEnemyOfOne <= jaseowns_HolySymbols and skill "chivalry" >= 75 and timer jaseowns_EnemyOfOneTimer >= jaseowns_EnemyOfOneTimerCD
+            elseif mbot_divineFuryIsUsed = 1 and mconfig_Chiv_UseEnemyOfOneAutomatically = 1 and mconfig_Chiv_MinSymbolsEnemyOfOne <= mbot_HolySymbols and skill "chivalry" >= 75 and timer mbot_EnemyOfOneTimer >= mbot_EnemyOfOneTimerCD
                 while insysmsg "Holy symbols remaining"
                 endwhile
                 say "[EnemyOfOne"
-                getlabel backpack jaseowns_PingCheck
+                getlabel backpack mbot_PingCheck
                 if insysmsg "Holy symbols remaining" 
-                    cooldown "Enemy Of One" jaseowns_EnemyOfOneTimerCD
-                    settimer jaseowns_EnemyOfOneTimer 0
-                    settimer jaseowns_Chiv_SymbolCheckTimer jaseowns_Chiv_SymbolCheckTimerCD
+                    cooldown "Enemy Of One" mbot_EnemyOfOneTimerCD
+                    settimer mbot_EnemyOfOneTimer 0
+                    settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
                 endif  
-            elseif jaseowns_Chiv_DiviveFuryIsUsed = 1 and mconfig_Chiv_UseConsecrateWeaponAutomatically = 1 and mconfig_Chiv_MinSymbolsConsecrateWeapon <= jaseowns_HolySymbols and skill "chivalry" >= 65 and timer jaseowns_ConsecrateWeaponTimer >= jaseowns_ConsecrateWeaponTimerCD
+            elseif mbot_divineFuryIsUsed = 1 and mconfig_Chiv_UseConsecrateWeaponAutomatically = 1 and mconfig_Chiv_MinSymbolsConsecrateWeapon <= mbot_HolySymbols and skill "chivalry" >= 65 and timer mbot_ConsecrateWeaponTimer >= mbot_ConsecrateWeaponTimerCD
                 while insysmsg "Holy symbols remaining"
                 endwhile
                 say "[ConsecrateWeapon"
-                getlabel backpack jaseowns_PingCheck
+                getlabel backpack mbot_PingCheck
                 if insysmsg "Holy symbols remaining" 
-                    cooldown "Consecrate Weapon" jaseowns_ConsecrateWeaponTimerCD
-                    settimer jaseowns_ConsecrateWeaponTimer 0
-                    settimer jaseowns_Chiv_SymbolCheckTimer jaseowns_Chiv_SymbolCheckTimerCD
+                    cooldown "Consecrate Weapon" mbot_ConsecrateWeaponTimerCD
+                    settimer mbot_ConsecrateWeaponTimer 0
+                    settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
                 endif
             endif
         endif
         
         if mconfig_Parry_AutoTaunting = 1 or mconfig_Parry_AutoAoeTaunting = 1
-            @setvar! jaseowns_TriggerAbility 0
-            if cooldown "Taunting" or timer jaseowns_TauntingTimer < mconfig_Parry_TauntingTimerCD
+            @setvar! mbot_TriggerAbility 0
+            if cooldown "Taunting" or timer mbot_TauntingTimer < mconfig_Parry_TauntingTimerCD
                 // do nothing
             elseif not varexist mconfig_Parry_AutoTauntHpDiffTrigger
                 if hp >= 80
-                    @setvar! jaseowns_TriggerAbility 1
+                    @setvar! mbot_TriggerAbility 1
                 endif
             elseif diffhits <= mconfig_Parry_AutoTauntHpDiffTrigger 
-                @setvar! jaseowns_TriggerAbility 1
+                @setvar! mbot_TriggerAbility 1
             endif
-            if jaseowns_TriggerAbility = 1
+            if mbot_TriggerAbility = 1
                 say "[Taunt"
                 wft 500
                 if targetexists 
@@ -1609,16 +1609,16 @@ while not dead
                     endwhile
                     if mconfig_Parry_AutoAoeTaunting = 1
                         hotkey "Target Self"
-                    elseif find jaseowns_CurrentBotTarget
-                        target jaseowns_CurrentBotTarget
+                    elseif find mbot_CurrentBotTarget
+                        target mbot_CurrentBotTarget
                     endif
-                    getlabel backpack jaseowns_PingCheck
+                    getlabel backpack mbot_PingCheck
                     if not targetexists 
                         if insysmsg "Cannot be seen"
                             // do nothing
                         else
                             cooldown "Taunting" mconfig_Parry_TauntingTimerCD
-                            settimer jaseowns_TauntingTimer 0
+                            settimer mbot_TauntingTimer 0
                         endif
                     else
                         hotkey "Cancel Current Target"
@@ -1630,10 +1630,10 @@ while not dead
     endif
     
     ##### Bard: passive song-buff maintenance
-    if jaseowns_BardDetected = 1
+    if mbot_BardDetected = 1
 
         if skill "Discordance" > 0
-            if not findbuff "song of discordance" and timer jaseowns_BOT_BardBuffTimer >= 10000
+            if not findbuff "song of discordance" and timer mbot_BOT_BardBuffTimer >= 10000
                 while insysmsg "What instrument"
                 endwhile
                 useskill 'Discordance'
@@ -1643,12 +1643,12 @@ while not dead
                     wft 500
                 endif
                 target backpack
-                settimer jaseowns_BOT_BardBuffTimer 0
+                settimer mbot_BOT_BardBuffTimer 0
             endif
         endif
 
         if skill "Provocation" > 0
-            if not findbuff "song of provocation" and timer jaseowns_BOT_BardBuffTimer >= 10000
+            if not findbuff "song of provocation" and timer mbot_BOT_BardBuffTimer >= 10000
                 while insysmsg "What instrument"
                 endwhile
                 useskill 'Provocation'
@@ -1658,12 +1658,12 @@ while not dead
                     wft 500
                 endif
                 target backpack
-                settimer jaseowns_BOT_BardBuffTimer 0
+                settimer mbot_BOT_BardBuffTimer 0
             endif
         endif
 
         if skill "Peacemaking" > 0
-            if not findbuff "song of peacemaking" and timer jaseowns_BOT_BardBuffTimer >= 10000
+            if not findbuff "song of peacemaking" and timer mbot_BOT_BardBuffTimer >= 10000
                 while insysmsg "What instrument"
                 endwhile
                 useskill 'Peacemaking'
@@ -1673,7 +1673,7 @@ while not dead
                     wft 500
                 endif
                 target backpack
-                settimer jaseowns_BOT_BardBuffTimer 0
+                settimer mbot_BOT_BardBuffTimer 0
             endif
         endif
 
