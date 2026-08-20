@@ -291,54 +291,57 @@ endif
 
 
 #####
-### Herding
-if not varexist myAwesomeCrookThatIsActivated
-    @setvar! myAwesomeCrookThatIsActivated 0
-endif
-if not find myAwesomeCrookThatIsActivated self
-    if skill "Herding" > 0 and findtype 3713 self as firstJrook
-        @setvar! isHerdingActive 0
-        while isHerdingActive = 0
-            if counttype 3713 self > 1
-                @clearignore
-                while findtype 3713 self as jrook
-                    getlabel jrook multiDesc
-                    if 'activated' in multiDesc
-                        @setvar! isHerdingActive jrook
-                        break
+### Taming (crook activation, "all guard me" timer setup)
+if jaseowns_TamingEnabled = 1
+
+    if not varexist myAwesomeCrookThatIsActivated
+        @setvar! myAwesomeCrookThatIsActivated 0
+    endif
+    if not find myAwesomeCrookThatIsActivated self
+        if skill "Herding" > 0 and findtype 3713 self as firstJrook
+            @setvar! isHerdingActive 0
+            while isHerdingActive = 0
+                if counttype 3713 self > 1
+                    @clearignore
+                    while findtype 3713 self as jrook
+                        getlabel jrook multiDesc
+                        if 'activated' in multiDesc
+                            @setvar! isHerdingActive jrook
+                            break
+                        endif
+                        @ignore jrook
+                    endwhile
+                    @clearignore
+                    if isHerdingActive = 0
+                        dclick firstJrook
                     endif
-                    @ignore jrook
-                endwhile
-                @clearignore
+                endif
+
                 if isHerdingActive = 0
-                    dclick firstJrook
-                endif
-            endif
-
-            if isHerdingActive = 0
-                getlabel firstJrook desc
-                if 'activated' in desc
-                    @setvar! isHerdingActive firstJrook
-                else
-                    dclick firstJrook
                     getlabel firstJrook desc
-                    @setvar! isHerdingActive firstJrook
+                    if 'activated' in desc
+                        @setvar! isHerdingActive firstJrook
+                    else
+                        dclick firstJrook
+                        getlabel firstJrook desc
+                        @setvar! isHerdingActive firstJrook
+                    endif
                 endif
-            endif
-        endwhile
-        @setvar! myAwesomeCrookThatIsActivated isHerdingActive
-    endif
-endif
-
-
-if jaseowns_Tamer_SayAllGuard = 1
-
-    if not varexist jaseowns_Tamer_SayAllGuardTimerCD
-        @setvar! jaseowns_Tamer_SayAllGuardTimerCD 9000
+            endwhile
+            @setvar! myAwesomeCrookThatIsActivated isHerdingActive
+        endif
     endif
 
-    if not timerexists jaseowns_Tamer_SayAllGuardTimer
-        settimer jaseowns_Tamer_SayAllGuardTimer jaseowns_Tamer_SayAllGuardTimerCD
+    if jaseowns_Tamer_SayAllGuard = 1
+
+        if not varexist jaseowns_Tamer_SayAllGuardTimerCD
+            @setvar! jaseowns_Tamer_SayAllGuardTimerCD 9000
+        endif
+
+        if not timerexists jaseowns_Tamer_SayAllGuardTimer
+            settimer jaseowns_Tamer_SayAllGuardTimer jaseowns_Tamer_SayAllGuardTimerCD
+        endif
+
     endif
 
 endif
@@ -415,7 +418,7 @@ while not dead
         endif
     endif
     
-    if jaseowns_Tamer_SayAllGuard = 1 and followers > 0
+    if jaseowns_TamingEnabled = 1 and jaseowns_Tamer_SayAllGuard = 1 and followers > 0
         if timer jaseowns_Tamer_SayAllGuardTimer >= jaseowns_Tamer_SayAllGuardTimerCD
             say "all guard me" 89
             settimer jaseowns_Tamer_SayAllGuardTimer 0
