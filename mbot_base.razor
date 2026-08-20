@@ -87,6 +87,16 @@ if not timerexists jaseowns_Chiv_SymbolCheckTimer
     settimer jaseowns_Chiv_SymbolCheckTimer jaseowns_Chiv_SymbolCheckTimerCD
 endif
 
+#####
+### Chivalry Config
+@setvar! jaseowns_Chiv_MinSymbols_NobleSacrifice 4
+@setvar! jaseowns_Chiv_MinSymbols_HolyLight 5
+@setvar! jaseowns_Chiv_MinSymbols_CloseWounds 7
+@setvar! jaseowns_Chiv_MinSymbols_CleanseByFire 6
+@setvar! jaseowns_Chiv_MinSymbols_DivineFury 8
+@setvar! jaseowns_Chiv_MinSymbols_EnemyOfOne 7
+@setvar! jaseowns_Chiv_MinSymbols_ConsecrateWeapon 6
+
 @setvar! jaseowns_UseItemTimerCD 650
 settimer jaseowns_UseItemTimer jaseowns_UseItemTimerCD
 
@@ -654,269 +664,33 @@ while not dead
             waitforgump 1387930325 500
         endif
         if gumpexists 1387930325
-            @setvar! jaseowns_HolySymbols_HasEnoughFor_HolyLightHeal 0
-            @setvar! jaseowns_HolySymbols_HasEnoughFor_NobleSacrificeHeal 0
             if cooldown PVP
                 unsetvar jaseowns_HolySymbols
             elseif ingump "21/" 1387930325 or ingump "20/" 1387930325 or ingump "19/" 1387930325 or ingump "18/" 1387930325 or ingump "17/" 1387930325 or ingump "16/" 1387930325 or ingump "15/" 1387930325 or ingump "14/" 1387930325 or ingump "13/" 1387930325 or ingump "12/" 1387930325
                 # 12+ symbols is always enough for these heals - cap here instead of tracking the exact count
                 @setvar! jaseowns_HolySymbols 12
-                @setvar! jaseowns_HolySymbols_HasEnoughFor_HolyLightHeal 1
-                @setvar! jaseowns_HolySymbols_HasEnoughFor_NobleSacrificeHeal 1
-                if jaseowns_Chiv_ReserveSymbols = 12
-                    @setvar! jaseowns_HolySymbols 0
-                elseif jaseowns_Chiv_ReserveSymbols = 11
-                    @setvar! jaseowns_HolySymbols 1
-                elseif jaseowns_Chiv_ReserveSymbols = 10
-                    @setvar! jaseowns_HolySymbols 2
-                elseif jaseowns_Chiv_ReserveSymbols = 9
-                    @setvar! jaseowns_HolySymbols 3
-                elseif jaseowns_Chiv_ReserveSymbols = 8
-                    @setvar! jaseowns_HolySymbols 4
-                elseif jaseowns_Chiv_ReserveSymbols = 7
-                    @setvar! jaseowns_HolySymbols 5
-                elseif jaseowns_Chiv_ReserveSymbols = 6
-                    @setvar! jaseowns_HolySymbols 6
-                elseif jaseowns_Chiv_ReserveSymbols = 5
-                    @setvar! jaseowns_HolySymbols 7
-                elseif jaseowns_Chiv_ReserveSymbols = 4
-                    @setvar! jaseowns_HolySymbols 8
-                elseif jaseowns_Chiv_ReserveSymbols = 3
-                    @setvar! jaseowns_HolySymbols 9
-                elseif jaseowns_Chiv_ReserveSymbols = 2
-                    @setvar! jaseowns_HolySymbols 10
-                elseif jaseowns_Chiv_ReserveSymbols = 1
-                    @setvar! jaseowns_HolySymbols 11
-                elseif jaseowns_Chiv_ReserveSymbols = 0
-                    @setvar! jaseowns_HolySymbols 12
-                else
-                    @setvar! jaseowns_HolySymbols 0
-                endif
             elseif ingump "11/" 1387930325
                 @setvar! jaseowns_HolySymbols 11
-                @setvar! jaseowns_HolySymbols_HasEnoughFor_HolyLightHeal 1
-                @setvar! jaseowns_HolySymbols_HasEnoughFor_NobleSacrificeHeal 1
-                if jaseowns_Chiv_ReserveSymbols = 11
-                    @setvar! jaseowns_HolySymbols 0
-                elseif jaseowns_Chiv_ReserveSymbols = 10
-                    @setvar! jaseowns_HolySymbols 1
-                elseif jaseowns_Chiv_ReserveSymbols = 9
-                    @setvar! jaseowns_HolySymbols 2
-                elseif jaseowns_Chiv_ReserveSymbols = 8
-                    @setvar! jaseowns_HolySymbols 3
-                elseif jaseowns_Chiv_ReserveSymbols = 7
-                    @setvar! jaseowns_HolySymbols 4
-                elseif jaseowns_Chiv_ReserveSymbols = 6
-                    @setvar! jaseowns_HolySymbols 5
-                elseif jaseowns_Chiv_ReserveSymbols = 5
-                    @setvar! jaseowns_HolySymbols 6
-                elseif jaseowns_Chiv_ReserveSymbols = 4
-                    @setvar! jaseowns_HolySymbols 7
-                elseif jaseowns_Chiv_ReserveSymbols = 3
-                    @setvar! jaseowns_HolySymbols 8
-                elseif jaseowns_Chiv_ReserveSymbols = 2
-                    @setvar! jaseowns_HolySymbols 9
-                elseif jaseowns_Chiv_ReserveSymbols = 1
-                    @setvar! jaseowns_HolySymbols 10
-                elseif jaseowns_Chiv_ReserveSymbols = 0
-                    @setvar! jaseowns_HolySymbols 11
-                else
-                    @setvar! jaseowns_HolySymbols 0
-                endif
             elseif ingump "10/" 1387930325
                 @setvar! jaseowns_HolySymbols 10
-                @setvar! jaseowns_HolySymbols_HasEnoughFor_HolyLightHeal 1
-                @setvar! jaseowns_HolySymbols_HasEnoughFor_NobleSacrificeHeal 1
-                if jaseowns_Chiv_ReserveSymbols = 10
-                    @setvar! jaseowns_HolySymbols 0
-                    @setvar! jaseowns_HolySymbols_HasEnoughForHeal 1
-                elseif jaseowns_Chiv_ReserveSymbols = 9
-                    @setvar! jaseowns_HolySymbols 1
-                elseif jaseowns_Chiv_ReserveSymbols = 8
-                    @setvar! jaseowns_HolySymbols 2
-                elseif jaseowns_Chiv_ReserveSymbols = 7
-                    @setvar! jaseowns_HolySymbols 3
-                elseif jaseowns_Chiv_ReserveSymbols = 6
-                    @setvar! jaseowns_HolySymbols 4
-                elseif jaseowns_Chiv_ReserveSymbols = 5
-                    @setvar! jaseowns_HolySymbols 5
-                elseif jaseowns_Chiv_ReserveSymbols = 4
-                    @setvar! jaseowns_HolySymbols 6
-                elseif jaseowns_Chiv_ReserveSymbols = 3
-                    @setvar! jaseowns_HolySymbols 7
-                elseif jaseowns_Chiv_ReserveSymbols = 2
-                    @setvar! jaseowns_HolySymbols 8
-                elseif jaseowns_Chiv_ReserveSymbols = 1
-                    @setvar! jaseowns_HolySymbols 9
-                elseif jaseowns_Chiv_ReserveSymbols = 0
-                    @setvar! jaseowns_HolySymbols 10
-                else
-                    @setvar! jaseowns_HolySymbols 0
-                endif
             elseif ingump "9/" 1387930325
                 @setvar! jaseowns_HolySymbols 9
-                @setvar! jaseowns_HolySymbols_HasEnoughFor_HolyLightHeal 1
-                @setvar! jaseowns_HolySymbols_HasEnoughFor_NobleSacrificeHeal 1
-                if jaseowns_Chiv_ReserveSymbols = 9
-                    @setvar! jaseowns_HolySymbols 0
-                elseif jaseowns_Chiv_ReserveSymbols = 8
-                    @setvar! jaseowns_HolySymbols 1
-                elseif jaseowns_Chiv_ReserveSymbols = 7
-                    @setvar! jaseowns_HolySymbols 2
-                elseif jaseowns_Chiv_ReserveSymbols = 6
-                    @setvar! jaseowns_HolySymbols 3
-                elseif jaseowns_Chiv_ReserveSymbols = 5
-                    @setvar! jaseowns_HolySymbols 4
-                elseif jaseowns_Chiv_ReserveSymbols = 4
-                    @setvar! jaseowns_HolySymbols 5
-                elseif jaseowns_Chiv_ReserveSymbols = 3
-                    @setvar! jaseowns_HolySymbols 6
-                elseif jaseowns_Chiv_ReserveSymbols = 2
-                    @setvar! jaseowns_HolySymbols 7
-                elseif jaseowns_Chiv_ReserveSymbols = 1
-                    @setvar! jaseowns_HolySymbols 8
-                elseif jaseowns_Chiv_ReserveSymbols = 0
-                    @setvar! jaseowns_HolySymbols 9
-                else
-                    @setvar! jaseowns_HolySymbols 0
-                endif
             elseif ingump "8/" 1387930325
                 @setvar! jaseowns_HolySymbols 8
-                @setvar! jaseowns_HolySymbols_HasEnoughFor_HolyLightHeal 1
-                @setvar! jaseowns_HolySymbols_HasEnoughFor_NobleSacrificeHeal 1
-                if jaseowns_Chiv_ReserveSymbols = 8
-                    @setvar! jaseowns_HolySymbols 0
-                elseif jaseowns_Chiv_ReserveSymbols = 7
-                    @setvar! jaseowns_HolySymbols 1
-                elseif jaseowns_Chiv_ReserveSymbols = 6
-                    @setvar! jaseowns_HolySymbols 2
-                elseif jaseowns_Chiv_ReserveSymbols = 5
-                    @setvar! jaseowns_HolySymbols 3
-                elseif jaseowns_Chiv_ReserveSymbols = 4
-                    @setvar! jaseowns_HolySymbols 4
-                elseif jaseowns_Chiv_ReserveSymbols = 3
-                    @setvar! jaseowns_HolySymbols 5
-                elseif jaseowns_Chiv_ReserveSymbols = 2
-                    @setvar! jaseowns_HolySymbols 6
-                elseif jaseowns_Chiv_ReserveSymbols = 1
-                    @setvar! jaseowns_HolySymbols 7
-                elseif jaseowns_Chiv_ReserveSymbols = 0
-                    @setvar! jaseowns_HolySymbols 8
-                else
-                    @setvar! jaseowns_HolySymbols 0
-                endif
             elseif ingump "7/" 1387930325
                 @setvar! jaseowns_HolySymbols 7
-                @setvar! jaseowns_HolySymbols_HasEnoughFor_HolyLightHeal 1
-                @setvar! jaseowns_HolySymbols_HasEnoughFor_NobleSacrificeHeal 1
-                if jaseowns_Chiv_ReserveSymbols = 7
-                    @setvar! jaseowns_HolySymbols 0
-                elseif jaseowns_Chiv_ReserveSymbols = 6
-                    @setvar! jaseowns_HolySymbols 1
-                elseif jaseowns_Chiv_ReserveSymbols = 5
-                    @setvar! jaseowns_HolySymbols 2
-                elseif jaseowns_Chiv_ReserveSymbols = 4
-                    @setvar! jaseowns_HolySymbols 3
-                elseif jaseowns_Chiv_ReserveSymbols = 3
-                    @setvar! jaseowns_HolySymbols 4
-                elseif jaseowns_Chiv_ReserveSymbols = 2
-                    @setvar! jaseowns_HolySymbols 5
-                elseif jaseowns_Chiv_ReserveSymbols = 1
-                    @setvar! jaseowns_HolySymbols 6
-                elseif jaseowns_Chiv_ReserveSymbols = 0
-                    @setvar! jaseowns_HolySymbols 7
-                else
-                    @setvar! jaseowns_HolySymbols 0
-                endif
             elseif ingump "6/" 1387930325
                 @setvar! jaseowns_HolySymbols 6
-                @setvar! jaseowns_HolySymbols_HasEnoughFor_HolyLightHeal 1
-                @setvar! jaseowns_HolySymbols_HasEnoughFor_NobleSacrificeHeal 1
-                if jaseowns_Chiv_ReserveSymbols = 6
-                    @setvar! jaseowns_HolySymbols 0
-                elseif jaseowns_Chiv_ReserveSymbols = 5
-                    @setvar! jaseowns_HolySymbols 1
-                elseif jaseowns_Chiv_ReserveSymbols = 4
-                    @setvar! jaseowns_HolySymbols 2
-                elseif jaseowns_Chiv_ReserveSymbols = 3
-                    @setvar! jaseowns_HolySymbols 3
-                elseif jaseowns_Chiv_ReserveSymbols = 2
-                    @setvar! jaseowns_HolySymbols 4
-                elseif jaseowns_Chiv_ReserveSymbols = 1
-                    @setvar! jaseowns_HolySymbols 5
-                elseif jaseowns_Chiv_ReserveSymbols = 0
-                    @setvar! jaseowns_HolySymbols 6
-                else
-                    @setvar! jaseowns_HolySymbols 0
-                endif
             elseif ingump "5/" 1387930325
                 @setvar! jaseowns_HolySymbols 5
-                @setvar! jaseowns_HolySymbols_HasEnoughFor_HolyLightHeal 1
-                @setvar! jaseowns_HolySymbols_HasEnoughFor_NobleSacrificeHeal 1
-                if jaseowns_Chiv_ReserveSymbols = 5
-                    @setvar! jaseowns_HolySymbols 0
-                elseif jaseowns_Chiv_ReserveSymbols = 4
-                    @setvar! jaseowns_HolySymbols 1
-                elseif jaseowns_Chiv_ReserveSymbols = 3
-                    @setvar! jaseowns_HolySymbols 2
-                elseif jaseowns_Chiv_ReserveSymbols = 2
-                    @setvar! jaseowns_HolySymbols 3
-                elseif jaseowns_Chiv_ReserveSymbols = 1
-                    @setvar! jaseowns_HolySymbols 4
-                elseif jaseowns_Chiv_ReserveSymbols = 0
-                    @setvar! jaseowns_HolySymbols 5
-                else
-                    @setvar! jaseowns_HolySymbols 0
-                endif
             elseif ingump "4/" 1387930325
                 @setvar! jaseowns_HolySymbols 4
-                @setvar! jaseowns_HolySymbols_HasEnoughFor_NobleSacrificeHeal 1
-                if jaseowns_Chiv_ReserveSymbols = 4
-                    @setvar! jaseowns_HolySymbols 0
-                elseif jaseowns_Chiv_ReserveSymbols = 3
-                    @setvar! jaseowns_HolySymbols 1
-                elseif jaseowns_Chiv_ReserveSymbols = 2
-                    @setvar! jaseowns_HolySymbols 2
-                elseif jaseowns_Chiv_ReserveSymbols = 1
-                    @setvar! jaseowns_HolySymbols 3
-                elseif jaseowns_Chiv_ReserveSymbols = 0
-                    @setvar! jaseowns_HolySymbols 4
-                else
-                    @setvar! jaseowns_HolySymbols 0
-                endif
             elseif ingump "3/" 1387930325
                 @setvar! jaseowns_HolySymbols 3
-                if jaseowns_Chiv_ReserveSymbols = 3
-                    @setvar! jaseowns_HolySymbols 0
-                elseif jaseowns_Chiv_ReserveSymbols = 2
-                    @setvar! jaseowns_HolySymbols 1
-                elseif jaseowns_Chiv_ReserveSymbols = 1
-                    @setvar! jaseowns_HolySymbols 2
-                elseif jaseowns_Chiv_ReserveSymbols = 0
-                    @setvar! jaseowns_HolySymbols 3
-                else
-                    @setvar! jaseowns_HolySymbols 0
-                endif
             elseif ingump "2/" 1387930325
                 @setvar! jaseowns_HolySymbols 2
-                if jaseowns_Chiv_ReserveSymbols = 2
-                    @setvar! jaseowns_HolySymbols 0
-                elseif jaseowns_Chiv_ReserveSymbols = 1
-                    @setvar! jaseowns_HolySymbols 1
-                elseif jaseowns_Chiv_ReserveSymbols = 0
-                    @setvar! jaseowns_HolySymbols 2
-                else
-                    @setvar! jaseowns_HolySymbols 0
-                endif
             elseif ingump "1/" 1387930325
                 @setvar! jaseowns_HolySymbols 1
-                if jaseowns_Chiv_ReserveSymbols = 1
-                    @setvar! jaseowns_HolySymbols 0
-                elseif jaseowns_Chiv_ReserveSymbols = 0
-                    @setvar! jaseowns_HolySymbols 1
-                else
-                    @setvar! jaseowns_HolySymbols 0
-                endif
             elseif ingump "0/" 1387930325
                 @setvar! jaseowns_HolySymbols 0
             endif
@@ -924,11 +698,12 @@ while not dead
         settimer jaseowns_Chiv_SymbolCheckTimer 0
     endif
 
+    ##### Chivalry Gate A - Noble Sacrifice / Holy Light (emergency heals, no reserve)
     if varexist jaseowns_HolySymbols
-        
+
         @setvar! jaseowns_BOT_UseNobleSacrifice 0
         if jaseowns_Chiv_UseNobleSacrificeAutomatically = 1 and skill "chivalry" >= 80 and timer jaseowns_NobleSacrificeTimer >= jaseowns_NobleSacrificeTimerCD
-            if jaseowns_HolySymbols_HasEnoughFor_NobleSacrificeHeal = 1 or 4 <= jaseowns_HolySymbols
+            if jaseowns_Chiv_MinSymbols_NobleSacrifice <= jaseowns_HolySymbols
                 if not varexist jaseowns_Chiv_AutoUseNobleSacrificeHpDiffTrigger
                     if hp <= 30
                         @setvar! jaseowns_BOT_UseNobleSacrifice 1
@@ -941,7 +716,7 @@ while not dead
 
         @setvar! jaseowns_BOT_UseHolyLight 0
         if jaseowns_Chiv_UseHolyLightAutomatically = 1 and skill "chivalry" >= 95 and timer jaseowns_HolyLightTimer >= jaseowns_HolyLightTimerCD
-            if jaseowns_HolySymbols_HasEnoughFor_HolyLightHeal = 1 or 5 <= jaseowns_HolySymbols
+            if jaseowns_Chiv_MinSymbols_HolyLight <= jaseowns_HolySymbols
                 if not varexist jaseowns_Chiv_AutoHolyLightHpDiffTrigger
                     if hp <= 20
                         @setvar! jaseowns_BOT_UseHolyLight 1
@@ -952,26 +727,13 @@ while not dead
             endif
         endif
 
-        @setvar! jaseowns_BOT_UseCloseWounds 0
-        if findbuff "disease" or findbuff "bleed"
-            if jaseowns_Chiv_UseCloseWoundsAutomatically = 1 and 3 <= jaseowns_HolySymbols and skill "chivalry" >= 70 and timer jaseowns_CloseWoundsTimer >= jaseowns_CloseWoundsTimerCD
-                if not varexist jaseowns_Chiv_AutoCloseWoundHpDiffTrigger
-                    if diffhits >= 5
-                        @setvar! jaseowns_BOT_UseCloseWounds 1
-                    endif
-                elseif diffhits >= jaseowns_Chiv_AutoCloseWoundHpDiffTrigger 
-                    @setvar! jaseowns_BOT_UseCloseWounds 1
-                endif
-            endif
-        endif
-       
         if jaseowns_BOT_UseNobleSacrifice = 1
-            
-            if targetexists 
+
+            if targetexists
                 hotkey "Clear Current Target"
             endif
-        
-            if skill "Healing" > 0 and findtype 3617 self 
+
+            if skill "Healing" > 0 and findtype 3617 self
                 while insysmsg "You begin applying"
                 endwhile
                 hotkey "Bandage Self"
@@ -980,16 +742,16 @@ while not dead
                     settimer jaseowns_BandageTimer 0
                 endif
             endif
-        
+
             say "[NobleSacrifice"
             wft 500
-            if targetexists 
-                while insysmsg "Holy symbols remaining" 
+            if targetexists
+                while insysmsg "Holy symbols remaining"
                 endwhile
                 hotkey "Target Self"
                 getlabel backpack jaseowns_PingCheck
-                if not targetexists 
-                    if insysmsg "Holy symbols remaining" 
+                if not targetexists
+                    if insysmsg "Holy symbols remaining"
                         cooldown "Noble Sacrifice" jaseowns_NobleSacrificeTimerCD
                         settimer jaseowns_NobleSacrificeTimer 0
                         settimer jaseowns_Chiv_SymbolCheckTimer jaseowns_Chiv_SymbolCheckTimerCD
@@ -999,29 +761,64 @@ while not dead
                 endif
             endif
         elseif jaseowns_BOT_UseHolyLight = 1
-            while insysmsg "Holy symbols remaining" 
+            while insysmsg "Holy symbols remaining"
             endwhile
             say "[HolyLight"
             getlabel backpack jaseowns_PingCheck
-            if insysmsg "Holy symbols remaining" 
+            if insysmsg "Holy symbols remaining"
                 cooldown "Holy Light" jaseowns_HolyLightTimerCD
                 settimer jaseowns_HolyLightTimer 0
                 settimer jaseowns_Chiv_SymbolCheckTimer jaseowns_Chiv_SymbolCheckTimerCD
             endif
-        elseif jaseowns_BOT_UseCloseWounds = 1
-            while insysmsg "Holy symbols remaining" 
+        endif
+
+    endif
+
+    ##### Chivalry Gate B - Close Wounds / Cleanse By Fire (respects reserve)
+    if varexist jaseowns_HolySymbols
+
+        @setvar! jaseowns_BOT_UseCloseWounds 0
+        if findbuff "disease" or findbuff "bleed"
+            if jaseowns_Chiv_UseCloseWoundsAutomatically = 1 and jaseowns_Chiv_MinSymbols_CloseWounds <= jaseowns_HolySymbols and skill "chivalry" >= 70 and timer jaseowns_CloseWoundsTimer >= jaseowns_CloseWoundsTimerCD
+                if not varexist jaseowns_Chiv_AutoCloseWoundHpDiffTrigger
+                    if diffhits >= 5
+                        @setvar! jaseowns_BOT_UseCloseWounds 1
+                    endif
+                elseif diffhits >= jaseowns_Chiv_AutoCloseWoundHpDiffTrigger
+                    @setvar! jaseowns_BOT_UseCloseWounds 1
+                endif
+            endif
+        endif
+
+        @setvar! jaseowns_BOT_UseCleanseByFire 0
+        if poisoned and jaseowns_Chiv_UseCleanseByFireAutomatically = 1 and jaseowns_Chiv_MinSymbols_CleanseByFire <= jaseowns_HolySymbols and skill "chivalry" >= 60 and timer jaseowns_CleanseByFireTimer >= jaseowns_CleanseByFireTimerCD
+            @setvar! jaseowns_BOT_UseCleanseByFire 1
+        endif
+
+        if jaseowns_BOT_UseCloseWounds = 1
+            while insysmsg "Holy symbols remaining"
             endwhile
             say "[CloseWounds"
             getlabel backpack jaseowns_PingCheck
-            if insysmsg "Holy symbols remaining" 
+            if insysmsg "Holy symbols remaining"
                 cooldown "Close Wounds" jaseowns_CloseWoundsTimerCD
                 settimer jaseowns_CloseWoundsTimer 0
                 settimer jaseowns_Chiv_SymbolCheckTimer jaseowns_Chiv_SymbolCheckTimerCD
             endif
+        elseif jaseowns_BOT_UseCleanseByFire = 1
+            while insysmsg "Holy symbols remaining"
+            endwhile
+            say "[CleanseByFire"
+            getlabel backpack jaseowns_PingCheck
+            if insysmsg "Holy symbols remaining"
+                cooldown "Cleanse By Fire" jaseowns_CleanseByFireTimerCD
+                settimer jaseowns_CleanseByFireTimer 0
+                settimer jaseowns_Chiv_SymbolCheckTimer jaseowns_Chiv_SymbolCheckTimerCD
+            endif
         endif
-        
+
     endif
-    
+
     @setvar! jaseowns_CurrentBotTargetAttacked 0
 
     
@@ -1761,27 +1558,17 @@ while not dead
                 @setvar! jaseowns_Chiv_DiviveFuryIsUsed 1
             endif
         
-            if jaseowns_Chiv_UseDivineFuryAutomatically = 1 and 4 <= jaseowns_HolySymbols and skill "chivalry" >= 90 and timer jaseowns_DivineFuryTimer >= jaseowns_DivineFuryTimerCD
+            if jaseowns_Chiv_UseDivineFuryAutomatically = 1 and jaseowns_Chiv_MinSymbols_DivineFury <= jaseowns_HolySymbols and skill "chivalry" >= 85 and timer jaseowns_DivineFuryTimer >= jaseowns_DivineFuryTimerCD
                 while insysmsg "Holy symbols remaining"
                 endwhile
                 say "[DivineFury"
                 getlabel backpack jaseowns_PingCheck
-                if insysmsg "Holy symbols remaining" 
+                if insysmsg "Holy symbols remaining"
                     cooldown "Divine Fury" jaseowns_DivineFuryTimerCD
                     settimer jaseowns_DivineFuryTimer 0
                     settimer jaseowns_Chiv_SymbolCheckTimer jaseowns_Chiv_SymbolCheckTimerCD
                 endif
-            elseif poisoned and jaseowns_Chiv_UseCleanseByFireAutomatically = 1 and 2 <= jaseowns_HolySymbols and skill "chivalry" >= 60 and timer jaseowns_CleanseByFireTimer >= jaseowns_CleanseByFireTimerCD
-                while insysmsg "Holy symbols remaining"
-                endwhile
-                say "[CleanseByFire"
-                getlabel backpack jaseowns_PingCheck
-                if insysmsg "Holy symbols remaining" 
-                    cooldown "Cleanse By Fire" jaseowns_CleanseByFireTimerCD
-                    settimer jaseowns_CleanseByFireTimer 0
-                    settimer jaseowns_Chiv_SymbolCheckTimer jaseowns_Chiv_SymbolCheckTimerCD
-                endif
-            elseif jaseowns_Chiv_DiviveFuryIsUsed = 1 and jaseowns_Chiv_UseEnemyOfOneAutomatically = 1 and 3 <= jaseowns_HolySymbols and skill "chivalry" >= 75 and timer jaseowns_EnemyOfOneTimer >= jaseowns_EnemyOfOneTimerCD
+            elseif jaseowns_Chiv_DiviveFuryIsUsed = 1 and jaseowns_Chiv_UseEnemyOfOneAutomatically = 1 and jaseowns_Chiv_MinSymbols_EnemyOfOne <= jaseowns_HolySymbols and skill "chivalry" >= 75 and timer jaseowns_EnemyOfOneTimer >= jaseowns_EnemyOfOneTimerCD
                 while insysmsg "Holy symbols remaining"
                 endwhile
                 say "[EnemyOfOne"
@@ -1791,7 +1578,7 @@ while not dead
                     settimer jaseowns_EnemyOfOneTimer 0
                     settimer jaseowns_Chiv_SymbolCheckTimer jaseowns_Chiv_SymbolCheckTimerCD
                 endif  
-            elseif jaseowns_Chiv_DiviveFuryIsUsed = 1 and jaseowns_Chiv_UseConsecrateWeaponAutomatically = 1 and 2 <= jaseowns_HolySymbols and skill "chivalry" >= 65 and timer jaseowns_ConsecrateWeaponTimer >= jaseowns_ConsecrateWeaponTimerCD
+            elseif jaseowns_Chiv_DiviveFuryIsUsed = 1 and jaseowns_Chiv_UseConsecrateWeaponAutomatically = 1 and jaseowns_Chiv_MinSymbols_ConsecrateWeapon <= jaseowns_HolySymbols and skill "chivalry" >= 65 and timer jaseowns_ConsecrateWeaponTimer >= jaseowns_ConsecrateWeaponTimerCD
                 while insysmsg "Holy symbols remaining"
                 endwhile
                 say "[ConsecrateWeapon"
