@@ -1,15 +1,17 @@
-#####################################
-### You should not have to edit this file ever.
-#####
-# 10/27/2025 = 3.0 - Updating targeting
-# - [x] remove clearsysmsg and clear out the messages we look for in the script 
-# - [ ] allow no target to happen from the script - new variable
-#####################################
-if mconfig_General_ShowVersion = 1
-    overhead "Dexxer Bot Base 3.0" 76
-endif
-
-# Premium Dexxer Bot- BASE
+################################################################
+### Muls Dexxer Bot - v1.0.20260819
+### Based on Jaseowns' Premium Dexxer Bot (June 2026 version)
+#
+# 2026-08-19 Release
+# - Optimized Chivalry
+# - Optimized Combat Loop
+# - Optimized barding
+# - Optimized tamer
+# - Fixed poison reapplication
+#
+# 47% smaller file size
+# 59% fewer branches -- 918 -> 378 branches (540 removed)
+################################################################
 
 @setvar! mbot_TamerDetected 0
 if skill "Animal Taming" >= 80
@@ -1546,10 +1548,11 @@ while not dead
                 settimer mbot_UseItemTimer 0
             endif
         endif
-        
-    
+
+
+        ##### Chivalry Gate C - Divine Fury / Enemy of One / Consecrate Weapon (respects reserve, combat only)
         if varexist mbot_HolySymbols
-            
+
             @setvar! mbot_divineFuryIsUsed 0
             if mconfig_Chiv_UseDivineFuryAutomatically = 0
                 @setvar! mbot_divineFuryIsUsed 1
