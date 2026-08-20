@@ -87,16 +87,6 @@ if not timerexists jaseowns_Chiv_SymbolCheckTimer
     settimer jaseowns_Chiv_SymbolCheckTimer jaseowns_Chiv_SymbolCheckTimerCD
 endif
 
-#####
-### Chivalry Config
-@setvar! jaseowns_Chiv_MinSymbols_NobleSacrifice 4
-@setvar! jaseowns_Chiv_MinSymbols_HolyLight 5
-@setvar! jaseowns_Chiv_MinSymbols_CloseWounds 7
-@setvar! jaseowns_Chiv_MinSymbols_CleanseByFire 6
-@setvar! jaseowns_Chiv_MinSymbols_DivineFury 8
-@setvar! jaseowns_Chiv_MinSymbols_EnemyOfOne 7
-@setvar! jaseowns_Chiv_MinSymbols_ConsecrateWeapon 6
-
 @setvar! jaseowns_UseItemTimerCD 650
 settimer jaseowns_UseItemTimer jaseowns_UseItemTimerCD
 
@@ -310,7 +300,7 @@ if not find myAwesomeCrookThatIsActivated self
         @setvar! isHerdingActive 0
         while isHerdingActive = 0
             if counttype 3713 self > 1
-                @clearignore 
+                @clearignore
                 while findtype 3713 self as jrook
                     getlabel jrook multiDesc
                     if 'activated' in multiDesc
@@ -319,12 +309,12 @@ if not find myAwesomeCrookThatIsActivated self
                     endif
                     @ignore jrook
                 endwhile
-                @clearignore 
+                @clearignore
                 if isHerdingActive = 0
                     dclick firstJrook
                 endif
             endif
-            
+
             if isHerdingActive = 0
                 getlabel firstJrook desc
                 if 'activated' in desc
@@ -333,7 +323,7 @@ if not find myAwesomeCrookThatIsActivated self
                     dclick firstJrook
                     getlabel firstJrook desc
                     @setvar! isHerdingActive firstJrook
-                endif 
+                endif
             endif
         endwhile
         @setvar! myAwesomeCrookThatIsActivated isHerdingActive
