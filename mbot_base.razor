@@ -8,10 +8,73 @@
 # - Optimized barding
 # - Optimized tamer
 # - Fixed poison reapplication
+# - Added Smart Weapon Equip
+# - Added Smart Shield Equip
 #
 # 47% smaller file size
-# 59% fewer branches -- 918 -> 378 branches (540 removed)
+# 65% fewer main loop branches -- 851 -> 299 branches (552 removed)
 ################################################################
+
+##### Smart Weapon Equip Config (edit here to add/remove weapons)
+removelist mbot_WeaponTypeList
+createlist mbot_WeaponTypeList
+# Archery: Balestra (30993), Bow (5042), Crossbow (3920), Great Bow (30990), Heavy Crossbow (5117), Hunting Bow (30994), Stubnose Crossbow (31184), Rampart Crossbow (31186), Recurve Bow (30995)
+pushlist mbot_WeaponTypeList 30994
+pushlist mbot_WeaponTypeList 30995
+pushlist mbot_WeaponTypeList 5117
+pushlist mbot_WeaponTypeList 31186
+pushlist mbot_WeaponTypeList 30990
+
+# Dual Wielding: Dual Hunting Knives (67778), Dual Katanas (67773), Dual Norse Axes (67774), Dual Rapiers (67775), Dual Sabres (67776), Dual Scimitars (67777)
+pushlist mbot_WeaponTypeList 67773
+pushlist mbot_WeaponTypeList 67775
+pushlist mbot_WeaponTypeList 67776
+
+# Fencing: Assassin's Knife (30996), Dagger (3922), Epee (30989), Fencing Sabre (30998), Hunting Knife (31188), Kryss (5121), Kukri (31176), Pitchfork (3719), Rapier (30997), Sarissa (30992), Short Spear (5123), Spear (3938), War Fork (5125)
+pushlist mbot_WeaponTypeList 5121
+pushlist mbot_WeaponTypeList 5125
+pushlist mbot_WeaponTypeList 30989
+pushlist mbot_WeaponTypeList 30997
+pushlist mbot_WeaponTypeList 30998
+pushlist mbot_WeaponTypeList 5123
+pushlist mbot_WeaponTypeList 3719
+
+# Mace Fighting: Black Staff (3568), Club (5044), Cudgel (31014), Flail (30999), Flanged Mace (30991), Giant Club (31178), Giant Spiked Mace (31182), Gnarled Staff (5112), Great Mace (31180), Great Sledge (31001), Hammer Pick (5181), Mace (3932), Maul (5179), Quarter Staff (3721), Shepherd's Crook (3713, not auto-equipped - shares graphic ID with the herding crook item), Skull Club (31000), War Axe (5040), War Hammer (5177), War Mace (5127)
+pushlist mbot_WeaponTypeList 5112
+pushlist mbot_WeaponTypeList 3568
+
+# Swordsmanship: Axe (3913), Bardiche (3917), Battle Axe (3911), Broadsword (3934), Cutlass (5185), Double Axe (3915), Executioner's Axe (3909), Great Axe (31190), Halberd (5182), Katana (5119), Large Battle Axe (5115), Longsword (3937), Norse Axe (31128), Scimitar (5046), Two Handed Axe (5187), Viking Sword (5049), Zweihander (30988)
+pushlist mbot_WeaponTypeList 5119
+pushlist mbot_WeaponTypeList 5049
+pushlist mbot_WeaponTypeList 3915
+pushlist mbot_WeaponTypeList 3911
+pushlist mbot_WeaponTypeList 3909
+pushlist mbot_WeaponTypeList 5182
+
+# Throwing: Chakram (67713), Francisca Axe (67723), Hurlbat (67734), Javelin (67744), Throwing Dagger (67754), Throwing Star (67764)
+pushlist mbot_WeaponTypeList 67754
+pushlist mbot_WeaponTypeList 67764
+
+# Wrestling: Cestus (31141), Fistblade (31142), Martial Manual (22187)
+pushlist mbot_WeaponTypeList 22187
+pushlist mbot_WeaponTypeList 31141
+pushlist mbot_WeaponTypeList 31142
+
+##### Smart Shield Equip Config (edit here to add/remove shields)
+removelist mbot_ShieldTypeList
+createlist mbot_ShieldTypeList
+# Shields: Bone Shield (31130), Bronze Shield (7026), Buckler (7027), Chaos Shield (7107), Heater Shield (7031), Metal Kite Shield (7029), Metal Shield (7035), Order Shield (7109), Parrying Gauche (31002), Wooden Kite Shield (7033), Wooden Shield (7034)
+pushlist mbot_ShieldTypeList 7026
+pushlist mbot_ShieldTypeList 7027
+pushlist mbot_ShieldTypeList 7029
+pushlist mbot_ShieldTypeList 7031
+pushlist mbot_ShieldTypeList 7033
+pushlist mbot_ShieldTypeList 7034
+pushlist mbot_ShieldTypeList 7035
+pushlist mbot_ShieldTypeList 7107
+pushlist mbot_ShieldTypeList 7109
+pushlist mbot_ShieldTypeList 31002
+pushlist mbot_ShieldTypeList 31130
 
 ##### Archetype Detection
 @setvar! mbot_TamerDetected 0
@@ -45,22 +108,6 @@ pushlist poison_check_list " (0."
 ##### Target State & Overhead Timers
 @setvar! mbot_CurrentBotTarget 0
 @setvar! mbot_FightingRangeCheck 12
-
-if not varexist mconfig_Bard_AutoUseAoePeaceWhenLowHealthCheck
-    @setvar! mconfig_Bard_AutoUseAoePeaceWhenLowHealthCheck 50
-endif
-
-if not varexist mconfig_Target_CurrentOverheadTimerCD
-    @setvar! mconfig_Target_CurrentOverheadTimerCD 2000
-endif
-
-if not varexist mconfig_Target_UnableToAttackOverheadTimerCD
-    @setvar! mconfig_Target_UnableToAttackOverheadTimerCD 2000
-endif
-
-if not varexist mconfig_Target_IgnoreMobOverheadTimerCD
-    @setvar! mconfig_Target_IgnoreMobOverheadTimerCD 2000
-endif
 
 settimer mbot_CurrentBotTargetOverheadTimer mconfig_Target_CurrentOverheadTimerCD
 settimer mbot_CurrentBotTargetUnableToAttackOverheadTimer mconfig_Target_UnableToAttackOverheadTimerCD
@@ -111,37 +158,10 @@ endif
 settimer mbot_UseItemTimer mbot_UseItemTimerCD
 
 ##### Potion Triggers & Overhead Display
-if not varexist mconfig_Potion_HealHpDiffTrigger
-    @setvar! mconfig_Potion_HealHpDiffTrigger 40
-endif
-if not varexist mconfig_Potion_CureHpDiffTrigger
-    @setvar! mconfig_Potion_CureHpDiffTrigger 0
-endif
-
 if mconfig_Potion_ShowOverheads = 1
-    if not varexist mconfig_Potion_CureOverheadIfCountIsLessThan
-        @setvar! mconfig_Potion_CureOverheadIfCountIsLessThan 5
-    endif
-    if not varexist mconfig_Potion_CureOverheadIfCountIsLessThanTimerCD
-        @setvar! mconfig_Potion_CureOverheadIfCountIsLessThanTimerCD 5000
-    endif
     settimer mbot_Potion_Cure_Overhead_IfCountIsLessThan_Timer mconfig_Potion_CureOverheadIfCountIsLessThanTimerCD
-    if not varexist mconfig_Potion_HealOverheadIfCountIsLessThan
-        @setvar! mconfig_Potion_HealOverheadIfCountIsLessThan 5
-    endif
-    if not varexist mconfig_Potion_HealOverheadIfCountIsLessThanTimerCD
-        @setvar! mconfig_Potion_HealOverheadIfCountIsLessThanTimerCD 5000
-    endif
     settimer mbot_Potion_Heal_Overhead_IfCountIsLessThan_Timer mconfig_Potion_HealOverheadIfCountIsLessThanTimerCD
-
-    if not varexist mconfig_Potion_ExplosionOverheadIfCountIsLessThan
-        @setvar! mconfig_Potion_ExplosionOverheadIfCountIsLessThan 5
-    endif
-    if not varexist mconfig_Potion_ExplosionOverheadIfCountIsLessThanTimerCD
-        @setvar! mconfig_Potion_ExplosionOverheadIfCountIsLessThanTimerCD 5000
-    endif
     settimer mbot_Potion_Explosion_Overhead_IfCountIsLessThan_Timer mconfig_Potion_ExplosionOverheadIfCountIsLessThanTimerCD
-    
 endif
 
 ##### Cooldown System Warmup (forces the cooldown table to exist before first real use)
@@ -168,40 +188,17 @@ else
     endif
 
     @setvar! mbot_Parry_SwitchCodexTimerCD 1000
-    
-    if not varexist mconfig_Parry_CodexMinMana
-        @setvar! mconfig_Parry_CodexMinMana 3
-    endif
-
-    if not varexist mconfig_Parry_SwitchToWardingIfBleedingHpDiff
-        @setvar! mconfig_Parry_SwitchToWardingIfBleedingHpDiff 0
-    endif
-    
-    if not varexist mconfig_Parry_SwitchToWardingIfDiseaseHpDiff
-        @setvar! mconfig_Parry_SwitchToWardingIfDiseaseHpDiff 0
-    endif
-    
-    if not varexist mconfig_Parry_SwitchToWardingIfPoisonHpDiff
-        @setvar! mconfig_Parry_SwitchToWardingIfPoisonHpDiff 0
-    endif
 
     if not timerexists mbot_Parry_SwitchCodexTimer
         settimer mbot_Parry_SwitchCodexTimer mbot_Parry_SwitchCodexTimerCD
     endif
 
-    if not varexist mconfig_Parry_TauntingTimerCD
-        @setvar! mconfig_Parry_TauntingTimerCD 15000
-    endif
-    
     if not timerexists mbot_TauntingTimer
         settimer mbot_TauntingTimer mconfig_Parry_TauntingTimerCD
     endif
 endif
 
 ##### Potion Satchel & Refresh Trigger
-if not varexist mconfig_Potion_RefreshStamDiffTrigger
-    @setvar! mconfig_Potion_RefreshStamDiffTrigger 5
-endif
 
 @setvar! mbot_PotionSatchel backpack
 if findlayer self Outerbody as mbot_MaybePotionSatchel
@@ -266,9 +263,6 @@ if mconfig_Weapon_ForceCodexHotBarToShow = 1 and not gumpexists 2016719803
     waitforgump 2016719803 1000
 endif
 
-if not varexist mconfig_Weapon_UseAbilityTimerCD
-    @setvar! mconfig_Weapon_UseAbilityTimerCD 30500
-endif
 settimer mbot_UseAbilityTimer mconfig_Weapon_UseAbilityTimerCD
 
 ##### Alchemy-Gated Features
@@ -278,9 +272,6 @@ if skill "Alchemy" < 80
 endif
 
 ##### Veterinary Setup
-if not varexist mconfig_Vet_UseSuppliesTimerCD
-    @setvar! mconfig_Vet_UseSuppliesTimerCD 5000
-endif
 settimer mbot_VET_UseVetSuppliesTimer mconfig_Vet_UseSuppliesTimerCD
 
 
@@ -317,6 +308,66 @@ if findlayer self lefthand as mbot_LeftHandWeapon
     @setvar! mbot_BOT_CurrentLeftHandWeapon mbot_LeftHandWeapon
 endif
 
+##### Smart Weapon Equip
+if not findlayer self righthand
+    if find mbot_BOT_CurrentRightHandWeapon backpack
+        dclick mbot_BOT_CurrentRightHandWeapon
+        getlabel backpack mbot_PingCheck
+    endif
+endif
+
+if not findlayer self righthand
+    overhead "Weapon not equipped, searching backpack..." 66
+
+    @clearignore
+    @setvar! mbot_FoundFallbackWeapon 0
+    foreach mbot_WeaponTypeId in mbot_WeaponTypeList
+        while mbot_FoundFallbackWeapon = 0 and findtype mbot_WeaponTypeId backpack as mbot_WeaponCandidate
+            getlabel mbot_WeaponCandidate mbot_WeaponCandidateDesc
+            if " aspect" in mbot_WeaponCandidateDesc or "exceptional " in mbot_WeaponCandidateDesc or "supremely" in mbot_WeaponCandidateDesc or "exceedingly" in mbot_WeaponCandidateDesc or "vanquishing" in mbot_WeaponCandidateDesc or "power" in mbot_WeaponCandidateDesc
+                dclick mbot_WeaponCandidate
+                getlabel backpack mbot_PingCheck
+                overhead "Weapon found! Autoequipping {{mbot_WeaponCandidateDesc}}" 66
+                @setvar! mbot_FoundFallbackWeapon 1
+            else
+                @ignore mbot_WeaponCandidate
+            endif
+        endwhile
+    endfor
+    @clearignore
+endif
+
+
+##### Smart Shield Equip (only equips if the right hand is empty or holds a one-handed weapon -
+##### a two-handed weapon in the right hand also occupies the lefthand layer in this engine,
+##### so gating on "lefthand empty" already covers both cases without a hardcoded 2h weapon list)
+if not findlayer self lefthand
+    if find mbot_BOT_CurrentLeftHandWeapon backpack
+        dclick mbot_BOT_CurrentLeftHandWeapon
+        getlabel backpack mbot_PingCheck
+    endif
+endif
+
+if not findlayer self lefthand
+    overhead "Shield not equipped, searching backpack..." 66
+
+    @clearignore
+    @setvar! mbot_FoundFallbackShield 0
+    foreach mbot_ShieldTypeId in mbot_ShieldTypeList
+        while mbot_FoundFallbackShield = 0 and findtype mbot_ShieldTypeId backpack as mbot_ShieldCandidate
+            getlabel mbot_ShieldCandidate mbot_ShieldCandidateDesc
+            if " aspect" in mbot_ShieldCandidateDesc or "exceptional " in mbot_ShieldCandidateDesc or "supremely" in mbot_ShieldCandidateDesc or "exceedingly" in mbot_ShieldCandidateDesc or "vanquishing" in mbot_ShieldCandidateDesc or "power" in mbot_ShieldCandidateDesc
+                dclick mbot_ShieldCandidate
+                getlabel backpack mbot_PingCheck
+                overhead "Shield found! Autoequipping {{mbot_ShieldCandidateDesc}}" 66
+                @setvar! mbot_FoundFallbackShield 1
+            else
+                @ignore mbot_ShieldCandidate
+            endif
+        endwhile
+    endfor
+    @clearignore
+endif
 
 ##### Taming Setup (crook activation, "all guard me" timer setup)
 if mbot_TamerDetected = 1
@@ -361,10 +412,6 @@ if mbot_TamerDetected = 1
 
     if mconfig_Taming_SayAllGuard = 1
 
-        if not varexist mconfig_Taming_SayAllGuardTimerCD
-            @setvar! mconfig_Taming_SayAllGuardTimerCD 9000
-        endif
-
         if not timerexists mbot_Tamer_SayAllGuardTimer
             settimer mbot_Tamer_SayAllGuardTimer mconfig_Taming_SayAllGuardTimerCD
         endif
@@ -404,11 +451,7 @@ while not dead
             // and not queued
             if poisoned or findbuff "disease" or findbuff "bleed"
                 hotkey "Bandage Self"
-            elseif not varexist mconfig_Healing_AutoBandageHpDiffTrigger
-                if hp < maxhp
-                    hotkey "Bandage Self"
-                endif
-            elseif diffhits > mconfig_Healing_AutoBandageHpDiffTrigger 
+            elseif diffhits > mconfig_Healing_AutoBandageHpDiffTrigger
                 hotkey "Bandage Self"
             endif
             getlabel backpack mbot_PingCheck
@@ -506,7 +549,7 @@ while not dead
     endif
 
     ##### Out of Combat: Overweight Gold Drop
-    if varexist mconfig_Weight_GoldToDropIfOverweight and weight > maxweight and timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+    if weight > maxweight and timer mbot_UseItemTimer >= mbot_UseItemTimerCD
         if findtype "gold coin" backpack as item
             while insysmsg "cannot drop anything"
             endwhile
@@ -741,11 +784,7 @@ while not dead
         @setvar! mbot_BOT_UseNobleSacrifice 0
         if mconfig_Chiv_UseNobleSacrificeAutomatically = 1 and skill "chivalry" >= 80 and timer mbot_NobleSacrificeTimer >= mbot_NobleSacrificeTimerCD
             if mconfig_Chiv_MinSymbolsNobleSacrifice <= mbot_HolySymbols
-                if not varexist mconfig_Chiv_AutoUseNobleSacrificeHpDiffTrigger
-                    if hp <= 30
-                        @setvar! mbot_BOT_UseNobleSacrifice 1
-                    endif
-                elseif diffhits >= mconfig_Chiv_AutoUseNobleSacrificeHpDiffTrigger
+                if diffhits >= mconfig_Chiv_AutoUseNobleSacrificeHpDiffTrigger
                     @setvar! mbot_BOT_UseNobleSacrifice 1
                 endif
             endif
@@ -754,11 +793,7 @@ while not dead
         @setvar! mbot_BOT_UseHolyLight 0
         if mconfig_Chiv_UseHolyLightAutomatically = 1 and skill "chivalry" >= 95 and timer mbot_HolyLightTimer >= mbot_HolyLightTimerCD
             if mconfig_Chiv_MinSymbolsHolyLight <= mbot_HolySymbols
-                if not varexist mconfig_Chiv_AutoHolyLightHpDiffTrigger
-                    if hp <= 20
-                        @setvar! mbot_BOT_UseHolyLight 1
-                    endif
-                elseif diffhits >= mconfig_Chiv_AutoHolyLightHpDiffTrigger
+                if diffhits >= mconfig_Chiv_AutoHolyLightHpDiffTrigger
                     @setvar! mbot_BOT_UseHolyLight 1
                 endif
             endif
@@ -816,11 +851,7 @@ while not dead
         @setvar! mbot_BOT_UseCloseWounds 0
         if findbuff "disease" or findbuff "bleed"
             if mconfig_Chiv_UseCloseWoundsAutomatically = 1 and mconfig_Chiv_MinSymbolsCloseWounds <= mbot_HolySymbols and skill "chivalry" >= 70 and timer mbot_CloseWoundsTimer >= mbot_CloseWoundsTimerCD
-                if not varexist mconfig_Chiv_AutoCloseWoundHpDiffTrigger
-                    if diffhits >= 5
-                        @setvar! mbot_BOT_UseCloseWounds 1
-                    endif
-                elseif diffhits >= mconfig_Chiv_AutoCloseWoundHpDiffTrigger
+                if diffhits >= mconfig_Chiv_AutoCloseWoundHpDiffTrigger
                     @setvar! mbot_BOT_UseCloseWounds 1
                 endif
             endif
@@ -1458,10 +1489,8 @@ while not dead
                 @setvar! mbot_parryStanceTarget 5
             elseif mconfig_Parry_SwitchToShieldBashWhileMoving = 1 and cooldown "Moving"
                 @setvar! mbot_parryStanceTarget 1
-            elseif varexist mconfig_Parry_SwitchToDefaultStance
-                @setvar! mbot_parryStanceTarget mconfig_Parry_SwitchToDefaultStance
             else
-                @setvar! mbot_parryStanceTarget 0
+                @setvar! mbot_parryStanceTarget mconfig_Parry_SwitchToDefaultStance
             endif
             
             if mbot_ActiveParryCodex != mbot_parryStanceTarget
@@ -1493,13 +1522,7 @@ while not dead
         ##### Post-Attack: Cleansing Brew
         if mconfig_Potion_UseCleansingBrewAutomatically = 1 and findtype 50675 backpack 2935 as mbot_UseItem
             if findbuff "bleed" or findbuff "disease"
-                if not varexist mconfig_Potion_CleansingBrewHpDiffTrigger
-                    if diffhits >= 5
-                        dclick mbot_UseItem
-                        cooldown "Cleansing Brew" mbot_UseCleansingBrewTimerCD
-                        settimer mbot_UseCleansingBrewTimer 0
-                    endif
-                elseif diffhits >= mconfig_Potion_CleansingBrewHpDiffTrigger 
+                if diffhits >= mconfig_Potion_CleansingBrewHpDiffTrigger
                     dclick mbot_UseItem
                     cooldown "Cleansing Brew" mbot_UseCleansingBrewTimerCD
                     settimer mbot_UseCleansingBrewTimer 0
@@ -1641,11 +1664,7 @@ while not dead
             @setvar! mbot_TriggerAbility 0
             if cooldown "Taunting" or timer mbot_TauntingTimer < mconfig_Parry_TauntingTimerCD
                 // do nothing
-            elseif not varexist mconfig_Parry_AutoTauntHpDiffTrigger
-                if hp >= 80
-                    @setvar! mbot_TriggerAbility 1
-                endif
-            elseif diffhits <= mconfig_Parry_AutoTauntHpDiffTrigger 
+            elseif diffhits <= mconfig_Parry_AutoTauntHpDiffTrigger
                 @setvar! mbot_TriggerAbility 1
             endif
             if mbot_TriggerAbility = 1
