@@ -855,554 +855,563 @@ while not dead
 
     endif
 
-    ##### Fight State Detection (auto-target mode vs manually-set target)
-    @setvar! mbot_CurrentBotTargetAttacked 0
-
-    if mconfig_Bot_FightAutoTarget = 1
+    ##### PvP Detection (gates Fight State Detection + the entire Combat Block)
+    if pvp
+        ##### In PvP - clear targeting/fight-mode state, skip combat entirely this iteration
+        @setvar! mbot_CurrentBotTarget 0
         @setvar! mbot_BOT_FIGHT 0
-        if mconfig_Bot_FightInPeaceMode = 1
-            if not warmode
-                @setvar! mbot_BOT_FIGHT 1
-            endif
-        elseif warmode
-            @setvar! mbot_BOT_FIGHT 1
-        endif
+        @setvar! mbot_CurrentBotTargetAttacked 0
+        @setvar! mbot_CurrentBotTargetGoodLOS 0
     else
+        ##### Fight State Detection (auto-target mode vs manually-set target)
+        @setvar! mbot_CurrentBotTargetAttacked 0
+
+        if mconfig_Bot_FightAutoTarget = 1
+            @setvar! mbot_BOT_FIGHT 0
+            if mconfig_Bot_FightInPeaceMode = 1
+                if not warmode
+                    @setvar! mbot_BOT_FIGHT 1
+                endif
+            elseif warmode
+                @setvar! mbot_BOT_FIGHT 1
+            endif
+        else
         
-        if insysmsg "Target a new 'Last Target'"
-            overhead "Set your target"
-            while targetexists 
-                wait 50
-            endwhile
-            getlabel backpack mbot_PingCheck
-            if insysmsg "Last Target set."
+            if insysmsg "Target a new 'Last Target'"
+                overhead "Set your target"
+                while targetexists 
+                    wait 50
+                endwhile
+                getlabel backpack mbot_PingCheck
+                if insysmsg "Last Target set."
+                    overhead "New target selected!" 89 lasttarget
+                    @setvar! mbot_CurrentBotTarget lasttarget 
+                    @setvar! mbot_BOT_FIGHT 1
+                endif
+            endif
+    
+            if insysmsg "New Target Set"
+                while insysmsg "New Target Set"
+                endwhile
                 overhead "New target selected!" 89 lasttarget
                 @setvar! mbot_CurrentBotTarget lasttarget 
                 @setvar! mbot_BOT_FIGHT 1
             endif
-        endif
-    
-        if insysmsg "New Target Set"
-            while insysmsg "New Target Set"
-            endwhile
-            overhead "New target selected!" 89 lasttarget
-            @setvar! mbot_CurrentBotTarget lasttarget 
-            @setvar! mbot_BOT_FIGHT 1
-        endif
         
-        if dead mbot_CurrentBotTarget
-            @setvar! mbot_BOT_FIGHT 0
+            if dead mbot_CurrentBotTarget
+                @setvar! mbot_BOT_FIGHT 0
+            endif
         endif
-    endif
 
-    ##### In Combat
-    if mbot_BOT_FIGHT = 1 and not cooldown PVP
+        ##### In Combat
+        if mbot_BOT_FIGHT = 1
 
-        ##### In Combat: Target Acquisition
-        if insysmsg "Target a new 'Last Target'"
-            overhead "Set your target"
-            while targetexists 
-                wait 50
-            endwhile
-            getlabel backpack mbot_PingCheck
-            if insysmsg "Last Target set."
-                overhead "New target selected!" 89 lasttarget
-                @setvar! mbot_CurrentBotTarget lasttarget 
+            ##### In Combat: Target Acquisition
+            if insysmsg "Target a new 'Last Target'"
+                overhead "Set your target"
+                while targetexists 
+                    wait 50
+                endwhile
+                getlabel backpack mbot_PingCheck
+                if insysmsg "Last Target set."
+                    overhead "New target selected!" 89 lasttarget
+                    @setvar! mbot_CurrentBotTarget lasttarget 
+                endif
             endif
-        endif
         
-        // do fighting
-        if not find mbot_CurrentBotTarget and mconfig_Bot_FightAutoTarget = 1
-            @setvar! mbot_BARD_PROVO_COUNTER 0
-            hotkey "target closest non-friendly monster"
-            @setvar! mbot_LastBotTarget lasttarget 
-            if mbot_CurrentBotTarget != mbot_LastBotTarget
-                @setvar! mbot_CurrentBotTarget mbot_LastBotTarget
+            // do fighting
+            if not find mbot_CurrentBotTarget and mconfig_Bot_FightAutoTarget = 1
+                @setvar! mbot_BARD_PROVO_COUNTER 0
+                hotkey "target closest non-friendly monster"
+                @setvar! mbot_LastBotTarget lasttarget 
+                if mbot_CurrentBotTarget != mbot_LastBotTarget
+                    @setvar! mbot_CurrentBotTarget mbot_LastBotTarget
+                endif
             endif
-        endif
         
-        if not dead mbot_CurrentBotTarget
-            if noto mbot_CurrentBotTarget = "friend" or noto mbot_CurrentBotTarget = "innocent" or noto mbot_CurrentBotTarget = "invulnerable"
-                @setvar! mbot_CurrentBotTarget 0
-            elseif noto mbot_CurrentBotTarget = "murderer" or noto mbot_CurrentBotTarget = "enemy"
-                // figure out if we want to change this
-                //@setvar! mbot_CurrentBotTarget 0
-            elseif noto mbot_CurrentBotTarget = "hostile" or noto mbot_CurrentBotTarget = "criminal"
-                // good to go
-            else
-                @setvar! mbot_CurrentBotTarget 0
+            if not dead mbot_CurrentBotTarget
+                if noto mbot_CurrentBotTarget = "friend" or noto mbot_CurrentBotTarget = "innocent" or noto mbot_CurrentBotTarget = "invulnerable"
+                    @setvar! mbot_CurrentBotTarget 0
+                elseif noto mbot_CurrentBotTarget = "murderer" or noto mbot_CurrentBotTarget = "enemy"
+                    // figure out if we want to change this
+                    //@setvar! mbot_CurrentBotTarget 0
+                elseif noto mbot_CurrentBotTarget = "hostile" or noto mbot_CurrentBotTarget = "criminal"
+                    // good to go
+                else
+                    @setvar! mbot_CurrentBotTarget 0
+                endif
             endif
-        endif
         
-        # TODO: handle hidden mobs
-        if not dead mbot_CurrentBotTarget
+            # TODO: handle hidden mobs
+            if not dead mbot_CurrentBotTarget
             
         
-            if timer mbot_CurrentBotTargetOverheadTimer >= mconfig_Target_CurrentOverheadTimerCD and listexists mconfig_Target_CurrentOverheadText
-                foreach mbot_Overhead in mconfig_Target_CurrentOverheadText
-                    if find mbot_CurrentBotTarget
-                        overhead mbot_Overhead mconfig_Target_CurrentOverheadHue mbot_CurrentBotTarget
-                    endif
-                endfor
-                settimer mbot_CurrentBotTargetOverheadTimer 0
-            endif
-
-            if find mbot_CurrentBotTarget ground -1 -1 mbot_FightingRangeCheck
-                
-                for 3
-                    if dead mbot_CurrentBotTarget
-                        break
-                    endif
-                    getlabel mbot_CurrentBotTarget mbot_CurrentBotTargetDesc
-                    if "-" in mbot_CurrentBotTargetDesc
-                        // do nothing - try again
-                    else
-                        break
-                    endif
-                endfor
-                
-                @setvar! mbot_IgnoreCurrentBotTarget 0
-                
-                if "(summoned" in mbot_CurrentBotTargetDesc or "(bonded" in mbot_CurrentBotTargetDesc or "(tame" in mbot_CurrentBotTargetDesc
-                    overhead "▼ Player pet - IGNORE ▼" 77 mbot_CurrentBotTarget
-                    @setvar! mbot_IgnoreCurrentBotTarget 1
-                elseif listexists mconfig_Target_IgnoreMobList
-                    foreach mbot_IgnoreMob in mconfig_Target_IgnoreMobList
-                        if mbot_IgnoreMob in mbot_CurrentBotTargetDesc
-                            if timer mbot_IgnoreMobOverheadTimer >= mconfig_Target_IgnoreMobOverheadTimerCD and listexists mconfig_Target_IgnoreMobOverheadText
-                                foreach mbot_Overhead in mconfig_Target_IgnoreMobOverheadText
-                                    if find mbot_CurrentBotTarget
-                                        overhead mbot_Overhead mconfig_Target_IgnoreMobOverheadHue  mbot_CurrentBotTarget
-                                    endif
-                                endfor
-                                settimer mbot_IgnoreMobOverheadTimer 0
-                            endif
-                            @setvar! mbot_IgnoreCurrentBotTarget 1
+                if timer mbot_CurrentBotTargetOverheadTimer >= mconfig_Target_CurrentOverheadTimerCD and listexists mconfig_Target_CurrentOverheadText
+                    foreach mbot_Overhead in mconfig_Target_CurrentOverheadText
+                        if find mbot_CurrentBotTarget
+                            overhead mbot_Overhead mconfig_Target_CurrentOverheadHue mbot_CurrentBotTarget
                         endif
                     endfor
+                    settimer mbot_CurrentBotTargetOverheadTimer 0
                 endif
 
-                if mbot_IgnoreCurrentBotTarget = 1 or dead mbot_CurrentBotTarget
-                    @setvar! mbot_CurrentBotTarget 0
-                else
-                    
-
-                    attack mbot_CurrentBotTarget
+                if find mbot_CurrentBotTarget ground -1 -1 mbot_FightingRangeCheck
                 
-                    if cooldown "Bard Reset"
-                        settimer mbot_UsedSkillTimer 5000
-                        cooldown "Bard Reset" 0
-                    endif
-                    
-                    @setvar! mbot_BOT_TargetPoisoned 0
-                    if "Ticks" in mbot_CurrentBotTargetDesc
-                        if "[3" in mbot_CurrentBotTargetDesc or "[4" in mbot_CurrentBotTargetDesc or "[5" in mbot_CurrentBotTargetDesc or "[6" in mbot_CurrentBotTargetDesc or "[7" in mbot_CurrentBotTargetDesc or "[8" in mbot_CurrentBotTargetDesc or "[9" in mbot_CurrentBotTargetDesc or "[10" in mbot_CurrentBotTargetDesc
-                            @setvar! mbot_BOT_TargetPoisoned 1
+                    for 3
+                        if dead mbot_CurrentBotTarget
+                            break
                         endif
-                    endif
-
-                    # TODO: longshot bro
-                    if findtype 5117|3920|31184|31186|30993|31172|31169|9917 righthand or findtype 5117|3920|31184|31186|30993 lefthand
-                        @setvar! mbot_DynamicRangeCheck 8
-                    elseif findtype 30994|30990|30995|5042 lefthand
-                        @setvar! mbot_DynamicRangeCheck 10
-                    else
-                        @setvar! mbot_DynamicRangeCheck 2
-                    endif
-
-                    ##### Shared line-of-sight probe - runs once, before both the bard section and the
-                    ##### attack decision below, so neither has to run its own separate ArmsLore probe.
-                    ##### Throttled by mbot_LOSCheckTimer since useskill + wft 500 is a real wait.
-                    if not targetexists and mbot_CurrentBotTargetGoodLOS = 0 and timer mbot_LOSCheckTimer >= mbot_LOSCheckTimerCD
-                        useskill "ArmsLore"
-                        wft 500
-                        if targetexists
-                            while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                            endwhile
-                            target mbot_CurrentBotTarget
-                            getlabel backpack mbot_PingCheck
-                            if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                                if timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
-                                    foreach mbot_Overhead in mconfig_Target_UnableToAttackOverheadText
+                        getlabel mbot_CurrentBotTarget mbot_CurrentBotTargetDesc
+                        if "-" in mbot_CurrentBotTargetDesc
+                            // do nothing - try again
+                        else
+                            break
+                        endif
+                    endfor
+                
+                    @setvar! mbot_IgnoreCurrentBotTarget 0
+                
+                    if "(summoned" in mbot_CurrentBotTargetDesc or "(bonded" in mbot_CurrentBotTargetDesc or "(tame" in mbot_CurrentBotTargetDesc
+                        overhead "▼ Player pet - IGNORE ▼" 77 mbot_CurrentBotTarget
+                        @setvar! mbot_IgnoreCurrentBotTarget 1
+                    elseif listexists mconfig_Target_IgnoreMobList
+                        foreach mbot_IgnoreMob in mconfig_Target_IgnoreMobList
+                            if mbot_IgnoreMob in mbot_CurrentBotTargetDesc
+                                if timer mbot_IgnoreMobOverheadTimer >= mconfig_Target_IgnoreMobOverheadTimerCD and listexists mconfig_Target_IgnoreMobOverheadText
+                                    foreach mbot_Overhead in mconfig_Target_IgnoreMobOverheadText
                                         if find mbot_CurrentBotTarget
-                                            overhead mbot_Overhead mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
+                                            overhead mbot_Overhead mconfig_Target_IgnoreMobOverheadHue  mbot_CurrentBotTarget
                                         endif
                                     endfor
-                                    settimer mbot_CurrentBotTargetOverheadTimer 0
+                                    settimer mbot_IgnoreMobOverheadTimer 0
                                 endif
-                                @setvar! mbot_CurrentBotTarget 0
-                            else
-                                @setvar! mbot_CurrentBotTargetGoodLOS 1
-                                settimer mbot_UsedSkillTimer 3000
-                                @setvar! mbot_CurrentBotTargetAttacked 1
+                                @setvar! mbot_IgnoreCurrentBotTarget 1
                             endif
-                        endif
-                        if targetexists
-                            hotkey "Cancel Current Target"
-                        endif
-                        settimer mbot_LOSCheckTimer 0
+                        endfor
                     endif
 
-                    ##### Bard section start - the attack decision below runs independently after this,
-                    ##### not as elseif alternatives to these branches.
-                    if mbot_BardDetected = 1
-                        if timer mbot_instrumentCheckTimer >= mbot_instrumentCheckTimerCD
-                            if not find mbot_activeInstrument backpack
-                                if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as mbot_activeInstrument
-                                    // found it
+                    if mbot_IgnoreCurrentBotTarget = 1 or dead mbot_CurrentBotTarget
+                        @setvar! mbot_CurrentBotTarget 0
+                    else
+                    
+
+                        attack mbot_CurrentBotTarget
+                
+                        if cooldown "Bard Reset"
+                            settimer mbot_UsedSkillTimer 5000
+                            cooldown "Bard Reset" 0
+                        endif
+                    
+                        @setvar! mbot_BOT_TargetPoisoned 0
+                        if "Ticks" in mbot_CurrentBotTargetDesc
+                            if "[3" in mbot_CurrentBotTargetDesc or "[4" in mbot_CurrentBotTargetDesc or "[5" in mbot_CurrentBotTargetDesc or "[6" in mbot_CurrentBotTargetDesc or "[7" in mbot_CurrentBotTargetDesc or "[8" in mbot_CurrentBotTargetDesc or "[9" in mbot_CurrentBotTargetDesc or "[10" in mbot_CurrentBotTargetDesc
+                                @setvar! mbot_BOT_TargetPoisoned 1
+                            endif
+                        endif
+
+                        # TODO: longshot bro
+                        if findtype 5117|3920|31184|31186|30993|31172|31169|9917 righthand or findtype 5117|3920|31184|31186|30993 lefthand
+                            @setvar! mbot_DynamicRangeCheck 8
+                        elseif findtype 30994|30990|30995|5042 lefthand
+                            @setvar! mbot_DynamicRangeCheck 10
+                        else
+                            @setvar! mbot_DynamicRangeCheck 2
+                        endif
+
+                        ##### Shared line-of-sight probe - runs once, before both the bard section and the
+                        ##### attack decision below, so neither has to run its own separate ArmsLore probe.
+                        ##### Throttled by mbot_LOSCheckTimer since useskill + wft 500 is a real wait.
+                        if not targetexists and mbot_CurrentBotTargetGoodLOS = 0 and timer mbot_LOSCheckTimer >= mbot_LOSCheckTimerCD
+                            useskill "ArmsLore"
+                            wft 500
+                            if targetexists
+                                while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
+                                endwhile
+                                target mbot_CurrentBotTarget
+                                getlabel backpack mbot_PingCheck
+                                if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
+                                    if timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
+                                        foreach mbot_Overhead in mconfig_Target_UnableToAttackOverheadText
+                                            if find mbot_CurrentBotTarget
+                                                overhead mbot_Overhead mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
+                                            endif
+                                        endfor
+                                        settimer mbot_CurrentBotTargetOverheadTimer 0
+                                    endif
+                                    @setvar! mbot_CurrentBotTarget 0
                                 else
-                                    overhead "I do not have an instrument" 34
+                                    @setvar! mbot_CurrentBotTargetGoodLOS 1
+                                    settimer mbot_UsedSkillTimer 3000
+                                    @setvar! mbot_CurrentBotTargetAttacked 1
                                 endif
                             endif
-                            settimer mbot_instrumentCheckTimer 0
+                            if targetexists
+                                hotkey "Cancel Current Target"
+                            endif
+                            settimer mbot_LOSCheckTimer 0
                         endif
 
-                        @setvar! mbot_Bard_SkipPeace 0
-                        if "pacified" in mbot_CurrentBotTargetDesc
-                            @setvar! mbot_Bard_SkipPeace 1
-                        endif
+                        ##### Bard section start - the attack decision below runs independently after this,
+                        ##### not as elseif alternatives to these branches.
+                        if mbot_BardDetected = 1
+                            if timer mbot_instrumentCheckTimer >= mbot_instrumentCheckTimerCD
+                                if not find mbot_activeInstrument backpack
+                                    if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as mbot_activeInstrument
+                                        // found it
+                                    else
+                                        overhead "I do not have an instrument" 34
+                                    endif
+                                endif
+                                settimer mbot_instrumentCheckTimer 0
+                            endif
 
-                        if "provo" in mbot_CurrentBotTargetDesc
-                            @setvar! mbot_Bard_SkipPeace 1
-                        endif
-
-                        @setvar! mbot_Bard_SkipDiscord 0
-                        if mconfig_Bard_UsePeaceFirst = 1 and mbot_Bard_SkipPeace = 0
-                            @setvar! mbot_Bard_SkipDiscord 1
-                        elseif "discord" in mbot_CurrentBotTargetDesc
-                            @setvar! mbot_Bard_SkipDiscord 1
-                        endif
-
-                        @setvar! mbot_Bard_DiscordCheckNextMob 0
-
-                        # PROVO
-                        if mbot_Bard_CanProvo = 1 and timer mbot_UsedSkillTimer >= 5000
-
-                            if mbot_BARD_PROVO_COUNTER = 4
-                                // do nothing
-                            else
-                                @setvar! mbot_Bard_SkipDiscord 1
+                            @setvar! mbot_Bard_SkipPeace 0
+                            if "pacified" in mbot_CurrentBotTargetDesc
                                 @setvar! mbot_Bard_SkipPeace 1
                             endif
-                    
-                            if not targetexists and timer mbot_BARD_TARGET_RANGECHECK_TIMER >= mbot_BARD_TARGET_RANGECHECK_TIMERCD
-                                
-                                if not find mbot_BARD_TARGET1 and find mbot_CurrentBotTarget ground -1 -1 mbot_BARD_TARGET_RANGECHECK
-                                    @setvar! mbot_BARD_TARGET1 mbot_CurrentBotTarget
-                                endif
-                            
-                                if mbot_BARD_TARGET1 = mbot_BARD_TARGET2
-                                    @setvar! mbot_BARD_TARGET2 0
-                                endif
-                            
-                                if find mbot_BARD_TARGET1 ground -1 -1 mbot_BARD_TARGET_RANGECHECK and find mbot_BARD_TARGET2 ground -1 -1 mbot_BARD_TARGET_RANGECHECK
-                                
-                                    for 3
-                                        if dead mbot_BARD_TARGET1
-                                            break
-                                        endif
-                                        getlabel mbot_BARD_TARGET1 mbot_CurrentBotTargetDesc1
-                                        if "-" in mbot_CurrentBotTargetDesc1
-                                            // do nothing - try again
-                                        else
-                                            break
-                                        endif
-                                    endfor
-                                
-                                    for 3
-                                        if dead mbot_BARD_TARGET2
-                                            break
-                                        endif
-                                        getlabel mbot_BARD_TARGET2 mbot_CurrentBotTargetDesc2
-                                        if "-" in mbot_CurrentBotTargetDesc2
-                                            // do nothing - try again
-                                        else
-                                            break
-                                        endif
-                                    endfor
-                                
-                                    while insysmsg "Target cannot be seen"
-                                    endwhile
-                                
-                                    if "provo" in mbot_CurrentBotTargetDesc1 and "provo" in mbot_CurrentBotTargetDesc2
-                                        if "discord" in mbot_CurrentBotTargetDesc2
-                                            // do nothing
-                                        else
-                                            @setvar! mbot_Bard_DiscordCheckNextMob mbot_BARD_TARGET2
-                                        endif
-                                        @setvar! mbot_BARD_TARGET2 0
-                                    else
-                                        @setvar! mbot_BARD_PROVO_COUNTER 0
-                                        while insysmsg "What instrument"
-                                        endwhile
-                                        useskill "Provocation" 
-                                        wft 500
-                                        if insysmsg "What instrument"
-                                            target mbot_activeInstrument
-                                            wft 500
-                                        endif
-                                        if targetexists
-                                            target mbot_BARD_TARGET1
-                                            getlabel backpack mbot_PingCheck
-                                            if insysmsg "Target cannot be seen"
-                                                @setvar! mbot_BARD_TARGET1 0
-                                            else
-                                                wft 500
-                                                target mbot_BARD_TARGET2
-                                                getlabel backpack mbot_PingCheck                
-                                                if insysmsg "Target cannot be seen"
-                                                    @setvar! mbot_BARD_TARGET2 0
-                                                endif
-                                            endif
-                                        endif
-                                    endif
-                            
+
+                            if "provo" in mbot_CurrentBotTargetDesc
+                                @setvar! mbot_Bard_SkipPeace 1
+                            endif
+
+                            @setvar! mbot_Bard_SkipDiscord 0
+                            if mconfig_Bard_UsePeaceFirst = 1 and mbot_Bard_SkipPeace = 0
+                                @setvar! mbot_Bard_SkipDiscord 1
+                            elseif "discord" in mbot_CurrentBotTargetDesc
+                                @setvar! mbot_Bard_SkipDiscord 1
+                            endif
+
+                            @setvar! mbot_Bard_DiscordCheckNextMob 0
+
+                            # PROVO
+                            if mbot_Bard_CanProvo = 1 and timer mbot_UsedSkillTimer >= 5000
+
+                                if mbot_BARD_PROVO_COUNTER = 4
+                                    // do nothing
                                 else
-                                
+                                    @setvar! mbot_Bard_SkipDiscord 1
+                                    @setvar! mbot_Bard_SkipPeace 1
+                                endif
                     
-                                    if mbot_BARD_PROVO_COUNTER = 0
-                                        @setvar! mbot_BARD_PROVO_COUNTER 1
-                                    elseif mbot_BARD_PROVO_COUNTER = 1
-                                        @setvar! mbot_BARD_PROVO_COUNTER 2
-                                    elseif mbot_BARD_PROVO_COUNTER = 2
-                                        @setvar! mbot_BARD_PROVO_COUNTER 3
-                                    else
-                                        @setvar! mbot_BARD_PROVO_COUNTER 4
-                                    endif
-                            
+                                if not targetexists and timer mbot_BARD_TARGET_RANGECHECK_TIMER >= mbot_BARD_TARGET_RANGECHECK_TIMERCD
+                                
                                     if not find mbot_BARD_TARGET1 and find mbot_CurrentBotTarget ground -1 -1 mbot_BARD_TARGET_RANGECHECK
                                         @setvar! mbot_BARD_TARGET1 mbot_CurrentBotTarget
                                     endif
                             
-                                    if find mbot_BARD_TARGET1 ground -1 -1 mbot_BARD_TARGET_RANGECHECK
-                                        // check for second one
-                                        hotkey "target closest non-friendly monster"
-                                        @setvar! mbot_LastBotTarget lasttarget 
-                                        if mbot_BARD_TARGET1 != mbot_LastBotTarget
-                                            for 3
-                                                if dead mbot_BARD_TARGET2
-                                                    break
-                                                endif
-                                                getlabel mbot_BARD_TARGET2 mbot_CurrentBotTargetDesc
-                                                if "-" in mbot_CurrentBotTargetDesc
-                                                    // do nothing - try again
-                                                else
-                                                    break
-                                                endif
-                                            endfor
-                                            if find mbot_LastBotTarget
-                                                overhead "ATTEMPTING CLOSEST" 38 mbot_LastBotTarget
+                                    if mbot_BARD_TARGET1 = mbot_BARD_TARGET2
+                                        @setvar! mbot_BARD_TARGET2 0
+                                    endif
+                            
+                                    if find mbot_BARD_TARGET1 ground -1 -1 mbot_BARD_TARGET_RANGECHECK and find mbot_BARD_TARGET2 ground -1 -1 mbot_BARD_TARGET_RANGECHECK
+                                
+                                        for 3
+                                            if dead mbot_BARD_TARGET1
+                                                break
                                             endif
-                                            if "provo" in mbot_CurrentBotTargetDesc
+                                            getlabel mbot_BARD_TARGET1 mbot_CurrentBotTargetDesc1
+                                            if "-" in mbot_CurrentBotTargetDesc1
+                                                // do nothing - try again
+                                            else
+                                                break
+                                            endif
+                                        endfor
+                                
+                                        for 3
+                                            if dead mbot_BARD_TARGET2
+                                                break
+                                            endif
+                                            getlabel mbot_BARD_TARGET2 mbot_CurrentBotTargetDesc2
+                                            if "-" in mbot_CurrentBotTargetDesc2
+                                                // do nothing - try again
+                                            else
+                                                break
+                                            endif
+                                        endfor
+                                
+                                        while insysmsg "Target cannot be seen"
+                                        endwhile
+                                
+                                        if "provo" in mbot_CurrentBotTargetDesc1 and "provo" in mbot_CurrentBotTargetDesc2
+                                            if "discord" in mbot_CurrentBotTargetDesc2
                                                 // do nothing
                                             else
-                                                @setvar! mbot_BARD_TARGET2 mbot_LastBotTarget    
+                                                @setvar! mbot_Bard_DiscordCheckNextMob mbot_BARD_TARGET2
+                                            endif
+                                            @setvar! mbot_BARD_TARGET2 0
+                                        else
+                                            @setvar! mbot_BARD_PROVO_COUNTER 0
+                                            while insysmsg "What instrument"
+                                            endwhile
+                                            useskill "Provocation" 
+                                            wft 500
+                                            if insysmsg "What instrument"
+                                                target mbot_activeInstrument
+                                                wft 500
+                                            endif
+                                            if targetexists
+                                                target mbot_BARD_TARGET1
+                                                getlabel backpack mbot_PingCheck
+                                                if insysmsg "Target cannot be seen"
+                                                    @setvar! mbot_BARD_TARGET1 0
+                                                else
+                                                    wft 500
+                                                    target mbot_BARD_TARGET2
+                                                    getlabel backpack mbot_PingCheck                
+                                                    if insysmsg "Target cannot be seen"
+                                                        @setvar! mbot_BARD_TARGET2 0
+                                                    endif
+                                                endif
                                             endif
                                         endif
-                                    
-                                        if not find mbot_BARD_TARGET2 ground -1 -1 mbot_BARD_TARGET_RANGECHECK
-                                        
-                                            @setvar! mbot_BARD_RANDOM_TARGET_OG 0
-                                            hotkey "next non-friendly monster target"
-                                            @setvar! mbot_BARD_RANDOM_TARGET lasttarget                     
-                                        
-                                            while find mbot_BARD_RANDOM_TARGET and mbot_BARD_RANDOM_TARGET != mbot_BARD_RANDOM_TARGET_OG
-                                                if mbot_BARD_RANDOM_TARGET_OG = 0
-                                                    @setvar! mbot_BARD_RANDOM_TARGET_OG mbot_BARD_RANDOM_TARGET
-                                                endif
-                                                if not find mbot_BARD_TARGET1
-                                                    break
-                                                endif
-                                            
-                                                if mbot_BARD_TARGET1 != mbot_BARD_RANDOM_TARGET and find mbot_BARD_RANDOM_TARGET ground -1 -1 mbot_BARD_TARGET_RANGECHECK
-                                                    for 3
-                                                        if dead mbot_BARD_RANDOM_TARGET
-                                                            break
-                                                        endif
-                                                        getlabel mbot_BARD_RANDOM_TARGET mbot_CurrentBotTargetDesc
-                                                        if "-" in mbot_CurrentBotTargetDesc
-                                                            // do nothing - try again
-                                                        else
-                                                            break
-                                                        endif
-                                                    endfor
-                                                
-                                                    if find mbot_BARD_RANDOM_TARGET
-                                                        overhead "ATTEMPTING RANDOM" 34 mbot_BARD_RANDOM_TARGET
-                                                    endif
-                                                
-                                                    if "provo" in mbot_CurrentBotTargetDesc
-                                                        if "discord" in mbot_CurrentBotTargetDesc
-                                                            // do nothing
-                                                        else
-                                                            @setvar! mbot_Bard_DiscordCheckNextMob mbot_BARD_RANDOM_TARGET
-                                                        endif
-                                                    else
-                                                        @setvar! mbot_BARD_TARGET2 mbot_BARD_RANDOM_TARGET    
+                            
+                                    else
+                                
+                    
+                                        if mbot_BARD_PROVO_COUNTER = 0
+                                            @setvar! mbot_BARD_PROVO_COUNTER 1
+                                        elseif mbot_BARD_PROVO_COUNTER = 1
+                                            @setvar! mbot_BARD_PROVO_COUNTER 2
+                                        elseif mbot_BARD_PROVO_COUNTER = 2
+                                            @setvar! mbot_BARD_PROVO_COUNTER 3
+                                        else
+                                            @setvar! mbot_BARD_PROVO_COUNTER 4
+                                        endif
+                            
+                                        if not find mbot_BARD_TARGET1 and find mbot_CurrentBotTarget ground -1 -1 mbot_BARD_TARGET_RANGECHECK
+                                            @setvar! mbot_BARD_TARGET1 mbot_CurrentBotTarget
+                                        endif
+                            
+                                        if find mbot_BARD_TARGET1 ground -1 -1 mbot_BARD_TARGET_RANGECHECK
+                                            // check for second one
+                                            hotkey "target closest non-friendly monster"
+                                            @setvar! mbot_LastBotTarget lasttarget 
+                                            if mbot_BARD_TARGET1 != mbot_LastBotTarget
+                                                for 3
+                                                    if dead mbot_BARD_TARGET2
                                                         break
                                                     endif
+                                                    getlabel mbot_BARD_TARGET2 mbot_CurrentBotTargetDesc
+                                                    if "-" in mbot_CurrentBotTargetDesc
+                                                        // do nothing - try again
+                                                    else
+                                                        break
+                                                    endif
+                                                endfor
+                                                if find mbot_LastBotTarget
+                                                    overhead "ATTEMPTING CLOSEST" 38 mbot_LastBotTarget
                                                 endif
+                                                if "provo" in mbot_CurrentBotTargetDesc
+                                                    // do nothing
+                                                else
+                                                    @setvar! mbot_BARD_TARGET2 mbot_LastBotTarget    
+                                                endif
+                                            endif
+                                    
+                                            if not find mbot_BARD_TARGET2 ground -1 -1 mbot_BARD_TARGET_RANGECHECK
+                                        
+                                                @setvar! mbot_BARD_RANDOM_TARGET_OG 0
                                                 hotkey "next non-friendly monster target"
                                                 @setvar! mbot_BARD_RANDOM_TARGET lasttarget                     
-                                            endwhile
+                                        
+                                                while find mbot_BARD_RANDOM_TARGET and mbot_BARD_RANDOM_TARGET != mbot_BARD_RANDOM_TARGET_OG
+                                                    if mbot_BARD_RANDOM_TARGET_OG = 0
+                                                        @setvar! mbot_BARD_RANDOM_TARGET_OG mbot_BARD_RANDOM_TARGET
+                                                    endif
+                                                    if not find mbot_BARD_TARGET1
+                                                        break
+                                                    endif
+                                            
+                                                    if mbot_BARD_TARGET1 != mbot_BARD_RANDOM_TARGET and find mbot_BARD_RANDOM_TARGET ground -1 -1 mbot_BARD_TARGET_RANGECHECK
+                                                        for 3
+                                                            if dead mbot_BARD_RANDOM_TARGET
+                                                                break
+                                                            endif
+                                                            getlabel mbot_BARD_RANDOM_TARGET mbot_CurrentBotTargetDesc
+                                                            if "-" in mbot_CurrentBotTargetDesc
+                                                                // do nothing - try again
+                                                            else
+                                                                break
+                                                            endif
+                                                        endfor
+                                                
+                                                        if find mbot_BARD_RANDOM_TARGET
+                                                            overhead "ATTEMPTING RANDOM" 34 mbot_BARD_RANDOM_TARGET
+                                                        endif
+                                                
+                                                        if "provo" in mbot_CurrentBotTargetDesc
+                                                            if "discord" in mbot_CurrentBotTargetDesc
+                                                                // do nothing
+                                                            else
+                                                                @setvar! mbot_Bard_DiscordCheckNextMob mbot_BARD_RANDOM_TARGET
+                                                            endif
+                                                        else
+                                                            @setvar! mbot_BARD_TARGET2 mbot_BARD_RANDOM_TARGET    
+                                                            break
+                                                        endif
+                                                    endif
+                                                    hotkey "next non-friendly monster target"
+                                                    @setvar! mbot_BARD_RANDOM_TARGET lasttarget                     
+                                                endwhile
+                                            endif
+                                            settimer mbot_BARD_TARGET_RANGECHECK_TIMER 0
                                         endif
-                                        settimer mbot_BARD_TARGET_RANGECHECK_TIMER 0
                                     endif
                                 endif
+                            else
+                                # TODO: logic for people without provo
+                                #  also do more discord checks (set a mbot_Bard_DiscordCheckNextMob)
                             endif
-                        else
-                            # TODO: logic for people without provo
-                            #  also do more discord checks (set a mbot_Bard_DiscordCheckNextMob)
-                        endif
                     
                     
-                        ### IN THE PROVO SECTION, TRY TO SET A LIST OF MOBS THAT ARE ALREADY PROVOED - SO YOU CAN KNOW WHAT TO DISCOR
+                            ### IN THE PROVO SECTION, TRY TO SET A LIST OF MOBS THAT ARE ALREADY PROVOED - SO YOU CAN KNOW WHAT TO DISCOR
 
-                        if mbot_Bard_CanDiscord = 1 and not dead mbot_Bard_DiscordCheckNextMob
-                            while insysmsg "What instrument"
-                            endwhile
-                            overhead "Discording Extra Mob: {{mbot_CurrentBotTargetDesc}}"
-                            useskill 'Discordance'
-                            wft 500
-                            if insysmsg "What instrument"
-                                target mbot_activeInstrument
-                                wft 500
-                            endif
-                            if targetexists 
-                                while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
+                            if mbot_Bard_CanDiscord = 1 and not dead mbot_Bard_DiscordCheckNextMob
+                                while insysmsg "What instrument"
                                 endwhile
-                                target mbot_Bard_DiscordCheckNextMob
-                                getlabel backpack mbot_PingCheck
-                                if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                                    if timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
-                                        foreach mbot_Overhead in mconfig_Target_UnableToAttackOverheadText
-                                            if find mbot_CurrentBotTarget
-                                                overhead mbot_Overhead mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
-                                            endif
-                                        endfor
-                                        settimer mbot_CurrentBotTargetOverheadTimer 0
-                                    endif
-                                    @setvar! mbot_Bard_DiscordCheckNextMob 0
-                                else
-                                    settimer mbot_UsedSkillTimer 0
+                                overhead "Discording Extra Mob: {{mbot_CurrentBotTargetDesc}}"
+                                useskill 'Discordance'
+                                wft 500
+                                if insysmsg "What instrument"
+                                    target mbot_activeInstrument
+                                    wft 500
                                 endif
-                            endif
+                                if targetexists 
+                                    while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
+                                    endwhile
+                                    target mbot_Bard_DiscordCheckNextMob
+                                    getlabel backpack mbot_PingCheck
+                                    if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
+                                        if timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
+                                            foreach mbot_Overhead in mconfig_Target_UnableToAttackOverheadText
+                                                if find mbot_CurrentBotTarget
+                                                    overhead mbot_Overhead mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
+                                                endif
+                                            endfor
+                                            settimer mbot_CurrentBotTargetOverheadTimer 0
+                                        endif
+                                        @setvar! mbot_Bard_DiscordCheckNextMob 0
+                                    else
+                                        settimer mbot_UsedSkillTimer 0
+                                    endif
+                                endif
                     
-                        elseif mbot_Bard_CanDiscord = 1 and mbot_Bard_SkipDiscord = 0 and timer mbot_UsedSkillTimer >= 5000
-                            while insysmsg "What instrument"
-                            endwhile
-                            overhead "Discording: {{mbot_CurrentBotTargetDesc}}"
-                            useskill 'Discordance'
-                            wft 500
-                            if insysmsg "What instrument"
-                                target mbot_activeInstrument
-                                wft 500
-                            endif
-                            if targetexists 
-                                while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
+                            elseif mbot_Bard_CanDiscord = 1 and mbot_Bard_SkipDiscord = 0 and timer mbot_UsedSkillTimer >= 5000
+                                while insysmsg "What instrument"
                                 endwhile
-                                target mbot_CurrentBotTarget
-                                getlabel backpack mbot_PingCheck
-                                if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                                    if timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
-                                        foreach mbot_Overhead in mconfig_Target_UnableToAttackOverheadText
-                                            if find mbot_CurrentBotTarget
-                                                overhead mbot_Overhead mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
-                                            endif
-                                        endfor
-                                        settimer mbot_CurrentBotTargetOverheadTimer 0
+                                overhead "Discording: {{mbot_CurrentBotTargetDesc}}"
+                                useskill 'Discordance'
+                                wft 500
+                                if insysmsg "What instrument"
+                                    target mbot_activeInstrument
+                                    wft 500
+                                endif
+                                if targetexists 
+                                    while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
+                                    endwhile
+                                    target mbot_CurrentBotTarget
+                                    getlabel backpack mbot_PingCheck
+                                    if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
+                                        if timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
+                                            foreach mbot_Overhead in mconfig_Target_UnableToAttackOverheadText
+                                                if find mbot_CurrentBotTarget
+                                                    overhead mbot_Overhead mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
+                                                endif
+                                            endfor
+                                            settimer mbot_CurrentBotTargetOverheadTimer 0
+                                        endif
+                                        @setvar! mbot_CurrentBotTarget 0
+                                    else
+                                        settimer mbot_UsedSkillTimer 0
+                                        @setvar! mbot_CurrentBotTargetAttacked 1
                                     endif
-                                    @setvar! mbot_CurrentBotTarget 0
-                                else
-                                    settimer mbot_UsedSkillTimer 0
-                                    @setvar! mbot_CurrentBotTargetAttacked 1
+                                endif
+                             elseif not dead mbot_Bard_DiscordCheckNextMob and timer mbot_UsedSkillTimer >= 5000
+                                while insysmsg "What instrument"
+                                endwhile
+                                overhead "Discording: {{mbot_CurrentBotTargetDesc}}"
+                                useskill 'Discordance'
+                                wft 500
+                                if insysmsg "What instrument"
+                                    target mbot_activeInstrument
+                                    wft 500
+                                endif
+                                if targetexists 
+                                    while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
+                                    endwhile
+                                    target mbot_CurrentBotTarget
+                                    getlabel backpack mbot_PingCheck
+                                    if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
+                                        if timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
+                                            foreach mbot_Overhead in mconfig_Target_UnableToAttackOverheadText
+                                                if find mbot_CurrentBotTarget
+                                                    overhead mbot_Overhead mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
+                                                endif
+                                            endfor
+                                            settimer mbot_CurrentBotTargetOverheadTimer 0
+                                        endif
+                                        @setvar! mbot_CurrentBotTarget 0
+                                    else
+                                        settimer mbot_UsedSkillTimer 0
+                                        @setvar! mbot_CurrentBotTargetAttacked 1
+                                    endif
+                                endif
+                            elseif mbot_Bard_CanPeacemake = 1 and mbot_Bard_SkipPeace = 0 and timer mbot_UsedSkillTimer >= 5000
+                                while insysmsg "What instrument"
+                                endwhile
+                                overhead "Peacmking"
+                                useskill 'Peacemaking'
+                                wft 500
+                                if insysmsg "What instrument"
+                                    target mbot_activeInstrument
+                                    wft 500
+                                endif
+                                if targetexists 
+                                    while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
+                                    endwhile
+                                    target mbot_CurrentBotTarget
+                                    getlabel backpack mbot_PingCheck
+                                    if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
+                                        if timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
+                                            foreach mbot_Overhead in mconfig_Target_UnableToAttackOverheadText
+                                                if find mbot_CurrentBotTarget
+                                                    overhead mbot_Overhead mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
+                                                endif
+                                            endfor
+                                            settimer mbot_CurrentBotTargetOverheadTimer 0
+                                        endif
+                                        @setvar! mbot_CurrentBotTarget 0
+                                    else
+                                        settimer mbot_UsedSkillTimer 0
+                                        @setvar! mbot_CurrentBotTargetAttacked 1
+                                        @setvar! mbot_CurrentBotTargetGoodLOS 1
+                                    endif
                                 endif
                             endif
-                         elseif not dead mbot_Bard_DiscordCheckNextMob and timer mbot_UsedSkillTimer >= 5000
-                            while insysmsg "What instrument"
-                            endwhile
-                            overhead "Discording: {{mbot_CurrentBotTargetDesc}}"
-                            useskill 'Discordance'
-                            wft 500
-                            if insysmsg "What instrument"
-                                target mbot_activeInstrument
-                                wft 500
-                            endif
-                            if targetexists 
-                                while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                                endwhile
-                                target mbot_CurrentBotTarget
-                                getlabel backpack mbot_PingCheck
-                                if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                                    if timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
-                                        foreach mbot_Overhead in mconfig_Target_UnableToAttackOverheadText
-                                            if find mbot_CurrentBotTarget
-                                                overhead mbot_Overhead mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
-                                            endif
-                                        endfor
-                                        settimer mbot_CurrentBotTargetOverheadTimer 0
-                                    endif
-                                    @setvar! mbot_CurrentBotTarget 0
-                                else
-                                    settimer mbot_UsedSkillTimer 0
-                                    @setvar! mbot_CurrentBotTargetAttacked 1
-                                endif
-                            endif
-                        elseif mbot_Bard_CanPeacemake = 1 and mbot_Bard_SkipPeace = 0 and timer mbot_UsedSkillTimer >= 5000
-                            while insysmsg "What instrument"
-                            endwhile
-                            overhead "Peacmking"
-                            useskill 'Peacemaking'
-                            wft 500
-                            if insysmsg "What instrument"
-                                target mbot_activeInstrument
-                                wft 500
-                            endif
-                            if targetexists 
-                                while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                                endwhile
-                                target mbot_CurrentBotTarget
-                                getlabel backpack mbot_PingCheck
-                                if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                                    if timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
-                                        foreach mbot_Overhead in mconfig_Target_UnableToAttackOverheadText
-                                            if find mbot_CurrentBotTarget
-                                                overhead mbot_Overhead mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
-                                            endif
-                                        endfor
-                                        settimer mbot_CurrentBotTargetOverheadTimer 0
-                                    endif
-                                    @setvar! mbot_CurrentBotTarget 0
-                                else
-                                    settimer mbot_UsedSkillTimer 0
-                                    @setvar! mbot_CurrentBotTargetAttacked 1
-                                    @setvar! mbot_CurrentBotTargetGoodLOS 1
-                                endif
-                            endif
+                        endif
+
+                        ##### Bard section end
+                        if find mbot_CurrentBotTarget ground -1 -1 mbot_DynamicRangeCheck
+                            // assume we got it
+                            @setvar! mbot_CurrentBotTargetAttacked 1
+                        elseif mbot_CurrentBotTargetGoodLOS = 1 and find mbot_CurrentBotTarget ground -1 -1 mbot_DynamicRangeCheck
+                            @setvar! mbot_CurrentBotTargetAttacked 1
                         endif
                     endif
-
-                    ##### Bard section end
-                    if find mbot_CurrentBotTarget ground -1 -1 mbot_DynamicRangeCheck
-                        // assume we got it
-                        @setvar! mbot_CurrentBotTargetAttacked 1
-                    elseif mbot_CurrentBotTargetGoodLOS = 1 and find mbot_CurrentBotTarget ground -1 -1 mbot_DynamicRangeCheck
-                        @setvar! mbot_CurrentBotTargetAttacked 1
-                    endif
+                else
+                    @setvar! mbot_CurrentBotTarget 0
+                    @setvar! mbot_CurrentBotTargetGoodLOS 0
                 endif
-            else
-                @setvar! mbot_CurrentBotTarget 0
-                @setvar! mbot_CurrentBotTargetGoodLOS 0
             endif
+        elseif mconfig_Bot_FightAutoTarget = 1
+            @setvar! mbot_CurrentBotTarget 0
+            @setvar! mbot_CurrentBotTargetGoodLOS 0
+            // do nothing
+        elseif dead mbot_CurrentBotTarget
+            @setvar! mbot_BOT_FIGHT 0
+            @setvar! mbot_CurrentBotTarget 0
+            @setvar! mbot_CurrentBotTargetGoodLOS 0
         endif
-    elseif mconfig_Bot_FightAutoTarget = 1
-        @setvar! mbot_CurrentBotTarget 0
-        @setvar! mbot_CurrentBotTargetGoodLOS 0
-        // do nothing
-    elseif dead mbot_CurrentBotTarget
-        @setvar! mbot_BOT_FIGHT 0
-        @setvar! mbot_CurrentBotTarget 0
-        @setvar! mbot_CurrentBotTargetGoodLOS 0
     endif
     
     ##### Out of Combat: Emergency AOE Peace (low health, not fighting)
