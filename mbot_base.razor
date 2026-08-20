@@ -11,6 +11,12 @@ endif
 
 # Premium Dexxer Bot- BASE
 
+# Detect tamer archetype from skills (not configurable - computed once, not every loop)
+@setvar! jaseowns_TamerDetected 0
+if skill "Animal Taming" >= 80
+    @setvar! jaseowns_TamerDetected 1
+endif
+
 @setvar! poison_display_timer_cd 120000
 @setvar! poison_check_timer_cd 6000
 settimer poison_check_timer poison_check_timer_cd
@@ -292,7 +298,7 @@ endif
 
 #####
 ### Taming (crook activation, "all guard me" timer setup)
-if mconfig_Taming_Enabled = 1
+if jaseowns_TamerDetected = 1
 
     if not varexist myAwesomeCrookThatIsActivated
         @setvar! myAwesomeCrookThatIsActivated 0
@@ -418,10 +424,12 @@ while not dead
         endif
     endif
     
-    if mconfig_Taming_Enabled = 1 and mconfig_Taming_SayAllGuard = 1 and followers > 0
-        if timer jaseowns_Tamer_SayAllGuardTimer >= mconfig_Taming_SayAllGuardTimerCD
-            say "all guard me" 89
-            settimer jaseowns_Tamer_SayAllGuardTimer 0
+    if jaseowns_TamerDetected = 1
+        if mconfig_Taming_SayAllGuard = 1 and followers > 0
+            if timer jaseowns_Tamer_SayAllGuardTimer >= mconfig_Taming_SayAllGuardTimerCD
+                say "all guard me" 89
+                settimer jaseowns_Tamer_SayAllGuardTimer 0
+            endif
         endif
     endif
     if skill "Poisoning" >= 50 and mconfig_Poison_AutomaticallyApply = 1
