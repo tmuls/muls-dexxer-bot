@@ -733,16 +733,6 @@ while not dead
                 hotkey "Clear Current Target"
             endif
 
-            if skill "Healing" > 0 and findtype 3617 self
-                while insysmsg "You begin applying"
-                endwhile
-                hotkey "Bandage Self"
-                getlabel backpack jaseowns_PingCheck
-                if insysmsg "You begin applying"
-                    settimer jaseowns_BandageTimer 0
-                endif
-            endif
-
             say "[NobleSacrifice"
             wft 500
             if targetexists
@@ -760,6 +750,15 @@ while not dead
                     hotkey "Cancel Current Target"
                 endif
             endif
+            if skill "Healing" > 0 and findtype 3617 self
+                while insysmsg "You begin applying"
+                endwhile
+                hotkey "Bandage Self"
+                getlabel backpack jaseowns_PingCheck
+                if insysmsg "You begin applying"
+                    settimer jaseowns_BandageTimer 0
+                endif
+            endif            
         elseif jaseowns_BOT_UseHolyLight = 1
             while insysmsg "Holy symbols remaining"
             endwhile
