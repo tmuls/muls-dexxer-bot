@@ -1,59 +1,18 @@
+#######
+# Muls Dexxer Bot Config
+# Based on Ultimate Dexxer Bot Rewrite 2024-2025 by Jaseowns
+# Init and base bot files are NOT compatible.  
+# All original variables have been renamed for consistency and to avoid weird compatibility issues
+# DO NOT ask jaseowns for support for this bot.  
+# This is my own fork adding my own features and optimizations along with new config variables.
+#######
+
 removelist mbot_PreviousScript
 createlist mbot_PreviousScript
 pushlist mbot_PreviousScript "Play Script: Combat\Dexxer\mbot_base"
 
-#######
-# Ultimate Dexxer Bot Rewrite 2024-2025 by Jaseowns
-# UO Outlands - jaseowns.com/discord
-#####################
-#overhead "Newer Dexxer Bot 3.0" 76
-#overhead "WAR mode to fight stuff" 34
-#overhead "PEACE to run around" 89
-#####################################
-# Recently Added:
-#######
-# GOALS Today:
-#   10/27/2025 = 3.0  - revamp target 
-#   09/03/2025 = 2.4  - targeting: allow different styles of play
-#   09/01/2025 = 2.3  - bard: multi target boat: remove spyglass
-#   08/29/2025 = 2.2  - bard: allow peace first, aoe peace if low health
-#   07/02/2025 = 2.00 - auto provoke
-#   06/25/2025 = 1.23 - fix chiv over 15, fix bosses
-#   06/18/2025 = 1.22 - range check harpooner
-#   06/16/2025 = 1.21 - talk about chiv timing
-#   05/09/2025 = 1.20 - no changes here, only in base
-#   05/07/2025 = 1.19 - no changes here, only in base
-#   04/25/2025 = 1.18 - Fix holy symbols
-#   03/09/2025 = 1.17 - Fix error
-#   03/07/2025 = 1.16 - No stream but fixed the error (hopefully)
-#   02/07/2025 = 1.15 - 6-9pm stream: Turn off auto guard and update vet kit heals
-#   11/18/2024 = 1.14 - 6-9pm stream: Taming and boating?
-#   11/18/2024 = 1.13 - 6-9am stream: Cleansing Brew, overhead low aids
-#   11/15/2024 = 1.12 - 6-9pm stream: Varaible for magic resist potion
-#   11/15/2024 = 1.11 - 6-9am stream: Bane updates, added overweight checks
-#   11/11/2024 = 1.10 - 6-9pm stream: Testing with new echo, fix LOS, fix re-equip  
-#   11/11/2024 = 1.9 - 6-9am stream: Poison and bane, pancea, disarm logic
-#   11/08/2024 = 1.8 - 6-9pm stream: Bard buffs - Explosion Potions - Para Pouch
-#   11/08/2024 = 1.7 - 6-9am stream: Bard abilities - Peace/Discord
-#   11/06/2024 = 1.6 - 6-9pm stream: i give up, im going bard
-#   11/06/2024 = 1.5 - 6-9am stream: Potions
-#   11/04/2024 = 1.4 - 6-9pm stream: Parry and Potions
-#   11/04/2024 = 1.3 - 6-9am stream: Holy Symbols point reserve
-#   11/02/2024 = 1.2 - Finished Chiv Abilities, added AOE Taunt
-#   11/01/2024 = 1.1 - Food, fix diease/diase, cleansebyfire, parry
-#   10/31/2024 = 1.0 - Initial Script
-#    
-
 @setvar! mconfig_General_ShowVersion 0
 
-# NEW IN 3.0 - 10/27/2025
-###########################
-# AUTO FIGHT / AUTO TARGET TOGGLE
-# - mconfig_Bot_FightAutoTarget 1 = Auto target (original behavior)
-# - mconfig_Bot_FightAutoTarget 0 = Do not auto target
-#  -- If you use 0, make sure to set a hotkey in Razor for
-#  -- Set Last Target and/or Target Closest Non-Friendly Monster
-#  -- The script needs to see the target in RAZOR to use pots and abilities.
 @setvar! mconfig_Bot_FightAutoTarget 1
 
 # Peace mode vs war mode 0 = war  1 = peace to fight mobs automatically
@@ -62,10 +21,6 @@ pushlist mbot_PreviousScript "Play Script: Combat\Dexxer\mbot_base"
 # Animal Taming (tamer archetype is auto-detected from skills, not configured here)
 @setvar! mconfig_Taming_SayAllGuard 0
 @setvar! mconfig_Taming_SayAllGuardTimerCD 15000
-
-# Vet
-@setvar! mconfig_Vet_UseKitsAutomatically 1
-@setvar! mconfig_Vet_UseSuppliesTimerCD 6000
 
 # Boating
 @setvar! mconfig_Boat_UseSpyGlassAutomatically 1
@@ -116,8 +71,8 @@ pushlist mbot_PreviousScript "Play Script: Combat\Dexxer\mbot_base"
 @setvar! mconfig_Weapon_UseAbility2 0
 @setvar! mconfig_Weapon_UseAbility3 0
 @setvar! mconfig_Weapon_UseAbilityTimerCD 5000
-@setvar! mconfig_Weapon_ForceAbilitiesHotBarToShow 0
-@setvar! mconfig_Weapon_ForceCodexHotBarToShow 1
+@setvar! mconfig_Weapon_ForceAbilitiesHotBarToShow 1
+@setvar! mconfig_Weapon_ForceCodexHotBarToShow 0
 
 # Poison
 @setvar! mconfig_Poison_AutomaticallyApply 1

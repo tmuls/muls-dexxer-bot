@@ -1,23 +1,23 @@
 ################################################################
-### Muls Dexxer Bot - v1.0.20260819
+### Muls Dexxer Bot - v1.0.20260820
 ### Based on Jaseowns' Premium Dexxer Bot (June 2026 version)
 #
 # 2026-08-20 Release
 # - Smart Weapon Equip supports all weapons
-#
-# 2026-08-19 Release
-# - Optimized Chivalry
-# - Optimized Combat Loop
-# - Optimized barding
-# - Optimized tamer
 # - Fixed poison reapplication
 # - Added Smart Weapon Equip
 # - Added Smart Shield Equip
+# - Support automatic full codex hotbar in addition to abilities hot bar
+# - Optimized Chivalry
+# - Optimized Combat Loop
+# - Optimized barding
+# - Removed support for tamer archetype
+#
 ################################################################
 #
-# Premium Bot Comparison
-# 45% smaller file size
-# 65% fewer main loop branches -- 851 -> 299 branches (552 removed)
+# Jaseowns Premium Bot Comparison
+# 46% smaller file size
+# 65.5% fewer main loop branches -- 851 -> 294 branches (557 removed)
 #
 ################################################################
 
@@ -213,16 +213,6 @@ if skill "Alchemy" < 80
     @setvar! mconfig_Potion_AutoExplodePot 0
 endif
 
-##### Veterinary Setup
-settimer mbot_VET_UseVetSuppliesTimer mconfig_Vet_UseSuppliesTimerCD
-
-if skill "Veterinary" < 50
-    @setvar! mconfig_Vet_UseKitsAutomatically 0
-    # You begin using veterinary supplies
-    # You finish using veterinary supplies
-    # You or your nearby followers do not require healing
-endif
-
 ##### Panacea & Cleansing Brew Timers
 @setvar! mbot_UsePanaceaTimerCD 30500
 if not timerexists mbot_UsePanaceaTimer
@@ -258,7 +248,7 @@ if not findlayer self righthand
 endif
 
 if not findlayer self righthand
-    overhead "Weapon not equipped, searching backpack..." 66
+    overhead "Smart weapon equip searching..." 66
     @clearignore
     @setvar! mbot_FoundFallbackWeapon 0
     while mbot_FoundFallbackWeapon = 0 and findtype 31017|31019|31021|31023|31025|31027|31029|31031|31033|31035|31037|31038|31041|31043|31045|31047|31049|31051|31053|31055|3920|5042|5117|30990|30993|30994|30995|31184|31186|67773|67774|67775|67776|67777|67778|3719|3922|3938|5121|5123|5125|30989|30992|30996|30997|30998|31176|31188|3568|3721|3932|5040|5044|5112|5127|5177|5179|5181|30991|30999|31000|31001|31014|31178|31180|31182|3909|3911|3913|3915|3917|3934|3937|5046|5049|5115|5119|5182|5185|5187|30988|31128|31190|67713|67723|67734|67744|67754|67764|22187|31141|31142 backpack as mbot_WeaponCandidate
@@ -266,7 +256,7 @@ if not findlayer self righthand
         if " aspect" in mbot_WeaponCandidateDesc or "exceptional " in mbot_WeaponCandidateDesc or "supremely" in mbot_WeaponCandidateDesc or "exceedingly" in mbot_WeaponCandidateDesc or "vanquishing" in mbot_WeaponCandidateDesc or "power" in mbot_WeaponCandidateDesc
             dclick mbot_WeaponCandidate
             getlabel backpack mbot_PingCheck
-            overhead "Weapon found! Autoequipping {{mbot_WeaponCandidateDesc}}" 66
+            overhead "Weapon found! Auto-equipping." 66
             @setvar! mbot_FoundFallbackWeapon 1
         else
             @ignore mbot_WeaponCandidate
@@ -285,16 +275,15 @@ if not findlayer self lefthand
 endif
 
 if not findlayer self lefthand
-    overhead "Shield not equipped, searching backpack..." 66
-
+    overhead "Smart shield equip searching..." 66
     @clearignore
     @setvar! mbot_FoundFallbackShield 0
     while mbot_FoundFallbackShield = 0 and findtype 7026|7027|7029|7031|7033|7034|7035|7107|7109|31002|31130 backpack as mbot_ShieldCandidate
         getlabel mbot_ShieldCandidate mbot_ShieldCandidateDesc
-        if " aspect" in mbot_ShieldCandidateDesc or "exceptional " in mbot_ShieldCandidateDesc or "supremely" in mbot_ShieldCandidateDesc or "exceedingly" in mbot_ShieldCandidateDesc or "vanquishing" in mbot_ShieldCandidateDesc or "power" in mbot_ShieldCandidateDesc
+        if "exceptional" in mbot_ShieldCandidateDesc or "invulnerable" in mbot_ShieldCandidateDesc or "fortified" in mbot_ShieldCandidateDesc
             dclick mbot_ShieldCandidate
             getlabel backpack mbot_PingCheck
-            overhead "Shield found! Autoequipping {{mbot_ShieldCandidateDesc}}" 66
+            overhead "Shield found! Auto-equipping..." 66
             @setvar! mbot_FoundFallbackShield 1
         else
             @ignore mbot_ShieldCandidate
@@ -369,12 +358,12 @@ while not dead
     endwhile
 
     // Handle manual bandage
-    while insysmsg "You begin applying" or insysmsg "You begin using veterinary supplies"
+    while insysmsg "You begin applying"
         settimer mbot_BandageTimer 0
     endwhile
 
     // Reset the timer if we finished
-    while insysmsg "You finish applying" or insysmsg "You heal what little" or insysmsg "barely help" or insysmsg "You fail to resurrect" or insysmsg "You are able to resurrect" or insysmsg "You finish using veterinary supplies" or insysmsg "You or your nearby followers do not require healing"
+    while insysmsg "You finish applying" or insysmsg "You heal what little" or insysmsg "barely help" or insysmsg "You fail to resurrect" or insysmsg "You are able to resurrect"
         settimer mbot_BandageTimer mbot_BandageTimerCD
     endwhile
     
@@ -648,26 +637,6 @@ while not dead
         endif
     endif
     
-    ##### Out of Combat: Veterinary Supplies
-    if mconfig_Vet_UseKitsAutomatically = 1 and findtype 25750 backpack 0 as mbot_VetSupply
-        if timer mbot_VET_UseVetSuppliesTimer >= mconfig_Vet_UseSuppliesTimerCD or hp < maxhp
-            if timer mbot_UseItemTimer >= mbot_UseItemTimerCD and timer mbot_BandageTimer >= mbot_BandageTimerCD
-                while insysmsg "You begin using veterinary supplies" or insysmsg "You or your nearby followers do not require healing"
-                endwhile
-                dclick mbot_VetSupply
-                settimer mbot_UseItemTimer 0
-                getlabel backpack mbot_PingCheck
-                if insysmsg "You begin using veterinary supplies"
-                    cooldown "Use Vet Supply" mconfig_Vet_UseSuppliesTimerCD
-                    settimer mbot_VET_UseVetSuppliesTimer 0
-                    settimer mbot_BandageTimer 0
-                elseif insysmsg "You or your nearby followers do not require healing"
-                    cooldown "Use Vet Supply" mconfig_Vet_UseSuppliesTimerCD
-                    settimer mbot_VET_UseVetSuppliesTimer 0
-                endif
-            endif
-        endif
-    endif
     
     ##### Out of Combat: Chivalry Symbol Count Detection
     if timer mbot_Chiv_SymbolCheckTimer >= mbot_Chiv_SymbolCheckTimerCD
