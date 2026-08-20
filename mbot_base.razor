@@ -13,6 +13,7 @@
 # 59% fewer branches -- 918 -> 378 branches (540 removed)
 ################################################################
 
+##### Archetype Detection
 @setvar! mbot_TamerDetected 0
 if skill "Animal Taming" >= 80
     @setvar! mbot_TamerDetected 1
@@ -23,6 +24,7 @@ if skill "Discordance" > 0 or skill "Peacemaking" > 0 or skill "Provocation" > 0
     @setvar! mbot_BardDetected 1
 endif
 
+##### Poison Sting Tracking
 @setvar! poison_display_timer_cd 120000
 @setvar! poison_check_timer_cd 6000
 settimer poison_check_timer poison_check_timer_cd
@@ -40,6 +42,7 @@ pushlist poison_check_list " (2."
 pushlist poison_check_list " (1."
 pushlist poison_check_list " (0."
 
+##### Target State & Overhead Timers
 @setvar! mbot_CurrentBotTarget 0
 @setvar! mbot_FightingRangeCheck 12
 
@@ -63,6 +66,7 @@ settimer mbot_CurrentBotTargetOverheadTimer mconfig_Target_CurrentOverheadTimerC
 settimer mbot_CurrentBotTargetUnableToAttackOverheadTimer mconfig_Target_UnableToAttackOverheadTimerCD
 settimer mbot_IgnoreMobOverheadTimer mconfig_Target_IgnoreMobOverheadTimerCD
 
+##### Chivalry Ability Timers
 @setvar! mbot_HolyLightTimerCD 30000
 if not timerexists mbot_HolyLightTimer
     settimer mbot_HolyLightTimer mbot_HolyLightTimerCD
@@ -97,6 +101,7 @@ if not timerexists mbot_Chiv_SymbolCheckTimer
     settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
 endif
 
+##### Combat Support Timers
 @setvar! mbot_LOSCheckTimerCD 500
 if not timerexists mbot_LOSCheckTimer
     settimer mbot_LOSCheckTimer mbot_LOSCheckTimerCD
@@ -105,6 +110,7 @@ endif
 @setvar! mbot_UseItemTimerCD 650
 settimer mbot_UseItemTimer mbot_UseItemTimerCD
 
+##### Potion Triggers & Overhead Display
 if not varexist mconfig_Potion_HealHpDiffTrigger
     @setvar! mconfig_Potion_HealHpDiffTrigger 40
 endif
@@ -138,6 +144,7 @@ if mconfig_Potion_ShowOverheads = 1
     
 endif
 
+##### Cooldown System Warmup (forces the cooldown table to exist before first real use)
 cooldown "Moving" 5000
 if not cooldown "Moving"
     overhead "We do not have the cooldown..." 34
@@ -146,6 +153,7 @@ else
     cooldown "Moving" 0
 endif
 
+##### Parry / Shield Setup
 if skill "Parrying" < 80
     @setvar! mconfig_Parry_AutoTaunting 0
     @setvar! mconfig_Parry_AutoAoeTaunting 0
@@ -190,6 +198,7 @@ else
     endif
 endif
 
+##### Potion Satchel & Refresh Trigger
 if not varexist mconfig_Potion_RefreshStamDiffTrigger
     @setvar! mconfig_Potion_RefreshStamDiffTrigger 5
 endif
@@ -237,6 +246,7 @@ if mbot_BardDetected = 1
 
 endif
 
+##### Explosion Pot & Used-Skill Timer
 if mconfig_Potion_AutoExplodePot = 1
     @setvar! mbot_AutoExplodePotTimerCD 15000
     settimer mbot_AutoExplodePotTimer mbot_AutoExplodePotTimerCD
@@ -245,6 +255,7 @@ endif
 @setvar! mbot_UsedSkillTimerCD 10000
 settimer mbot_UsedSkillTimer mbot_UsedSkillTimerCD
 
+##### Weapon Ability Hotbar Setup
 if mconfig_Weapon_ForceAbilitiesHotBarToShow = 1 and not gumpexists 3954121934
     say "[abilitieshotbar"
     waitforgump 3954121934 1000
@@ -260,11 +271,13 @@ if not varexist mconfig_Weapon_UseAbilityTimerCD
 endif
 settimer mbot_UseAbilityTimer mconfig_Weapon_UseAbilityTimerCD
 
+##### Alchemy-Gated Features
 if skill "Alchemy" < 80
     @setvar! mconfig_Potion_HasPanacea 0
     @setvar! mconfig_Potion_AutoExplodePot 0
 endif
 
+##### Veterinary Setup
 if not varexist mconfig_Vet_UseSuppliesTimerCD
     @setvar! mconfig_Vet_UseSuppliesTimerCD 5000
 endif
@@ -278,6 +291,7 @@ if skill "Veterinary" < 50
     # You or your nearby followers do not require healing
 endif
 
+##### Panacea & Cleansing Brew Timers
 @setvar! mbot_UsePanaceaTimerCD 30500
 if not timerexists mbot_UsePanaceaTimer
     settimer mbot_UsePanaceaTimer mbot_UsePanaceaTimerCD
@@ -288,6 +302,7 @@ if not timerexists mbot_UseCleansingBrewTimer
     settimer mbot_UseCleansingBrewTimer mbot_UseCleansingBrewTimerCD
 endif
 
+##### Weapon State Tracking
 if not varexist mbot_BOT_CurrentRightHandWeapon
     @setvar! mbot_BOT_CurrentRightHandWeapon 0
 endif
@@ -303,8 +318,7 @@ if findlayer self lefthand as mbot_LeftHandWeapon
 endif
 
 
-#####
-### Taming (crook activation, "all guard me" timer setup)
+##### Taming Setup (crook activation, "all guard me" timer setup)
 if mbot_TamerDetected = 1
 
     if not varexist mbot_activeCrook
@@ -359,17 +373,18 @@ if mbot_TamerDetected = 1
 
 endif
 
+##### Bandage Timer & Red Pouch Tracking
 @setvar! mbot_BandageTimerCD 20000
 if not timerexists mbot_BandageTimer
     settimer mbot_BandageTimer mbot_BandageTimerCD
 endif
-
 
 @setvar! mbot_RedPouchCountTotal 0
 
 
 while not dead
 
+    ##### Out of Combat: Sysmsg Cleanup & Self-Bandaging
     while insysmsg "You deliver a poison sting"
         cooldown "Poison Sting" 5000
     endwhile
@@ -403,6 +418,7 @@ while not dead
         endif
     endif
     
+    ##### Out of Combat: Thief Pouch Alert
     if mconfig_Thief_AlertRedPouchPop = 1 and counttype 3705 backpack 38 as mbot_RedPouchCount
         if mbot_RedPouchCountTotal != 0 and mbot_RedPouchCountTotal != mbot_RedPouchCount
             overhead "Warning: THIEF we lost a pouch!" 34
@@ -411,7 +427,8 @@ while not dead
         endif
     endif
 
-    if casting 
+    ##### Out of Combat: Weapon Re-equip
+    if casting
         settimer mbot_UseItemTimer 0
     endif
 
@@ -431,6 +448,7 @@ while not dead
         endif
     endif
     
+    ##### Out of Combat: Taming - All Guard Trigger
     if mbot_TamerDetected = 1
         if mconfig_Taming_SayAllGuard = 1 and followers > 0
             if timer mbot_Tamer_SayAllGuardTimer >= mconfig_Taming_SayAllGuardTimerCD
@@ -439,6 +457,8 @@ while not dead
             endif
         endif
     endif
+
+    ##### Out of Combat: Weapon Poison Application
     if skill "Poisoning" >= 50 and mconfig_Poison_AutomaticallyApply = 1
         if counttype 3850 mbot_PotionSatchel or counttype 3850 backpack
             @setvar! weapon_to_poison 0
@@ -485,6 +505,7 @@ while not dead
         endif
     endif
 
+    ##### Out of Combat: Overweight Gold Drop
     if varexist mconfig_Weight_GoldToDropIfOverweight and weight > maxweight and timer mbot_UseItemTimer >= mbot_UseItemTimerCD
         if findtype "gold coin" backpack as item
             while insysmsg "cannot drop anything"
@@ -501,8 +522,9 @@ while not dead
         endif
     endif
     
+    ##### Out of Combat: Potion Overhead Display
     if mconfig_Potion_ShowOverheads = 1
-    
+
         if timer mbot_Potion_Cure_Overhead_IfCountIsLessThan_Timer >= mconfig_Potion_CureOverheadIfCountIsLessThanTimerCD
             @setvar! mbot_BOT_CurePotionCount 0
             if counttype 3847 mbot_PotionSatchel as mbot_TempPotionCount
@@ -556,6 +578,7 @@ while not dead
         
     endif
 
+    ##### Out of Combat: Food
     if not queued and not findbuff "food" and findtype "tray" backpack as mbot_FoodItem
         if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
             dclick mbot_FoodItem
@@ -563,6 +586,7 @@ while not dead
         endif
     endif
     
+    ##### Out of Combat: Panacea & Cure/Heal/Refresh Potions
     if mconfig_Potion_HasPanacea = 1 and timer mbot_UsePanaceaTimer >= mbot_UsePanaceaTimerCD
         if findbuff "bleed" or findbuff "disease"
             if findtype 3847 self 0 as mbot_UseItem
@@ -601,8 +625,9 @@ while not dead
     endif
     
     // Trapped
-    if paralyzed and not queued 
-        if findtype "pouch" backpack 38 
+    ##### Out of Combat: Paralyze Escape (Trapped Pouch)
+    if paralyzed and not queued
+        if findtype "pouch" backpack 38
             yell "[pouch"
             getlabel backpack mbot_PingCheck
         else
@@ -610,6 +635,7 @@ while not dead
         endif
     endif
 
+    ##### Out of Combat: Skinning
     if not queued and mconfig_Skinning_UseKnifeAutomatically = 1 and findtype 11552 backpack as mbot_SkinningKnife
         if findbuff "Actively Meditating"
             //do nothing
@@ -626,6 +652,7 @@ while not dead
         endif
     endif
     
+    ##### Out of Combat: Tracking
     if skill "Tracking" > 0
         if not findbuff "tracking"
             while insysmsg "You will now hunt all hostile players."
@@ -646,6 +673,7 @@ while not dead
         endif
     endif
     
+    ##### Out of Combat: Veterinary Supplies
     if mconfig_Vet_UseKitsAutomatically = 1 and findtype 25750 backpack 0 as mbot_VetSupply
         if timer mbot_VET_UseVetSuppliesTimer >= mconfig_Vet_UseSuppliesTimerCD or hp < maxhp
             if timer mbot_UseItemTimer >= mbot_UseItemTimerCD and timer mbot_BandageTimer >= mbot_BandageTimerCD
@@ -666,6 +694,7 @@ while not dead
         endif
     endif
     
+    ##### Out of Combat: Chivalry Symbol Count Detection
     if timer mbot_Chiv_SymbolCheckTimer >= mbot_Chiv_SymbolCheckTimerCD
         if not gumpexists 1387930325 and skill "chivalry" >= 50
             say '[chivalryhotbar'
@@ -826,9 +855,9 @@ while not dead
 
     endif
 
+    ##### Fight State Detection (auto-target mode vs manually-set target)
     @setvar! mbot_CurrentBotTargetAttacked 0
 
-    
     if mconfig_Bot_FightAutoTarget = 1
         @setvar! mbot_BOT_FIGHT 0
         if mconfig_Bot_FightInPeaceMode = 1
@@ -866,8 +895,10 @@ while not dead
         endif
     endif
 
+    ##### In Combat
     if mbot_BOT_FIGHT = 1 and not cooldown PVP
-        
+
+        ##### In Combat: Target Acquisition
         if insysmsg "Target a new 'Last Target'"
             overhead "Set your target"
             while targetexists 
@@ -1374,6 +1405,7 @@ while not dead
         @setvar! mbot_CurrentBotTargetGoodLOS 0
     endif
     
+    ##### Out of Combat: Emergency AOE Peace (low health, not fighting)
     if mbot_BOT_FIGHT = 0 and hp < mconfig_Bard_AutoUseAoePeaceWhenLowHealthCheck and skill "Peacemaking" > 0 and timer mbot_UsedSkillTimer >= 5000
         while insysmsg "What instrument"
         endwhile
@@ -1390,10 +1422,8 @@ while not dead
     endif
     
 
-    #####
-    ## Parry Codex Options
-    ###
-    if skill "Parry" >= 80 
+    ##### Parry Codex Stance Switching (runs regardless of fight state)
+    if skill "Parry" >= 80
         if mana >= mconfig_Parry_CodexMinMana and timer mbot_Parry_SwitchCodexTimer >= mbot_Parry_SwitchCodexTimerCD and findtype 11889 backpack as mbot_ParryCodex
             getlabel mbot_ParryCodex mbot_ParryCodexDesc
 
@@ -1442,15 +1472,16 @@ while not dead
         endif
     endif
 
-    // Attacking stuff
+    ##### Post-Attack Actions (this iteration only, if we attacked)
     if mbot_CurrentBotTargetAttacked = 1
-        
+
         if mconfig_Healing_AidCountAlertLessThan20 = 1 and skill "Healing" > 0 and counttype 3617 self as mbot_BOT_AidCount
             if 20 > mbot_BOT_AidCount
             overhead "We are low on aids {{mbot_BOT_AidCount}}" 34
             endif
         endif
     
+        ##### Post-Attack: Cleansing Brew
         if mconfig_Potion_UseCleansingBrewAutomatically = 1 and findtype 50675 backpack 2935 as mbot_UseItem
             if findbuff "bleed" or findbuff "disease"
                 if not varexist mconfig_Potion_CleansingBrewHpDiffTrigger
@@ -1467,6 +1498,7 @@ while not dead
             endif
         endif
     
+        ##### Post-Attack: Weapon Abilities
         if mconfig_Weapon_UseAbility1 = 1 and timer mbot_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
             while insysmsg "You do cannot perform that ability yet." or insysmsg "You have not yet unlocked that weapon ability." or insysmsg "You do not have the required codex or skills to use that weapon ability."
             endwhile
@@ -1484,6 +1516,7 @@ while not dead
             settimer mbot_UseAbilityTimer 0 
         endif   
             
+        ##### Post-Attack: Explosion Pot
         if not queued and mconfig_Potion_AutoExplodePot = 1 and find mbot_CurrentBotTarget ground -1 -1 8 and findtype 3853 self 0 as mbot_explosionPot
             if timer mbot_AutoExplodePotTimer >= mbot_AutoExplodePotTimerCD and timer mbot_UseItemTimer >= mbot_UseItemTimerCD
                 @ignore mbot_explosionPot
@@ -1523,6 +1556,7 @@ while not dead
             endif
         endif
     
+        ##### Post-Attack: Buff Potions & Chivalry Gate C
         if not queued and mconfig_Potion_UseAgilityAutomatically = 1 and not findbuff "Agility" and findtype 3848 self as mbot_Potion
             if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
                 dclick mbot_Potion
@@ -1593,6 +1627,7 @@ while not dead
             endif
         endif
         
+        ##### Post-Attack: Taunting
         if mconfig_Parry_AutoTaunting = 1 or mconfig_Parry_AutoAoeTaunting = 1
             @setvar! mbot_TriggerAbility 0
             if cooldown "Taunting" or timer mbot_TauntingTimer < mconfig_Parry_TauntingTimerCD
@@ -1632,7 +1667,7 @@ while not dead
         
     endif
     
-    ##### Bard: passive song-buff maintenance
+    ##### Out of Combat: Bard Passive Song-Buff Maintenance
     if mbot_BardDetected = 1
 
         if skill "Discordance" > 0
