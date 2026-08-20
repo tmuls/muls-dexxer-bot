@@ -11,10 +11,14 @@ endif
 
 # Premium Dexxer Bot- BASE
 
-# Detect tamer archetype from skills (not configurable - computed once, not every loop)
 @setvar! jaseowns_TamerDetected 0
 if skill "Animal Taming" >= 80
     @setvar! jaseowns_TamerDetected 1
+endif
+
+@setvar! jaseowns_BardDetected 0
+if skill "Discordance" > 0 or skill "Peacemaking" > 0 or skill "Provocation" > 0
+    @setvar! jaseowns_BardDetected 1
 endif
 
 @setvar! poison_display_timer_cd 120000
@@ -86,11 +90,14 @@ if not timerexists jaseowns_EnemyOfOneTimer
     settimer jaseowns_EnemyOfOneTimer jaseowns_EnemyOfOneTimerCD
 endif
 
-if not varexist jaseowns_Chiv_SymbolCheckTimerCD
-    @setvar! jaseowns_Chiv_SymbolCheckTimerCD 1000
-endif
+@setvar! jaseowns_Chiv_SymbolCheckTimerCD 1000
 if not timerexists jaseowns_Chiv_SymbolCheckTimer
     settimer jaseowns_Chiv_SymbolCheckTimer jaseowns_Chiv_SymbolCheckTimerCD
+endif
+
+@setvar! jaseowns_LOSCheckTimerCD 500
+if not timerexists jaseowns_LOSCheckTimer
+    settimer jaseowns_LOSCheckTimer jaseowns_LOSCheckTimerCD
 endif
 
 @setvar! jaseowns_UseItemTimerCD 650
@@ -150,9 +157,7 @@ else
         cooldown "Bulwark" 0
     endif
 
-    if not varexist jaseowns_Parry_SwitchCodexTimerCD
-        @setvar! jaseowns_Parry_SwitchCodexTimerCD 1000
-    endif
+    @setvar! jaseowns_Parry_SwitchCodexTimerCD 1000
     
     if not varexist mconfig_Parry_CodexMinMana
         @setvar! mconfig_Parry_CodexMinMana 3
@@ -192,39 +197,40 @@ if findlayer self Outerbody as jaseowns_MaybePotionSatchel
     @setvar! jaseowns_PotionSatchel jaseowns_MaybePotionSatchel
 endif
 
-if skill "Discordance" >= 50 and mconfig_Bard_DiscordAutomatically = 1
-    @setvar! jaseowns_Bard_CanDiscord 1
-else
-    @setvar! jaseowns_Bard_CanDiscord 0
-endif
+##### Bard Config/Setup (only relevant if a bard archetype was detected)
+if jaseowns_BardDetected = 1
 
-if skill "Peacemaking" >= 50 and mconfig_Bard_PeaceAutomatically = 1
-    @setvar! jaseowns_Bard_CanPeacemake 1
-else
-    @setvar! jaseowns_Bard_CanPeacemake 0
-endif
+    if skill "Discordance" >= 50 and mconfig_Bard_DiscordAutomatically = 1
+        @setvar! jaseowns_Bard_CanDiscord 1
+    else
+        @setvar! jaseowns_Bard_CanDiscord 0
+    endif
 
-if skill "Provocation" >= 50 and mconfig_Bard_ProvoAutomatically = 1
-    @setvar! jaseowns_Bard_CanProvo 1
-else
-    @setvar! jaseowns_Bard_CanProvo 0
-endif
+    if skill "Peacemaking" >= 50 and mconfig_Bard_PeaceAutomatically = 1
+        @setvar! jaseowns_Bard_CanPeacemake 1
+    else
+        @setvar! jaseowns_Bard_CanPeacemake 0
+    endif
 
-# Bard Variables
-if jaseowns_Bard_CanProvo = 1
-    @setvar! jaseowns_BARD_PROVO_COUNTER 0
-    @setvar! jaseowns_BARD_TARGET1 0
-    @setvar! jaseowns_BARD_TARGET2 0
-    if not varexist jaseowns_BARD_TARGET_RANGECHECK
+    if skill "Provocation" >= 50 and mconfig_Bard_ProvoAutomatically = 1
+        @setvar! jaseowns_Bard_CanProvo 1
+    else
+        @setvar! jaseowns_Bard_CanProvo 0
+    endif
+
+    # Bard Variables
+    if jaseowns_Bard_CanProvo = 1
+        @setvar! jaseowns_BARD_PROVO_COUNTER 0
+        @setvar! jaseowns_BARD_TARGET1 0
+        @setvar! jaseowns_BARD_TARGET2 0
         @setvar! jaseowns_BARD_TARGET_RANGECHECK 8
-    endif
-    if not varexist jaseowns_BARD_TARGET_RANGECHECK_TIMERCD
         @setvar! jaseowns_BARD_TARGET_RANGECHECK_TIMERCD 1000
+        settimer jaseowns_BARD_TARGET_RANGECHECK_TIMER jaseowns_BARD_TARGET_RANGECHECK_TIMERCD
     endif
-    settimer jaseowns_BARD_TARGET_RANGECHECK_TIMER jaseowns_BARD_TARGET_RANGECHECK_TIMERCD
-endif
 
-settimer jaseowns_BOT_BardBuffTimer 10000
+    settimer jaseowns_BOT_BardBuffTimer 10000
+
+endif
 
 if mconfig_Potion_AutoExplodePot = 1
     @setvar! jaseowns_AutoExplodePotTimerCD 15000
@@ -267,16 +273,12 @@ if skill "Veterinary" < 50
     # You or your nearby followers do not require healing
 endif
 
-if not varexist jaseowns_UsePanaceaTimerCD
-    @setvar! jaseowns_UsePanaceaTimerCD 30500
-endif
+@setvar! jaseowns_UsePanaceaTimerCD 30500
 if not timerexists jaseowns_UsePanaceaTimer
     settimer jaseowns_UsePanaceaTimer jaseowns_UsePanaceaTimerCD
 endif
 
-if not varexist jaseowns_UseCleansingBrewTimerCD
-    @setvar! jaseowns_UseCleansingBrewTimerCD 120500
-endif
+@setvar! jaseowns_UseCleansingBrewTimerCD 120500
 if not timerexists jaseowns_UseCleansingBrewTimer
     settimer jaseowns_UseCleansingBrewTimer jaseowns_UseCleansingBrewTimerCD
 endif
@@ -962,23 +964,7 @@ while not dead
                             @setvar! jaseowns_BOT_TargetPoisoned 1
                         endif
                     endif
-                    
-                    @setvar! jaseowns_Bard_SkipPeace 0
-                    if "pacified" in jaseowns_CurrentBotTargetDesc
-                        @setvar! jaseowns_Bard_SkipPeace 1
-                    endif
 
-                    if "provo" in jaseowns_CurrentBotTargetDesc
-                        @setvar! jaseowns_Bard_SkipPeace 1
-                    endif
-                    
-                    @setvar! jaseowns_Bard_SkipDiscord 0
-                    if mconfig_Bard_UsePeaceFirst = 1 and jaseowns_Bard_SkipPeace = 0
-                        @setvar! jaseowns_Bard_SkipDiscord 1
-                    elseif "discord" in jaseowns_CurrentBotTargetDesc
-                        @setvar! jaseowns_Bard_SkipDiscord 1
-                    endif
-                    
                     # TODO: longshot bro
                     if findtype 5117|3920|31184|31186|30993|31172|31169|9917 righthand or findtype 5117|3920|31184|31186|30993 lefthand
                         @setvar! jaseowns_DynamicRangeCheck 8
@@ -987,345 +973,14 @@ while not dead
                     else
                         @setvar! jaseowns_DynamicRangeCheck 2
                     endif
-                    
-                    @setvar! jaseowns_Bard_DiscordCheckNextMob 0
-                    
-                    # PROVO
-                    if jaseowns_Bard_CanProvo = 1 and timer jaseowns_UsedSkillTimer >= 5000
 
-                        if jaseowns_BARD_PROVO_COUNTER = 4
-                            // do nothing
-                        else
-                            @setvar! jaseowns_Bard_SkipDiscord 1
-                            @setvar! jaseowns_Bard_SkipPeace 1
-                        endif
-                    
-                        if not targetexists and timer jaseowns_BARD_TARGET_RANGECHECK_TIMER >= jaseowns_BARD_TARGET_RANGECHECK_TIMERCD
-                                
-                            if not find jaseowns_BARD_TARGET1 and find jaseowns_CurrentBotTarget ground -1 -1 jaseowns_BARD_TARGET_RANGECHECK
-                                @setvar! jaseowns_BARD_TARGET1 jaseowns_CurrentBotTarget
-                            endif
-                            
-                            if jaseowns_BARD_TARGET1 = jaseowns_BARD_TARGET2
-                                @setvar! jaseowns_BARD_TARGET2 0
-                            endif
-                            
-                            if find jaseowns_BARD_TARGET1 ground -1 -1 jaseowns_BARD_TARGET_RANGECHECK and find jaseowns_BARD_TARGET2 ground -1 -1 jaseowns_BARD_TARGET_RANGECHECK
-                                
-                                for 3
-                                    if dead jaseowns_BARD_TARGET1
-                                        break
-                                    endif
-                                    getlabel jaseowns_BARD_TARGET1 jaseowns_CurrentBotTargetDesc1
-                                    if "-" in jaseowns_CurrentBotTargetDesc1
-                                        // do nothing - try again
-                                    else
-                                        break
-                                    endif
-                                endfor
-                                
-                                for 3
-                                    if dead jaseowns_BARD_TARGET2
-                                        break
-                                    endif
-                                    getlabel jaseowns_BARD_TARGET2 jaseowns_CurrentBotTargetDesc2
-                                    if "-" in jaseowns_CurrentBotTargetDesc2
-                                        // do nothing - try again
-                                    else
-                                        break
-                                    endif
-                                endfor
-                                
-                                while insysmsg "Target cannot be seen"
-                                endwhile
-                                
-                                if "provo" in jaseowns_CurrentBotTargetDesc1 and "provo" in jaseowns_CurrentBotTargetDesc2
-                                    if "discord" in jaseowns_CurrentBotTargetDesc2
-                                        // do nothing
-                                    else
-                                        @setvar! jaseowns_Bard_DiscordCheckNextMob jaseowns_BARD_TARGET2
-                                    endif
-                                    @setvar! jaseowns_BARD_TARGET2 0
-                                else
-                                    @setvar! jaseowns_BARD_PROVO_COUNTER 0
-                                    while insysmsg "What instrument"
-                                    endwhile
-                                    useskill "Provocation" 
-                                    wft 500
-                                    if insysmsg "What instrument"
-                                        if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as jaseowns_Instrument 
-                                            target jaseowns_Instrument
-                                            @setvar! jase_MyInny jaseowns_Instrument
-                                        else
-                                            overhead "I do not have an instrument" 34
-                                        endif
-                                        wft 500
-                                    endif
-                                    if targetexists
-                                        target jaseowns_BARD_TARGET1
-                                        getlabel backpack jaseowns_PingCheck
-                                        if insysmsg "Target cannot be seen"
-                                            @setvar! jaseowns_BARD_TARGET1 0
-                                        else
-                                            wft 500
-                                            target jaseowns_BARD_TARGET2
-                                            getlabel backpack jaseowns_PingCheck                
-                                            if insysmsg "Target cannot be seen"
-                                                @setvar! jaseowns_BARD_TARGET2 0
-                                            endif
-                                        endif
-                                    endif
-                                endif
-                            
-                            else
-                                
-                    
-                                if jaseowns_BARD_PROVO_COUNTER = 0
-                                    @setvar! jaseowns_BARD_PROVO_COUNTER 1
-                                elseif jaseowns_BARD_PROVO_COUNTER = 1
-                                    @setvar! jaseowns_BARD_PROVO_COUNTER 2
-                                elseif jaseowns_BARD_PROVO_COUNTER = 2
-                                    @setvar! jaseowns_BARD_PROVO_COUNTER 3
-                                else
-                                    @setvar! jaseowns_BARD_PROVO_COUNTER 4
-                                endif
-                            
-                                if not find jaseowns_BARD_TARGET1 and find jaseowns_CurrentBotTarget ground -1 -1 jaseowns_BARD_TARGET_RANGECHECK
-                                    @setvar! jaseowns_BARD_TARGET1 jaseowns_CurrentBotTarget
-                                endif
-                            
-                                if find jaseowns_BARD_TARGET1 ground -1 -1 jaseowns_BARD_TARGET_RANGECHECK
-                                    // check for second one
-                                    hotkey "target closest non-friendly monster"
-                                    @setvar! jaseowns_LastBotTarget lasttarget 
-                                    if jaseowns_BARD_TARGET1 != jaseowns_LastBotTarget
-                                        for 3
-                                            if dead jaseowns_BARD_TARGET2
-                                                break
-                                            endif
-                                            getlabel jaseowns_BARD_TARGET2 jaseowns_CurrentBotTargetDesc
-                                            if "-" in jaseowns_CurrentBotTargetDesc
-                                                // do nothing - try again
-                                            else
-                                                break
-                                            endif
-                                        endfor
-                                        if find jaseowns_LastBotTarget
-                                            overhead "ATTEMPTING CLOSEST" 38 jaseowns_LastBotTarget
-                                        endif
-                                        if "provo" in jaseowns_CurrentBotTargetDesc
-                                            // do nothing
-                                        else
-                                            @setvar! jaseowns_BARD_TARGET2 jaseowns_LastBotTarget    
-                                        endif
-                                    endif
-                                    
-                                    if not find jaseowns_BARD_TARGET2 ground -1 -1 jaseowns_BARD_TARGET_RANGECHECK
-                                        
-                                        @setvar! jaseowns_BARD_RANDOM_TARGET_OG 0
-                                        hotkey "next non-friendly monster target"
-                                        @setvar! jaseowns_BARD_RANDOM_TARGET lasttarget                     
-                                        
-                                        while find jaseowns_BARD_RANDOM_TARGET and jaseowns_BARD_RANDOM_TARGET != jaseowns_BARD_RANDOM_TARGET_OG
-                                            if jaseowns_BARD_RANDOM_TARGET_OG = 0
-                                                @setvar! jaseowns_BARD_RANDOM_TARGET_OG jaseowns_BARD_RANDOM_TARGET
-                                            endif
-                                            if not find jaseowns_BARD_TARGET1
-                                                break
-                                            endif
-                                            
-                                            if jaseowns_BARD_TARGET1 != jaseowns_BARD_RANDOM_TARGET and find jaseowns_BARD_RANDOM_TARGET ground -1 -1 jaseowns_BARD_TARGET_RANGECHECK
-                                                for 3
-                                                    if dead jaseowns_BARD_RANDOM_TARGET
-                                                        break
-                                                    endif
-                                                    getlabel jaseowns_BARD_RANDOM_TARGET jaseowns_CurrentBotTargetDesc
-                                                    if "-" in jaseowns_CurrentBotTargetDesc
-                                                        // do nothing - try again
-                                                    else
-                                                        break
-                                                    endif
-                                                endfor
-                                                
-                                                if find jaseowns_BARD_RANDOM_TARGET
-                                                    overhead "ATTEMPTING RANDOM" 34 jaseowns_BARD_RANDOM_TARGET
-                                                endif
-                                                
-                                                if "provo" in jaseowns_CurrentBotTargetDesc
-                                                    if "discord" in jaseowns_CurrentBotTargetDesc
-                                                        // do nothing
-                                                    else
-                                                        @setvar! jaseowns_Bard_DiscordCheckNextMob jaseowns_BARD_RANDOM_TARGET
-                                                    endif
-                                                else
-                                                    @setvar! jaseowns_BARD_TARGET2 jaseowns_BARD_RANDOM_TARGET    
-                                                    break
-                                                endif
-                                            endif
-                                            hotkey "next non-friendly monster target"
-                                            @setvar! jaseowns_BARD_RANDOM_TARGET lasttarget                     
-                                        endwhile
-                                    endif
-                                    settimer jaseowns_BARD_TARGET_RANGECHECK_TIMER 0
-                                endif
-                            endif
-                        endif
-                    else
-                        # TODO: logic for people without provo
-                        #  also do more discord checks (set a jaseowns_Bard_DiscordCheckNextMob)
-                    endif
-                    
-                    
-                    ### IN THE PROVO SECTION, TRY TO SET A LIST OF MOBS THAT ARE ALREADY PROVOED - SO YOU CAN KNOW WHAT TO DISCOR
-
-                    if jaseowns_Bard_CanDiscord = 1 and not dead jaseowns_Bard_DiscordCheckNextMob
-                        while insysmsg "What instrument"
-                        endwhile
-                        overhead "Discording Extra Mob: {{jaseowns_CurrentBotTargetDesc}}"
-                        useskill 'Discordance'
-                        wft 500
-                        if insysmsg "What instrument"
-                            if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as jaseowns_Instrument 
-                                target jaseowns_Instrument
-                                @setvar! jase_MyInny jaseowns_Instrument
-                            else
-                                overhead "I do not have an instrument" 34
-                            endif
-                            wft 500
-                        endif
-                        if targetexists 
-                            while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                            endwhile
-                            target jaseowns_Bard_DiscordCheckNextMob
-                            getlabel backpack jaseowns_PingCheck
-                            if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                                if timer jaseowns_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
-                                    foreach jaseowns_Overhead in mconfig_Target_UnableToAttackOverheadText
-                                        if find jaseowns_CurrentBotTarget
-                                            overhead jaseowns_Overhead mconfig_Target_UnableToAttackOverheadHue jaseowns_CurrentBotTarget
-                                        endif
-                                    endfor
-                                    settimer jaseowns_CurrentBotTargetOverheadTimer 0
-                                endif
-                                @setvar! jaseowns_Bard_DiscordCheckNextMob 0
-                            else
-                                settimer jaseowns_UsedSkillTimer 0
-                            endif
-                        endif
-                    
-                    elseif jaseowns_Bard_CanDiscord = 1 and jaseowns_Bard_SkipDiscord = 0 and timer jaseowns_UsedSkillTimer >= 5000
-                        while insysmsg "What instrument"
-                        endwhile
-                        overhead "Discording: {{jaseowns_CurrentBotTargetDesc}}"
-                        useskill 'Discordance'
-                        wft 500
-                        if insysmsg "What instrument"
-                            if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as jaseowns_Instrument 
-                                target jaseowns_Instrument
-                                @setvar! jase_MyInny jaseowns_Instrument
-                            else
-                                overhead "I do not have an instrument" 34
-                            endif
-                            wft 500
-                        endif
-                        if targetexists 
-                            while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                            endwhile
-                            target jaseowns_CurrentBotTarget
-                            getlabel backpack jaseowns_PingCheck
-                            if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                                if timer jaseowns_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
-                                    foreach jaseowns_Overhead in mconfig_Target_UnableToAttackOverheadText
-                                        if find jaseowns_CurrentBotTarget
-                                            overhead jaseowns_Overhead mconfig_Target_UnableToAttackOverheadHue jaseowns_CurrentBotTarget
-                                        endif
-                                    endfor
-                                    settimer jaseowns_CurrentBotTargetOverheadTimer 0
-                                endif
-                                @setvar! jaseowns_CurrentBotTarget 0
-                            else
-                                settimer jaseowns_UsedSkillTimer 0
-                                @setvar! jaseowns_CurrentBotTargetAttacked 1
-                            endif
-                        endif
-                     elseif not dead jaseowns_Bard_DiscordCheckNextMob and timer jaseowns_UsedSkillTimer >= 5000
-                        while insysmsg "What instrument"
-                        endwhile
-                        overhead "Discording: {{jaseowns_CurrentBotTargetDesc}}"
-                        useskill 'Discordance'
-                        wft 500
-                        if insysmsg "What instrument"
-                            if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as jaseowns_Instrument 
-                                target jaseowns_Instrument
-                                @setvar! jase_MyInny jaseowns_Instrument
-                            else
-                                overhead "I do not have an instrument" 34
-                            endif
-                            wft 500
-                        endif
-                        if targetexists 
-                            while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                            endwhile
-                            target jaseowns_CurrentBotTarget
-                            getlabel backpack jaseowns_PingCheck
-                            if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                                if timer jaseowns_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
-                                    foreach jaseowns_Overhead in mconfig_Target_UnableToAttackOverheadText
-                                        if find jaseowns_CurrentBotTarget
-                                            overhead jaseowns_Overhead mconfig_Target_UnableToAttackOverheadHue jaseowns_CurrentBotTarget
-                                        endif
-                                    endfor
-                                    settimer jaseowns_CurrentBotTargetOverheadTimer 0
-                                endif
-                                @setvar! jaseowns_CurrentBotTarget 0
-                            else
-                                settimer jaseowns_UsedSkillTimer 0
-                                @setvar! jaseowns_CurrentBotTargetAttacked 1
-                            endif
-                        endif
-                    elseif jaseowns_Bard_CanPeacemake = 1 and jaseowns_Bard_SkipPeace = 0 and timer jaseowns_UsedSkillTimer >= 5000
-                        while insysmsg "What instrument"
-                        endwhile
-                        overhead "Peacmking"
-                        useskill 'Peacemaking'
-                        wft 500
-                        if insysmsg "What instrument"
-                            if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as jaseowns_Instrument 
-                                target jaseowns_Instrument
-                                @setvar! jase_MyInny jaseowns_Instrument
-                            else
-                                overhead "I do not have an instrument" 34
-                            endif
-                            wft 500
-                        endif
-                        if targetexists 
-                            while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                            endwhile
-                            target jaseowns_CurrentBotTarget
-                            getlabel backpack jaseowns_PingCheck
-                            if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                                if timer jaseowns_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
-                                    foreach jaseowns_Overhead in mconfig_Target_UnableToAttackOverheadText
-                                        if find jaseowns_CurrentBotTarget
-                                            overhead jaseowns_Overhead mconfig_Target_UnableToAttackOverheadHue jaseowns_CurrentBotTarget
-                                        endif
-                                    endfor
-                                    settimer jaseowns_CurrentBotTargetOverheadTimer 0
-                                endif
-                                @setvar! jaseowns_CurrentBotTarget 0
-                            else
-                                settimer jaseowns_UsedSkillTimer 0
-                                @setvar! jaseowns_CurrentBotTargetAttacked 1
-                                @setvar! jaseowns_CurrentBotTargetGoodLOS 1
-                            endif
-                        endif
-                    elseif find jaseowns_CurrentBotTarget ground -1 -1 jaseowns_DynamicRangeCheck
-                        // assume we got it
-                        @setvar! jaseowns_CurrentBotTargetAttacked 1
-                    elseif not targetexists and jaseowns_CurrentBotTargetGoodLOS = 0
+                    ##### Shared line-of-sight probe - runs once, before both the bard section and the
+                    ##### attack decision below, so neither has to run its own separate ArmsLore probe.
+                    ##### Throttled by jaseowns_LOSCheckTimer since useskill + wft 500 is a real wait.
+                    if not targetexists and jaseowns_CurrentBotTargetGoodLOS = 0 and timer jaseowns_LOSCheckTimer >= jaseowns_LOSCheckTimerCD
                         useskill "ArmsLore"
                         wft 500
-                        if targetexists 
+                        if targetexists
                             while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
                             endwhile
                             target jaseowns_CurrentBotTarget
@@ -1348,8 +1003,368 @@ while not dead
                         endif
                         if targetexists
                             hotkey "Cancel Current Target"
-                        endif 
-                    elseif jaseowns_CurrentBotTargetGoodLOS = 1 and find jaseowns_CurrentBotTarget ground -1 -1 jaseowns_DynamicRangeCheck 
+                        endif
+                        settimer jaseowns_LOSCheckTimer 0
+                    endif
+
+                    ##### Bard section start - the attack decision below runs independently after this,
+                    ##### not as elseif alternatives to these branches.
+                    if jaseowns_BardDetected = 1
+                        @setvar! jaseowns_Bard_SkipPeace 0
+                        if "pacified" in jaseowns_CurrentBotTargetDesc
+                            @setvar! jaseowns_Bard_SkipPeace 1
+                        endif
+
+                        if "provo" in jaseowns_CurrentBotTargetDesc
+                            @setvar! jaseowns_Bard_SkipPeace 1
+                        endif
+
+                        @setvar! jaseowns_Bard_SkipDiscord 0
+                        if mconfig_Bard_UsePeaceFirst = 1 and jaseowns_Bard_SkipPeace = 0
+                            @setvar! jaseowns_Bard_SkipDiscord 1
+                        elseif "discord" in jaseowns_CurrentBotTargetDesc
+                            @setvar! jaseowns_Bard_SkipDiscord 1
+                        endif
+
+                        @setvar! jaseowns_Bard_DiscordCheckNextMob 0
+
+                        # PROVO
+                        if jaseowns_Bard_CanProvo = 1 and timer jaseowns_UsedSkillTimer >= 5000
+
+                            if jaseowns_BARD_PROVO_COUNTER = 4
+                                // do nothing
+                            else
+                                @setvar! jaseowns_Bard_SkipDiscord 1
+                                @setvar! jaseowns_Bard_SkipPeace 1
+                            endif
+                    
+                            if not targetexists and timer jaseowns_BARD_TARGET_RANGECHECK_TIMER >= jaseowns_BARD_TARGET_RANGECHECK_TIMERCD
+                                
+                                if not find jaseowns_BARD_TARGET1 and find jaseowns_CurrentBotTarget ground -1 -1 jaseowns_BARD_TARGET_RANGECHECK
+                                    @setvar! jaseowns_BARD_TARGET1 jaseowns_CurrentBotTarget
+                                endif
+                            
+                                if jaseowns_BARD_TARGET1 = jaseowns_BARD_TARGET2
+                                    @setvar! jaseowns_BARD_TARGET2 0
+                                endif
+                            
+                                if find jaseowns_BARD_TARGET1 ground -1 -1 jaseowns_BARD_TARGET_RANGECHECK and find jaseowns_BARD_TARGET2 ground -1 -1 jaseowns_BARD_TARGET_RANGECHECK
+                                
+                                    for 3
+                                        if dead jaseowns_BARD_TARGET1
+                                            break
+                                        endif
+                                        getlabel jaseowns_BARD_TARGET1 jaseowns_CurrentBotTargetDesc1
+                                        if "-" in jaseowns_CurrentBotTargetDesc1
+                                            // do nothing - try again
+                                        else
+                                            break
+                                        endif
+                                    endfor
+                                
+                                    for 3
+                                        if dead jaseowns_BARD_TARGET2
+                                            break
+                                        endif
+                                        getlabel jaseowns_BARD_TARGET2 jaseowns_CurrentBotTargetDesc2
+                                        if "-" in jaseowns_CurrentBotTargetDesc2
+                                            // do nothing - try again
+                                        else
+                                            break
+                                        endif
+                                    endfor
+                                
+                                    while insysmsg "Target cannot be seen"
+                                    endwhile
+                                
+                                    if "provo" in jaseowns_CurrentBotTargetDesc1 and "provo" in jaseowns_CurrentBotTargetDesc2
+                                        if "discord" in jaseowns_CurrentBotTargetDesc2
+                                            // do nothing
+                                        else
+                                            @setvar! jaseowns_Bard_DiscordCheckNextMob jaseowns_BARD_TARGET2
+                                        endif
+                                        @setvar! jaseowns_BARD_TARGET2 0
+                                    else
+                                        @setvar! jaseowns_BARD_PROVO_COUNTER 0
+                                        while insysmsg "What instrument"
+                                        endwhile
+                                        useskill "Provocation" 
+                                        wft 500
+                                        if insysmsg "What instrument"
+                                            if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as jaseowns_Instrument 
+                                                target jaseowns_Instrument
+                                                @setvar! jase_MyInny jaseowns_Instrument
+                                            else
+                                                overhead "I do not have an instrument" 34
+                                            endif
+                                            wft 500
+                                        endif
+                                        if targetexists
+                                            target jaseowns_BARD_TARGET1
+                                            getlabel backpack jaseowns_PingCheck
+                                            if insysmsg "Target cannot be seen"
+                                                @setvar! jaseowns_BARD_TARGET1 0
+                                            else
+                                                wft 500
+                                                target jaseowns_BARD_TARGET2
+                                                getlabel backpack jaseowns_PingCheck                
+                                                if insysmsg "Target cannot be seen"
+                                                    @setvar! jaseowns_BARD_TARGET2 0
+                                                endif
+                                            endif
+                                        endif
+                                    endif
+                            
+                                else
+                                
+                    
+                                    if jaseowns_BARD_PROVO_COUNTER = 0
+                                        @setvar! jaseowns_BARD_PROVO_COUNTER 1
+                                    elseif jaseowns_BARD_PROVO_COUNTER = 1
+                                        @setvar! jaseowns_BARD_PROVO_COUNTER 2
+                                    elseif jaseowns_BARD_PROVO_COUNTER = 2
+                                        @setvar! jaseowns_BARD_PROVO_COUNTER 3
+                                    else
+                                        @setvar! jaseowns_BARD_PROVO_COUNTER 4
+                                    endif
+                            
+                                    if not find jaseowns_BARD_TARGET1 and find jaseowns_CurrentBotTarget ground -1 -1 jaseowns_BARD_TARGET_RANGECHECK
+                                        @setvar! jaseowns_BARD_TARGET1 jaseowns_CurrentBotTarget
+                                    endif
+                            
+                                    if find jaseowns_BARD_TARGET1 ground -1 -1 jaseowns_BARD_TARGET_RANGECHECK
+                                        // check for second one
+                                        hotkey "target closest non-friendly monster"
+                                        @setvar! jaseowns_LastBotTarget lasttarget 
+                                        if jaseowns_BARD_TARGET1 != jaseowns_LastBotTarget
+                                            for 3
+                                                if dead jaseowns_BARD_TARGET2
+                                                    break
+                                                endif
+                                                getlabel jaseowns_BARD_TARGET2 jaseowns_CurrentBotTargetDesc
+                                                if "-" in jaseowns_CurrentBotTargetDesc
+                                                    // do nothing - try again
+                                                else
+                                                    break
+                                                endif
+                                            endfor
+                                            if find jaseowns_LastBotTarget
+                                                overhead "ATTEMPTING CLOSEST" 38 jaseowns_LastBotTarget
+                                            endif
+                                            if "provo" in jaseowns_CurrentBotTargetDesc
+                                                // do nothing
+                                            else
+                                                @setvar! jaseowns_BARD_TARGET2 jaseowns_LastBotTarget    
+                                            endif
+                                        endif
+                                    
+                                        if not find jaseowns_BARD_TARGET2 ground -1 -1 jaseowns_BARD_TARGET_RANGECHECK
+                                        
+                                            @setvar! jaseowns_BARD_RANDOM_TARGET_OG 0
+                                            hotkey "next non-friendly monster target"
+                                            @setvar! jaseowns_BARD_RANDOM_TARGET lasttarget                     
+                                        
+                                            while find jaseowns_BARD_RANDOM_TARGET and jaseowns_BARD_RANDOM_TARGET != jaseowns_BARD_RANDOM_TARGET_OG
+                                                if jaseowns_BARD_RANDOM_TARGET_OG = 0
+                                                    @setvar! jaseowns_BARD_RANDOM_TARGET_OG jaseowns_BARD_RANDOM_TARGET
+                                                endif
+                                                if not find jaseowns_BARD_TARGET1
+                                                    break
+                                                endif
+                                            
+                                                if jaseowns_BARD_TARGET1 != jaseowns_BARD_RANDOM_TARGET and find jaseowns_BARD_RANDOM_TARGET ground -1 -1 jaseowns_BARD_TARGET_RANGECHECK
+                                                    for 3
+                                                        if dead jaseowns_BARD_RANDOM_TARGET
+                                                            break
+                                                        endif
+                                                        getlabel jaseowns_BARD_RANDOM_TARGET jaseowns_CurrentBotTargetDesc
+                                                        if "-" in jaseowns_CurrentBotTargetDesc
+                                                            // do nothing - try again
+                                                        else
+                                                            break
+                                                        endif
+                                                    endfor
+                                                
+                                                    if find jaseowns_BARD_RANDOM_TARGET
+                                                        overhead "ATTEMPTING RANDOM" 34 jaseowns_BARD_RANDOM_TARGET
+                                                    endif
+                                                
+                                                    if "provo" in jaseowns_CurrentBotTargetDesc
+                                                        if "discord" in jaseowns_CurrentBotTargetDesc
+                                                            // do nothing
+                                                        else
+                                                            @setvar! jaseowns_Bard_DiscordCheckNextMob jaseowns_BARD_RANDOM_TARGET
+                                                        endif
+                                                    else
+                                                        @setvar! jaseowns_BARD_TARGET2 jaseowns_BARD_RANDOM_TARGET    
+                                                        break
+                                                    endif
+                                                endif
+                                                hotkey "next non-friendly monster target"
+                                                @setvar! jaseowns_BARD_RANDOM_TARGET lasttarget                     
+                                            endwhile
+                                        endif
+                                        settimer jaseowns_BARD_TARGET_RANGECHECK_TIMER 0
+                                    endif
+                                endif
+                            endif
+                        else
+                            # TODO: logic for people without provo
+                            #  also do more discord checks (set a jaseowns_Bard_DiscordCheckNextMob)
+                        endif
+                    
+                    
+                        ### IN THE PROVO SECTION, TRY TO SET A LIST OF MOBS THAT ARE ALREADY PROVOED - SO YOU CAN KNOW WHAT TO DISCOR
+
+                        if jaseowns_Bard_CanDiscord = 1 and not dead jaseowns_Bard_DiscordCheckNextMob
+                            while insysmsg "What instrument"
+                            endwhile
+                            overhead "Discording Extra Mob: {{jaseowns_CurrentBotTargetDesc}}"
+                            useskill 'Discordance'
+                            wft 500
+                            if insysmsg "What instrument"
+                                if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as jaseowns_Instrument 
+                                    target jaseowns_Instrument
+                                    @setvar! jase_MyInny jaseowns_Instrument
+                                else
+                                    overhead "I do not have an instrument" 34
+                                endif
+                                wft 500
+                            endif
+                            if targetexists 
+                                while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
+                                endwhile
+                                target jaseowns_Bard_DiscordCheckNextMob
+                                getlabel backpack jaseowns_PingCheck
+                                if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
+                                    if timer jaseowns_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
+                                        foreach jaseowns_Overhead in mconfig_Target_UnableToAttackOverheadText
+                                            if find jaseowns_CurrentBotTarget
+                                                overhead jaseowns_Overhead mconfig_Target_UnableToAttackOverheadHue jaseowns_CurrentBotTarget
+                                            endif
+                                        endfor
+                                        settimer jaseowns_CurrentBotTargetOverheadTimer 0
+                                    endif
+                                    @setvar! jaseowns_Bard_DiscordCheckNextMob 0
+                                else
+                                    settimer jaseowns_UsedSkillTimer 0
+                                endif
+                            endif
+                    
+                        elseif jaseowns_Bard_CanDiscord = 1 and jaseowns_Bard_SkipDiscord = 0 and timer jaseowns_UsedSkillTimer >= 5000
+                            while insysmsg "What instrument"
+                            endwhile
+                            overhead "Discording: {{jaseowns_CurrentBotTargetDesc}}"
+                            useskill 'Discordance'
+                            wft 500
+                            if insysmsg "What instrument"
+                                if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as jaseowns_Instrument 
+                                    target jaseowns_Instrument
+                                    @setvar! jase_MyInny jaseowns_Instrument
+                                else
+                                    overhead "I do not have an instrument" 34
+                                endif
+                                wft 500
+                            endif
+                            if targetexists 
+                                while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
+                                endwhile
+                                target jaseowns_CurrentBotTarget
+                                getlabel backpack jaseowns_PingCheck
+                                if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
+                                    if timer jaseowns_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
+                                        foreach jaseowns_Overhead in mconfig_Target_UnableToAttackOverheadText
+                                            if find jaseowns_CurrentBotTarget
+                                                overhead jaseowns_Overhead mconfig_Target_UnableToAttackOverheadHue jaseowns_CurrentBotTarget
+                                            endif
+                                        endfor
+                                        settimer jaseowns_CurrentBotTargetOverheadTimer 0
+                                    endif
+                                    @setvar! jaseowns_CurrentBotTarget 0
+                                else
+                                    settimer jaseowns_UsedSkillTimer 0
+                                    @setvar! jaseowns_CurrentBotTargetAttacked 1
+                                endif
+                            endif
+                         elseif not dead jaseowns_Bard_DiscordCheckNextMob and timer jaseowns_UsedSkillTimer >= 5000
+                            while insysmsg "What instrument"
+                            endwhile
+                            overhead "Discording: {{jaseowns_CurrentBotTargetDesc}}"
+                            useskill 'Discordance'
+                            wft 500
+                            if insysmsg "What instrument"
+                                if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as jaseowns_Instrument 
+                                    target jaseowns_Instrument
+                                    @setvar! jase_MyInny jaseowns_Instrument
+                                else
+                                    overhead "I do not have an instrument" 34
+                                endif
+                                wft 500
+                            endif
+                            if targetexists 
+                                while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
+                                endwhile
+                                target jaseowns_CurrentBotTarget
+                                getlabel backpack jaseowns_PingCheck
+                                if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
+                                    if timer jaseowns_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
+                                        foreach jaseowns_Overhead in mconfig_Target_UnableToAttackOverheadText
+                                            if find jaseowns_CurrentBotTarget
+                                                overhead jaseowns_Overhead mconfig_Target_UnableToAttackOverheadHue jaseowns_CurrentBotTarget
+                                            endif
+                                        endfor
+                                        settimer jaseowns_CurrentBotTargetOverheadTimer 0
+                                    endif
+                                    @setvar! jaseowns_CurrentBotTarget 0
+                                else
+                                    settimer jaseowns_UsedSkillTimer 0
+                                    @setvar! jaseowns_CurrentBotTargetAttacked 1
+                                endif
+                            endif
+                        elseif jaseowns_Bard_CanPeacemake = 1 and jaseowns_Bard_SkipPeace = 0 and timer jaseowns_UsedSkillTimer >= 5000
+                            while insysmsg "What instrument"
+                            endwhile
+                            overhead "Peacmking"
+                            useskill 'Peacemaking'
+                            wft 500
+                            if insysmsg "What instrument"
+                                if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as jaseowns_Instrument 
+                                    target jaseowns_Instrument
+                                    @setvar! jase_MyInny jaseowns_Instrument
+                                else
+                                    overhead "I do not have an instrument" 34
+                                endif
+                                wft 500
+                            endif
+                            if targetexists 
+                                while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
+                                endwhile
+                                target jaseowns_CurrentBotTarget
+                                getlabel backpack jaseowns_PingCheck
+                                if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
+                                    if timer jaseowns_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
+                                        foreach jaseowns_Overhead in mconfig_Target_UnableToAttackOverheadText
+                                            if find jaseowns_CurrentBotTarget
+                                                overhead jaseowns_Overhead mconfig_Target_UnableToAttackOverheadHue jaseowns_CurrentBotTarget
+                                            endif
+                                        endfor
+                                        settimer jaseowns_CurrentBotTargetOverheadTimer 0
+                                    endif
+                                    @setvar! jaseowns_CurrentBotTarget 0
+                                else
+                                    settimer jaseowns_UsedSkillTimer 0
+                                    @setvar! jaseowns_CurrentBotTargetAttacked 1
+                                    @setvar! jaseowns_CurrentBotTargetGoodLOS 1
+                                endif
+                            endif
+                        endif
+                    endif
+
+                    ##### Bard section end
+                    if find jaseowns_CurrentBotTarget ground -1 -1 jaseowns_DynamicRangeCheck
+                        // assume we got it
+                        @setvar! jaseowns_CurrentBotTargetAttacked 1
+                    elseif jaseowns_CurrentBotTargetGoodLOS = 1 and find jaseowns_CurrentBotTarget ground -1 -1 jaseowns_DynamicRangeCheck
                         @setvar! jaseowns_CurrentBotTargetAttacked 1
                     endif
                 endif
@@ -1630,65 +1645,70 @@ while not dead
         
     endif
     
-    if skill "Discordance" > 0
-        if not findbuff "song of discordance" and timer jaseowns_BOT_BardBuffTimer >= 10000
-            while insysmsg "What instrument"
-            endwhile
-            useskill 'Discordance'
-            wft 500
-            if insysmsg "What instrument"
-                if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as jaseowns_Instrument 
-                    target jaseowns_Instrument
-                    @setvar! jase_MyInny jaseowns_Instrument
-                else
-                    overhead "I do not have an instrument" 34
-                endif
+    ##### Bard: passive song-buff maintenance
+    if jaseowns_BardDetected = 1
+
+        if skill "Discordance" > 0
+            if not findbuff "song of discordance" and timer jaseowns_BOT_BardBuffTimer >= 10000
+                while insysmsg "What instrument"
+                endwhile
+                useskill 'Discordance'
                 wft 500
+                if insysmsg "What instrument"
+                    if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as jaseowns_Instrument
+                        target jaseowns_Instrument
+                        @setvar! jase_MyInny jaseowns_Instrument
+                    else
+                        overhead "I do not have an instrument" 34
+                    endif
+                    wft 500
+                endif
+                target backpack
+                settimer jaseowns_BOT_BardBuffTimer 0
             endif
-            target backpack
-            settimer jaseowns_BOT_BardBuffTimer 0
         endif
+
+        if skill "Provocation" > 0
+            if not findbuff "song of provocation" and timer jaseowns_BOT_BardBuffTimer >= 10000
+                while insysmsg "What instrument"
+                endwhile
+                useskill 'Provocation'
+                wft 500
+                if insysmsg "What instrument"
+                    if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as jaseowns_Instrument
+                        target jaseowns_Instrument
+                        @setvar! jase_MyInny jaseowns_Instrument
+                    else
+                        overhead "I do not have an instrument" 34
+                    endif
+                    wft 500
+                endif
+                target backpack
+                settimer jaseowns_BOT_BardBuffTimer 0
+            endif
+        endif
+
+        if skill "Peacemaking" > 0
+            if not findbuff "song of peacemaking" and timer jaseowns_BOT_BardBuffTimer >= 10000
+                while insysmsg "What instrument"
+                endwhile
+                useskill 'Peacemaking'
+                wft 500
+                if insysmsg "What instrument"
+                    if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as jaseowns_Instrument
+                        target jaseowns_Instrument
+                        @setvar! jase_MyInny jaseowns_Instrument
+                    else
+                        overhead "I do not have an instrument" 34
+                    endif
+                    wft 500
+                endif
+                target backpack
+                settimer jaseowns_BOT_BardBuffTimer 0
+            endif
+        endif
+
     endif
 
-    if skill "Provocation" > 0
-        if not findbuff "song of provocation" and timer jaseowns_BOT_BardBuffTimer >= 10000
-            while insysmsg "What instrument"
-            endwhile
-            useskill 'Provocation'
-            wft 500
-            if insysmsg "What instrument"
-                if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as jaseowns_Instrument 
-                    target jaseowns_Instrument
-                    @setvar! jase_MyInny jaseowns_Instrument
-                else
-                    overhead "I do not have an instrument" 34
-                endif
-                wft 500
-            endif
-            target backpack
-            settimer jaseowns_BOT_BardBuffTimer 0
-        endif
-    endif
-
-    if skill "Peacemaking" > 0
-        if not findbuff "song of peacemaking" and timer jaseowns_BOT_BardBuffTimer >= 10000
-            while insysmsg "What instrument"
-            endwhile
-            useskill 'Peacemaking'
-            wft 500
-            if insysmsg "What instrument"
-                if findtype 3740|3742|3762|3763|10245|20006|20008|20010|20012|20014|20016 backpack as jaseowns_Instrument 
-                    target jaseowns_Instrument
-                    @setvar! jase_MyInny jaseowns_Instrument
-                else
-                    overhead "I do not have an instrument" 34
-                endif
-                wft 500
-            endif
-            target backpack
-            settimer jaseowns_BOT_BardBuffTimer 0
-        endif
-    endif
-    
     wait 10
 endwhile
