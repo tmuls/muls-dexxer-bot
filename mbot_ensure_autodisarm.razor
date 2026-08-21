@@ -1,0 +1,14 @@
+overhead "Enabling auto-disarm"
+
+@setvar! mbot_DisarmConfirmed 0
+settimer mbot_DisarmToggleTimer 0
+while mbot_DisarmConfirmed = 0 and timer mbot_DisarmToggleTimer < 6000
+    clearsysmsg
+    say "[DisarmUntoggleMode"
+    wait 1000
+    if insysmsg "Disarm mode will now never untoggle."
+        @setvar! mbot_DisarmConfirmed 1
+    endif
+endwhile
+
+overhead "Auto-disarm enabled, change with [DisarmUnToggleMode"
