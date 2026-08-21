@@ -35,10 +35,8 @@ if skill "Discordance" > 0 or skill "Peacemaking" > 0 or skill "Provocation" > 0
 endif
 
 ##### Poison Sting Tracking
-@setvar! poison_display_timer_cd 120000
 @setvar! poison_check_timer_cd 6000
 settimer poison_check_timer poison_check_timer_cd
-settimer poison_display_timer poison_display_timer_cd
 
 @setvar! poison_apply_timer_cd 600000
 @setvar! poison_reapply_timer_cd 598000
@@ -497,10 +495,6 @@ while not dead
             endif
             if weapon_to_poison != 0
                 getlabel weapon_to_poison weapon_to_poisonDesc
-                if timer poison_display_timer >= poison_display_timer_cd
-                    overhead "{{weapon_to_poisonDesc}}" 72
-                    settimer poison_display_timer 0
-                endif
                 if timer poison_check_timer >= poison_check_timer_cd and timer poison_reapply_timer <= poison_reapply_timer_cd
                     settimer poison_check_timer 0                    
                     if "poison charge" in weapon_to_poisonDesc
