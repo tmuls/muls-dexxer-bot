@@ -498,340 +498,7 @@ while not dead
     endif
 
 
-    ##### Out of Combat: Thief Pouch Alert
-    if mconfig_Thief_AlertRedPouchPop = 1 and counttype 3705 backpack 38 as mbot_RedPouchCount
-        if mbot_RedPouchCountTotal != 0 and mbot_RedPouchCountTotal != mbot_RedPouchCount
-            overhead "Warning: THIEF we lost a pouch!" 34
-        else
-            @setvar! mbot_RedPouchCountTotal mbot_RedPouchCount    
-        endif
-    endif
-
-    ##### Out of Combat: Weapon Re-equip
-    if casting
-        settimer mbot_UseItemTimer 0
-    endif
-
-    if not queued and find mbot_BOT_CurrentRightHandWeapon backpack and timer mbot_UseItemTimer >= mbot_UseItemTimerCD
-        if findlayer self righthand as mbot_RightHandWeapon
-            @setvar! mbot_BOT_CurrentRightHandWeapon mbot_RightHandWeapon
-        else
-            dclick mbot_BOT_CurrentRightHandWeapon
-            settimer mbot_UseItemTimer 0
-        endif
-    elseif not queued and find mbot_BOT_CurrentLeftHandWeapon backpack and timer mbot_UseItemTimer >= mbot_UseItemTimerCD
-        if findlayer self lefthand as mbot_LeftHandWeapon
-            @setvar! mbot_BOT_CurrentLeftHandWeapon mbot_LeftHandWeapon
-        else
-            dclick mbot_BOT_CurrentLeftHandWeapon
-            settimer mbot_UseItemTimer 0
-        endif
-    endif
-    
-    ##### Out of Combat: Taming - All Guard Trigger
-    if mbot_TamerDetected = 1
-        if mconfig_Taming_SayAllGuard = 1 and followers > 0
-            if timer mbot_Tamer_SayAllGuardTimer >= mconfig_Taming_SayAllGuardTimerCD
-                say "all guard me" 89
-                settimer mbot_Tamer_SayAllGuardTimer 0
-            endif
-        endif
-    endif
-
-    ##### Out of Combat: Weapon Poison Application
-    if skill "Poisoning" >= 50 and mconfig_Poison_AutomaticallyApply = 1
-        if counttype 3850 mbot_PotionSatchel or counttype 3850 backpack
-            @setvar! weapon_to_poison 0
-            if findlayer self righthand as mbot_RightHandWeapon
-                @setvar! weapon_to_poison mbot_RightHandWeapon
-                @setvar! mbot_BOT_CurrentRightHandWeapon mbot_RightHandWeapon
-            endif
-            if weapon_to_poison != 0
-                getlabel weapon_to_poison weapon_to_poisonDesc
-                if timer poison_check_timer >= poison_check_timer_cd and timer poison_reapply_timer <= poison_reapply_timer_cd
-                    settimer poison_check_timer 0                    
-                    if "poison charge" in weapon_to_poisonDesc
-                        foreach reapply_text in poison_check_list
-                            if reapply_text in weapon_to_poisonDesc
-                                overhead "Need to reapply poison: {{reapply_text}}.XX charges remain"
-                                settimer poison_reapply_timer poison_failed_timer_cd
-                            endif                        
-                        endfor                          
-                    else
-                        overhead "Weapon not poisoned, applying poison {{weapon_to_poisonDesc}}" 34
-                        settimer poison_reapply_timer poison_failed_timer_cd
-                    endif
-                endif
-                if insysmsg "You fail to apply a sufficient dose of poison." or insysmsg "grave mistake while"
-                    overhead "Failed to apply Poison" 72     
-                    settimer poison_reapply_timer poison_failed_timer_cd               
-                elseif insysmsg "You apply the poison." 
-                    overhead "Poison applied!" 72
-                    settimer poison_reapply_timer 0
-                endif
-                if timer poison_reapply_timer >= poison_apply_timer_cd
-                    overhead "Applying Poison" 72
-                    menu weapon_to_poison 0
-                    settimer poison_check_timer 0
-                    settimer poison_reapply_timer poison_reapply_timer_cd
-                endif
-            endif
-        else
-            overhead "Out of poison pots!" 34
-        endif
-    endif
-
-    ##### Out of Combat: Overweight Gold Drop
-    if weight > maxweight and timer mbot_UseItemTimer >= mbot_UseItemTimerCD
-        if findtype "gold coin" backpack as item
-            while insysmsg "cannot drop anything"
-            endwhile
-            lift item mconfig_Weight_GoldToDropIfOverweight
-            droprelloc 0 0
-            getlabel backpack mbot_PingCheck
-            if insysmsg "cannot drop anything"
-                drop backpack -1 -1 -1
-            endif
-            settimer mbot_UseItemTimer 0
-        else
-            overhead "We are overweight and cannot drop anything" 34
-        endif
-    endif
-    
-    ##### Out of Combat: Potion Overhead Display
-    if mconfig_Potion_ShowOverheads = 1
-
-        if timer mbot_Potion_Cure_Overhead_IfCountIsLessThan_Timer >= mconfig_Potion_CureOverheadIfCountIsLessThanTimerCD
-            @setvar! mbot_BOT_CurePotionCount 0
-            if counttype 3847 mbot_PotionSatchel as mbot_TempPotionCount
-                @setvar! mbot_BOT_CurePotionCount mbot_TempPotionCount
-            elseif counttype 3847 backpack as mbot_TempPotionCount
-                @setvar! mbot_BOT_CurePotionCount mbot_TempPotionCount
-            endif
-            if mbot_BOT_CurePotionCount < mconfig_Potion_CureOverheadIfCountIsLessThan
-                if mbot_BOT_CurePotionCount = 0
-                    overhead "Cure: Out of cures" 34
-                else
-                    overhead "Cures Remaining: {{mbot_BOT_CurePotionCount}}"
-                endif
-            endif
-            settimer mbot_Potion_Cure_Overhead_IfCountIsLessThan_Timer 0
-        endif
-        
-        if timer mbot_Potion_Heal_Overhead_IfCountIsLessThan_Timer >= mconfig_Potion_HealOverheadIfCountIsLessThanTimerCD
-            @setvar! mbot_BOT_HealPotionCount 0
-            if counttype 3852 mbot_PotionSatchel as mbot_TempPotionCount
-                @setvar! mbot_BOT_HealPotionCount mbot_TempPotionCount
-            elseif counttype 3852 backpack as mbot_TempPotionCount
-                @setvar! mbot_BOT_HealPotionCount mbot_TempPotionCount
-            endif
-            if mbot_BOT_HealPotionCount < mconfig_Potion_HealOverheadIfCountIsLessThan
-                if mbot_BOT_HealPotionCount = 0
-                    overhead "Heal: Out of heals" 34
-                else
-                    overhead "Heal Remaining: {{mbot_BOT_HealPotionCount}}"
-                endif
-            endif
-            settimer mbot_Potion_Heal_Overhead_IfCountIsLessThan_Timer 0
-        endif
-        
-        if timer mbot_Potion_Explosion_Overhead_IfCountIsLessThan_Timer >= mconfig_Potion_ExplosionOverheadIfCountIsLessThanTimerCD
-            @setvar! mbot_BOT_ExplosionPotionCount 0
-            if counttype 3853 mbot_PotionSatchel as mbot_TempPotionCount
-                @setvar! mbot_BOT_ExplosionPotionCount mbot_TempPotionCount
-            elseif counttype 3853 backpack as mbot_TempPotionCount
-                @setvar! mbot_BOT_ExplosionPotionCount mbot_TempPotionCount
-            endif
-            if mbot_BOT_ExplosionPotionCount < mconfig_Potion_ExplosionOverheadIfCountIsLessThan
-                if mbot_BOT_ExplosionPotionCount = 0
-                    overhead "Explosion: Out of explosions" 34
-                else
-                    overhead "Explosion Remaining: {{mbot_BOT_ExplosionPotionCount}}"
-                endif
-            endif
-            settimer mbot_Potion_Explosion_Overhead_IfCountIsLessThan_Timer 0
-        endif
-        
-    endif
-
-    ##### Out of Combat: Food
-    if not queued and not findbuff "food" and findtype "tray" backpack as mbot_FoodItem
-        if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
-            dclick mbot_FoodItem
-            settimer mbot_UseItemTimer 0
-        endif
-    endif
-    
-    ##### Out of Combat: Skinning
-    if not queued and mconfig_Skinning_UseKnifeAutomatically = 1 and findtype 11552 backpack as mbot_SkinningKnife
-        if findbuff "Actively Meditating"
-            //do nothing
-        elseif findtype 8198 ground -1 -1 2 as mbot_Corpse
-            while not targetexists 
-                dclick mbot_SkinningKnife
-                wft 500
-            endwhile
-            while targetexists 
-                hotkey "Target Self"
-                getlabel backpack mbot_PingCheck
-            endwhile
-            @ignore mbot_Corpse
-        endif
-    endif
-    
-    ##### Out of Combat: Chivalry Symbol Count Detection
-    if timer mbot_Chiv_SymbolCheckTimer >= mbot_Chiv_SymbolCheckTimerCD
-        if not gumpexists 1387930325 and skill "chivalry" >= 50
-            say '[chivalryhotbar'
-            waitforgump 1387930325 500
-            if not gumpexists 1387930325
-                overhead "!!!!!!!!!! CHIVALRY HOTBAR GUMP NOT FOUND !!!!!!!!!!" 34
-            endif
-        endif
-        if gumpexists 1387930325
-            if cooldown PVP
-                unsetvar mbot_HolySymbols
-            elseif ingump "21/" 1387930325 or ingump "20/" 1387930325 or ingump "19/" 1387930325 or ingump "18/" 1387930325 or ingump "17/" 1387930325 or ingump "16/" 1387930325 or ingump "15/" 1387930325 or ingump "14/" 1387930325 or ingump "13/" 1387930325 or ingump "12/" 1387930325
-                # 12+ symbols is always enough for these heals - cap here instead of tracking the exact count
-                @setvar! mbot_HolySymbols 12
-            elseif ingump "11/" 1387930325
-                @setvar! mbot_HolySymbols 11
-            elseif ingump "10/" 1387930325
-                @setvar! mbot_HolySymbols 10
-            elseif ingump "9/" 1387930325
-                @setvar! mbot_HolySymbols 9
-            elseif ingump "8/" 1387930325
-                @setvar! mbot_HolySymbols 8
-            elseif ingump "7/" 1387930325
-                @setvar! mbot_HolySymbols 7
-            elseif ingump "6/" 1387930325
-                @setvar! mbot_HolySymbols 6
-            elseif ingump "5/" 1387930325
-                @setvar! mbot_HolySymbols 5
-            elseif ingump "4/" 1387930325
-                @setvar! mbot_HolySymbols 4
-            elseif ingump "3/" 1387930325
-                @setvar! mbot_HolySymbols 3
-            elseif ingump "2/" 1387930325
-                @setvar! mbot_HolySymbols 2
-            elseif ingump "1/" 1387930325
-                @setvar! mbot_HolySymbols 1
-            elseif ingump "0/" 1387930325
-                @setvar! mbot_HolySymbols 0
-            endif
-        endif
-        settimer mbot_Chiv_SymbolCheckTimer 0
-    endif
-
-    ##### Chivalry Gate A - Noble Sacrifice / Holy Light (emergency heals, no reserve)
-    if varexist mbot_HolySymbols
-
-        @setvar! mbot_BOT_UseNobleSacrifice 0
-        if mconfig_Chiv_UseNobleSacrificeAutomatically = 1 and skill "chivalry" >= 80 and timer mbot_NobleSacrificeTimer >= mbot_NobleSacrificeTimerCD
-            if mconfig_Chiv_MinSymbolsNobleSacrifice <= mbot_HolySymbols
-                if diffhits >= mconfig_Chiv_AutoUseNobleSacrificeHpDiffTrigger
-                    @setvar! mbot_BOT_UseNobleSacrifice 1
-                endif
-            endif
-        endif
-
-        @setvar! mbot_BOT_UseHolyLight 0
-        if mconfig_Chiv_UseHolyLightAutomatically = 1 and skill "chivalry" >= 95 and timer mbot_HolyLightTimer >= mbot_HolyLightTimerCD
-            if mconfig_Chiv_MinSymbolsHolyLight <= mbot_HolySymbols
-                if diffhits >= mconfig_Chiv_AutoHolyLightHpDiffTrigger
-                    @setvar! mbot_BOT_UseHolyLight 1
-                endif
-            endif
-        endif
-
-        if mbot_BOT_UseNobleSacrifice = 1
-
-            if targetexists
-                hotkey "Clear Current Target"
-            endif
-
-            say "[NobleSacrifice"
-            wft 500
-            if targetexists
-                while insysmsg "Holy symbols remaining"
-                endwhile
-                hotkey "Target Self"
-                getlabel backpack mbot_PingCheck
-                if not targetexists
-                    if insysmsg "Holy symbols remaining"
-                        cooldown "Noble Sacrifice" mbot_NobleSacrificeTimerCD
-                        settimer mbot_NobleSacrificeTimer 0
-                        settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
-                    endif
-                else
-                    hotkey "Cancel Current Target"
-                endif
-            endif
-            if skill "Healing" > 0 and findtype 3617 self
-                while insysmsg "You begin applying"
-                endwhile
-                hotkey "Bandage Self"
-                getlabel backpack mbot_PingCheck
-                if insysmsg "You begin applying"
-                    settimer mbot_BandageTimer 0
-                endif
-            endif            
-        elseif mbot_BOT_UseHolyLight = 1
-            while insysmsg "Holy symbols remaining"
-            endwhile
-            say "[HolyLight"
-            getlabel backpack mbot_PingCheck
-            if insysmsg "Holy symbols remaining"
-                cooldown "Holy Light" mbot_HolyLightTimerCD
-                settimer mbot_HolyLightTimer 0
-                settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
-            endif
-        endif
-
-    endif
-
-    ##### Chivalry Gate B - Close Wounds / Cleanse By Fire (respects reserve)
-    if varexist mbot_HolySymbols
-
-        @setvar! mbot_BOT_UseCloseWounds 0
-        if findbuff "disease" or findbuff "bleed"
-            if mconfig_Chiv_UseCloseWoundsAutomatically = 1 and mconfig_Chiv_MinSymbolsCloseWounds <= mbot_HolySymbols and skill "chivalry" >= 70 and timer mbot_CloseWoundsTimer >= mbot_CloseWoundsTimerCD
-                if diffhits >= mconfig_Chiv_AutoCloseWoundHpDiffTrigger
-                    @setvar! mbot_BOT_UseCloseWounds 1
-                endif
-            endif
-        endif
-
-        @setvar! mbot_BOT_UseCleanseByFire 0
-        if poisoned and mconfig_Chiv_UseCleanseByFireAutomatically = 1 and mconfig_Chiv_MinSymbolsCleanseByFire <= mbot_HolySymbols and skill "chivalry" >= 60 and timer mbot_CleanseByFireTimer >= mbot_CleanseByFireTimerCD
-            @setvar! mbot_BOT_UseCleanseByFire 1
-        endif
-
-        if mbot_BOT_UseCloseWounds = 1
-            while insysmsg "Holy symbols remaining"
-            endwhile
-            say "[CloseWounds"
-            getlabel backpack mbot_PingCheck
-            if insysmsg "Holy symbols remaining"
-                cooldown "Close Wounds" mbot_CloseWoundsTimerCD
-                settimer mbot_CloseWoundsTimer 0
-                settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
-            endif
-        elseif mbot_BOT_UseCleanseByFire = 1
-            while insysmsg "Holy symbols remaining"
-            endwhile
-            say "[CleanseByFire"
-            getlabel backpack mbot_PingCheck
-            if insysmsg "Holy symbols remaining"
-                cooldown "Cleanse By Fire" mbot_CleanseByFireTimerCD
-                settimer mbot_CleanseByFireTimer 0
-                settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
-            endif
-        endif
-
-    endif
-
-    ##### PvP Detection (gates Fight State Detection + the entire Combat Block)
+    ##### Everything Else - disabled during PvP (not survivability-safe)
     if pvp
         ##### In PvP - clear targeting/fight-mode state, skip combat entirely this iteration
         @setvar! mbot_CurrentBotTarget 0
@@ -839,6 +506,339 @@ while not dead
         @setvar! mbot_CurrentBotTargetAttacked 0
         @setvar! mbot_CurrentBotTargetGoodLOS 0
     else
+        ##### Out of Combat: Thief Pouch Alert
+        if mconfig_Thief_AlertRedPouchPop = 1 and counttype 3705 backpack 38 as mbot_RedPouchCount
+            if mbot_RedPouchCountTotal != 0 and mbot_RedPouchCountTotal != mbot_RedPouchCount
+                overhead "Warning: THIEF we lost a pouch!" 34
+            else
+                @setvar! mbot_RedPouchCountTotal mbot_RedPouchCount    
+            endif
+        endif
+
+        ##### Out of Combat: Weapon Re-equip
+        if casting
+            settimer mbot_UseItemTimer 0
+        endif
+
+        if not queued and find mbot_BOT_CurrentRightHandWeapon backpack and timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+            if findlayer self righthand as mbot_RightHandWeapon
+                @setvar! mbot_BOT_CurrentRightHandWeapon mbot_RightHandWeapon
+            else
+                dclick mbot_BOT_CurrentRightHandWeapon
+                settimer mbot_UseItemTimer 0
+            endif
+        elseif not queued and find mbot_BOT_CurrentLeftHandWeapon backpack and timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+            if findlayer self lefthand as mbot_LeftHandWeapon
+                @setvar! mbot_BOT_CurrentLeftHandWeapon mbot_LeftHandWeapon
+            else
+                dclick mbot_BOT_CurrentLeftHandWeapon
+                settimer mbot_UseItemTimer 0
+            endif
+        endif
+    
+        ##### Out of Combat: Taming - All Guard Trigger
+        if mbot_TamerDetected = 1
+            if mconfig_Taming_SayAllGuard = 1 and followers > 0
+                if timer mbot_Tamer_SayAllGuardTimer >= mconfig_Taming_SayAllGuardTimerCD
+                    say "all guard me" 89
+                    settimer mbot_Tamer_SayAllGuardTimer 0
+                endif
+            endif
+        endif
+
+        ##### Out of Combat: Weapon Poison Application
+        if skill "Poisoning" >= 50 and mconfig_Poison_AutomaticallyApply = 1
+            if counttype 3850 mbot_PotionSatchel or counttype 3850 backpack
+                @setvar! weapon_to_poison 0
+                if findlayer self righthand as mbot_RightHandWeapon
+                    @setvar! weapon_to_poison mbot_RightHandWeapon
+                    @setvar! mbot_BOT_CurrentRightHandWeapon mbot_RightHandWeapon
+                endif
+                if weapon_to_poison != 0
+                    getlabel weapon_to_poison weapon_to_poisonDesc
+                    if timer poison_check_timer >= poison_check_timer_cd and timer poison_reapply_timer <= poison_reapply_timer_cd
+                        settimer poison_check_timer 0                    
+                        if "poison charge" in weapon_to_poisonDesc
+                            foreach reapply_text in poison_check_list
+                                if reapply_text in weapon_to_poisonDesc
+                                    overhead "Need to reapply poison: {{reapply_text}}.XX charges remain"
+                                    settimer poison_reapply_timer poison_failed_timer_cd
+                                endif                        
+                            endfor                          
+                        else
+                            overhead "Weapon not poisoned, applying poison {{weapon_to_poisonDesc}}" 34
+                            settimer poison_reapply_timer poison_failed_timer_cd
+                        endif
+                    endif
+                    if insysmsg "You fail to apply a sufficient dose of poison." or insysmsg "grave mistake while"
+                        overhead "Failed to apply Poison" 72     
+                        settimer poison_reapply_timer poison_failed_timer_cd               
+                    elseif insysmsg "You apply the poison." 
+                        overhead "Poison applied!" 72
+                        settimer poison_reapply_timer 0
+                    endif
+                    if timer poison_reapply_timer >= poison_apply_timer_cd
+                        overhead "Applying Poison" 72
+                        menu weapon_to_poison 0
+                        settimer poison_check_timer 0
+                        settimer poison_reapply_timer poison_reapply_timer_cd
+                    endif
+                endif
+            else
+                overhead "Out of poison pots!" 34
+            endif
+        endif
+
+        ##### Out of Combat: Overweight Gold Drop
+        if weight > maxweight and timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+            if findtype "gold coin" backpack as item
+                while insysmsg "cannot drop anything"
+                endwhile
+                lift item mconfig_Weight_GoldToDropIfOverweight
+                droprelloc 0 0
+                getlabel backpack mbot_PingCheck
+                if insysmsg "cannot drop anything"
+                    drop backpack -1 -1 -1
+                endif
+                settimer mbot_UseItemTimer 0
+            else
+                overhead "We are overweight and cannot drop anything" 34
+            endif
+        endif
+    
+        ##### Out of Combat: Potion Overhead Display
+        if mconfig_Potion_ShowOverheads = 1
+
+            if timer mbot_Potion_Cure_Overhead_IfCountIsLessThan_Timer >= mconfig_Potion_CureOverheadIfCountIsLessThanTimerCD
+                @setvar! mbot_BOT_CurePotionCount 0
+                if counttype 3847 mbot_PotionSatchel as mbot_TempPotionCount
+                    @setvar! mbot_BOT_CurePotionCount mbot_TempPotionCount
+                elseif counttype 3847 backpack as mbot_TempPotionCount
+                    @setvar! mbot_BOT_CurePotionCount mbot_TempPotionCount
+                endif
+                if mbot_BOT_CurePotionCount < mconfig_Potion_CureOverheadIfCountIsLessThan
+                    if mbot_BOT_CurePotionCount = 0
+                        overhead "Cure: Out of cures" 34
+                    else
+                        overhead "Cures Remaining: {{mbot_BOT_CurePotionCount}}"
+                    endif
+                endif
+                settimer mbot_Potion_Cure_Overhead_IfCountIsLessThan_Timer 0
+            endif
+        
+            if timer mbot_Potion_Heal_Overhead_IfCountIsLessThan_Timer >= mconfig_Potion_HealOverheadIfCountIsLessThanTimerCD
+                @setvar! mbot_BOT_HealPotionCount 0
+                if counttype 3852 mbot_PotionSatchel as mbot_TempPotionCount
+                    @setvar! mbot_BOT_HealPotionCount mbot_TempPotionCount
+                elseif counttype 3852 backpack as mbot_TempPotionCount
+                    @setvar! mbot_BOT_HealPotionCount mbot_TempPotionCount
+                endif
+                if mbot_BOT_HealPotionCount < mconfig_Potion_HealOverheadIfCountIsLessThan
+                    if mbot_BOT_HealPotionCount = 0
+                        overhead "Heal: Out of heals" 34
+                    else
+                        overhead "Heal Remaining: {{mbot_BOT_HealPotionCount}}"
+                    endif
+                endif
+                settimer mbot_Potion_Heal_Overhead_IfCountIsLessThan_Timer 0
+            endif
+        
+            if timer mbot_Potion_Explosion_Overhead_IfCountIsLessThan_Timer >= mconfig_Potion_ExplosionOverheadIfCountIsLessThanTimerCD
+                @setvar! mbot_BOT_ExplosionPotionCount 0
+                if counttype 3853 mbot_PotionSatchel as mbot_TempPotionCount
+                    @setvar! mbot_BOT_ExplosionPotionCount mbot_TempPotionCount
+                elseif counttype 3853 backpack as mbot_TempPotionCount
+                    @setvar! mbot_BOT_ExplosionPotionCount mbot_TempPotionCount
+                endif
+                if mbot_BOT_ExplosionPotionCount < mconfig_Potion_ExplosionOverheadIfCountIsLessThan
+                    if mbot_BOT_ExplosionPotionCount = 0
+                        overhead "Explosion: Out of explosions" 34
+                    else
+                        overhead "Explosion Remaining: {{mbot_BOT_ExplosionPotionCount}}"
+                    endif
+                endif
+                settimer mbot_Potion_Explosion_Overhead_IfCountIsLessThan_Timer 0
+            endif
+        
+        endif
+
+        ##### Out of Combat: Food
+        if not queued and not findbuff "food" and findtype "tray" backpack as mbot_FoodItem
+            if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+                dclick mbot_FoodItem
+                settimer mbot_UseItemTimer 0
+            endif
+        endif
+    
+        ##### Out of Combat: Skinning
+        if not queued and mconfig_Skinning_UseKnifeAutomatically = 1 and findtype 11552 backpack as mbot_SkinningKnife
+            if findbuff "Actively Meditating"
+                //do nothing
+            elseif findtype 8198 ground -1 -1 2 as mbot_Corpse
+                while not targetexists 
+                    dclick mbot_SkinningKnife
+                    wft 500
+                endwhile
+                while targetexists 
+                    hotkey "Target Self"
+                    getlabel backpack mbot_PingCheck
+                endwhile
+                @ignore mbot_Corpse
+            endif
+        endif
+    
+        ##### Out of Combat: Chivalry Symbol Count Detection
+        if timer mbot_Chiv_SymbolCheckTimer >= mbot_Chiv_SymbolCheckTimerCD
+            if not gumpexists 1387930325 and skill "chivalry" >= 50
+                say '[chivalryhotbar'
+                waitforgump 1387930325 500
+                if not gumpexists 1387930325
+                    overhead "!!!!!!!!!! CHIVALRY HOTBAR GUMP NOT FOUND !!!!!!!!!!" 34
+                endif
+            endif
+            if gumpexists 1387930325
+                if cooldown PVP
+                    unsetvar mbot_HolySymbols
+                elseif ingump "21/" 1387930325 or ingump "20/" 1387930325 or ingump "19/" 1387930325 or ingump "18/" 1387930325 or ingump "17/" 1387930325 or ingump "16/" 1387930325 or ingump "15/" 1387930325 or ingump "14/" 1387930325 or ingump "13/" 1387930325 or ingump "12/" 1387930325
+                    # 12+ symbols is always enough for these heals - cap here instead of tracking the exact count
+                    @setvar! mbot_HolySymbols 12
+                elseif ingump "11/" 1387930325
+                    @setvar! mbot_HolySymbols 11
+                elseif ingump "10/" 1387930325
+                    @setvar! mbot_HolySymbols 10
+                elseif ingump "9/" 1387930325
+                    @setvar! mbot_HolySymbols 9
+                elseif ingump "8/" 1387930325
+                    @setvar! mbot_HolySymbols 8
+                elseif ingump "7/" 1387930325
+                    @setvar! mbot_HolySymbols 7
+                elseif ingump "6/" 1387930325
+                    @setvar! mbot_HolySymbols 6
+                elseif ingump "5/" 1387930325
+                    @setvar! mbot_HolySymbols 5
+                elseif ingump "4/" 1387930325
+                    @setvar! mbot_HolySymbols 4
+                elseif ingump "3/" 1387930325
+                    @setvar! mbot_HolySymbols 3
+                elseif ingump "2/" 1387930325
+                    @setvar! mbot_HolySymbols 2
+                elseif ingump "1/" 1387930325
+                    @setvar! mbot_HolySymbols 1
+                elseif ingump "0/" 1387930325
+                    @setvar! mbot_HolySymbols 0
+                endif
+            endif
+            settimer mbot_Chiv_SymbolCheckTimer 0
+        endif
+
+        ##### Chivalry Gate A - Noble Sacrifice / Holy Light (emergency heals, no reserve)
+        if varexist mbot_HolySymbols
+
+            @setvar! mbot_BOT_UseNobleSacrifice 0
+            if mconfig_Chiv_UseNobleSacrificeAutomatically = 1 and skill "chivalry" >= 80 and timer mbot_NobleSacrificeTimer >= mbot_NobleSacrificeTimerCD
+                if mconfig_Chiv_MinSymbolsNobleSacrifice <= mbot_HolySymbols
+                    if diffhits >= mconfig_Chiv_AutoUseNobleSacrificeHpDiffTrigger
+                        @setvar! mbot_BOT_UseNobleSacrifice 1
+                    endif
+                endif
+            endif
+
+            @setvar! mbot_BOT_UseHolyLight 0
+            if mconfig_Chiv_UseHolyLightAutomatically = 1 and skill "chivalry" >= 95 and timer mbot_HolyLightTimer >= mbot_HolyLightTimerCD
+                if mconfig_Chiv_MinSymbolsHolyLight <= mbot_HolySymbols
+                    if diffhits >= mconfig_Chiv_AutoHolyLightHpDiffTrigger
+                        @setvar! mbot_BOT_UseHolyLight 1
+                    endif
+                endif
+            endif
+
+            if mbot_BOT_UseNobleSacrifice = 1
+
+                if targetexists
+                    hotkey "Clear Current Target"
+                endif
+
+                say "[NobleSacrifice"
+                wft 500
+                if targetexists
+                    while insysmsg "Holy symbols remaining"
+                    endwhile
+                    hotkey "Target Self"
+                    getlabel backpack mbot_PingCheck
+                    if not targetexists
+                        if insysmsg "Holy symbols remaining"
+                            cooldown "Noble Sacrifice" mbot_NobleSacrificeTimerCD
+                            settimer mbot_NobleSacrificeTimer 0
+                            settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
+                        endif
+                    else
+                        hotkey "Cancel Current Target"
+                    endif
+                endif
+                if skill "Healing" > 0 and findtype 3617 self
+                    while insysmsg "You begin applying"
+                    endwhile
+                    hotkey "Bandage Self"
+                    getlabel backpack mbot_PingCheck
+                    if insysmsg "You begin applying"
+                        settimer mbot_BandageTimer 0
+                    endif
+                endif            
+            elseif mbot_BOT_UseHolyLight = 1
+                while insysmsg "Holy symbols remaining"
+                endwhile
+                say "[HolyLight"
+                getlabel backpack mbot_PingCheck
+                if insysmsg "Holy symbols remaining"
+                    cooldown "Holy Light" mbot_HolyLightTimerCD
+                    settimer mbot_HolyLightTimer 0
+                    settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
+                endif
+            endif
+
+        endif
+
+        ##### Chivalry Gate B - Close Wounds / Cleanse By Fire (respects reserve)
+        if varexist mbot_HolySymbols
+
+            @setvar! mbot_BOT_UseCloseWounds 0
+            if findbuff "disease" or findbuff "bleed"
+                if mconfig_Chiv_UseCloseWoundsAutomatically = 1 and mconfig_Chiv_MinSymbolsCloseWounds <= mbot_HolySymbols and skill "chivalry" >= 70 and timer mbot_CloseWoundsTimer >= mbot_CloseWoundsTimerCD
+                    if diffhits >= mconfig_Chiv_AutoCloseWoundHpDiffTrigger
+                        @setvar! mbot_BOT_UseCloseWounds 1
+                    endif
+                endif
+            endif
+
+            @setvar! mbot_BOT_UseCleanseByFire 0
+            if poisoned and mconfig_Chiv_UseCleanseByFireAutomatically = 1 and mconfig_Chiv_MinSymbolsCleanseByFire <= mbot_HolySymbols and skill "chivalry" >= 60 and timer mbot_CleanseByFireTimer >= mbot_CleanseByFireTimerCD
+                @setvar! mbot_BOT_UseCleanseByFire 1
+            endif
+
+            if mbot_BOT_UseCloseWounds = 1
+                while insysmsg "Holy symbols remaining"
+                endwhile
+                say "[CloseWounds"
+                getlabel backpack mbot_PingCheck
+                if insysmsg "Holy symbols remaining"
+                    cooldown "Close Wounds" mbot_CloseWoundsTimerCD
+                    settimer mbot_CloseWoundsTimer 0
+                    settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
+                endif
+            elseif mbot_BOT_UseCleanseByFire = 1
+                while insysmsg "Holy symbols remaining"
+                endwhile
+                say "[CleanseByFire"
+                getlabel backpack mbot_PingCheck
+                if insysmsg "Holy symbols remaining"
+                    cooldown "Cleanse By Fire" mbot_CleanseByFireTimerCD
+                    settimer mbot_CleanseByFireTimer 0
+                    settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
+                endif
+            endif
+
+        endif
+
         ##### Fight State Detection (auto-target mode vs manually-set target)
         @setvar! mbot_CurrentBotTargetAttacked 0
 
@@ -1380,307 +1380,307 @@ while not dead
             @setvar! mbot_CurrentBotTarget 0
             @setvar! mbot_CurrentBotTargetGoodLOS 0
         endif
-    endif
-    
-    ##### Out of Combat: Emergency AOE Peace (low health, not fighting)
-    if mbot_BOT_FIGHT = 0 and hp < mconfig_Bard_AutoUseAoePeaceWhenLowHealthCheck and skill "Peacemaking" > 0 and timer mbot_UsedSkillTimer >= 5000
-        while insysmsg "What instrument"
-        endwhile
-        useskill 'Peacemaking'
-        wft 500
-        if insysmsg "What instrument"
-            target mbot_activeInstrument
+        ##### Out of Combat: Emergency AOE Peace (low health, not fighting)
+        if mbot_BOT_FIGHT = 0 and hp < mconfig_Bard_AutoUseAoePeaceWhenLowHealthCheck and skill "Peacemaking" > 0 and timer mbot_UsedSkillTimer >= 5000
+            while insysmsg "What instrument"
+            endwhile
+            useskill 'Peacemaking'
             wft 500
-        endif
-        if targetexists 
-            hotkey "Target Self"
-            settimer mbot_UsedSkillTimer 0
-        endif
-    endif
-    
-
-    ##### Parry Codex Stance Switching (runs regardless of fight state)
-    if skill "Parry" >= 80
-        if mana >= mconfig_Parry_CodexMinMana and timer mbot_Parry_SwitchCodexTimer >= mbot_Parry_SwitchCodexTimerCD and findtype 11889 backpack as mbot_ParryCodex
-            getlabel mbot_ParryCodex mbot_ParryCodexDesc
-
-            if "Shield Bash" in mbot_ParryCodexDesc
-                @setvar! mbot_ActiveParryCodex 1
-            elseif "Warding" in mbot_ParryCodexDesc
-                @setvar! mbot_ActiveParryCodex 2
-            elseif "Testudo" in mbot_ParryCodexDesc
-                @setvar! mbot_ActiveParryCodex 3
-            elseif "Mirror" in mbot_ParryCodexDesc
-                @setvar! mbot_ActiveParryCodex 4
-            elseif "Bulwark" in mbot_ParryCodexDesc
-                @setvar! mbot_ActiveParryCodex 5
-            endif
-            
-            if findbuff "bleed" and mconfig_Parry_SwitchToWardingIfBleeding = 1 and diffhits >= mconfig_Parry_SwitchToWardingIfBleedingHpDiff
-                @setvar! mbot_parryStanceTarget 2
-            elseif findbuff "disease" and mconfig_Parry_SwitchToWardingIfDisease = 1 and diffhits >= mconfig_Parry_SwitchToWardingIfDiseaseHpDiff
-                @setvar! mbot_parryStanceTarget 2
-            elseif poisoned and mconfig_Parry_SwitchToWardingIfPoison = 1 and diffhits >= mconfig_Parry_SwitchToWardingIfPoisonHpDiff
-                @setvar! mbot_parryStanceTarget 2
-            elseif mconfig_Parry_SwitchToBulwarkIfStandingStill = 1 and not cooldown "Bulwark"
-                @setvar! mbot_parryStanceTarget 5
-            elseif mconfig_Parry_SwitchToShieldBashWhileMoving = 1 and cooldown "Moving"
-                @setvar! mbot_parryStanceTarget 1
-            else
-                @setvar! mbot_parryStanceTarget mconfig_Parry_SwitchToDefaultStance
-            endif
-            
-            if mbot_ActiveParryCodex != mbot_parryStanceTarget
-                if mbot_parryStanceTarget = 1
-                    say "[ShieldsStance1"
-                elseif mbot_parryStanceTarget = 2
-                    say "[ShieldsStance2"
-                elseif mbot_parryStanceTarget = 3
-                    say "[ShieldsStance3"
-                elseif mbot_parryStanceTarget = 4
-                    say "[ShieldsStance4"
-                elseif mbot_parryStanceTarget = 5
-                    say "[ShieldsStance5"
-                endif
-                settimer mbot_Parry_SwitchCodexTimer 0
-            endif
-        endif
-    endif
-
-    ##### Post-Attack Actions (this iteration only, if we attacked)
-    if mbot_CurrentBotTargetAttacked = 1
-
-        if mconfig_Healing_AidCountAlertLessThan20 = 1 and skill "Healing" > 0 and counttype 3617 self as mbot_BOT_AidCount
-            if 20 > mbot_BOT_AidCount
-            overhead "We are low on aids {{mbot_BOT_AidCount}}" 34
-            endif
-        endif
-    
-        ##### Post-Attack: Cleansing Brew
-        if mconfig_Potion_UseCleansingBrewAutomatically = 1 and findtype 50675 backpack 2935 as mbot_UseItem
-            if findbuff "bleed" or findbuff "disease"
-                if diffhits >= mconfig_Potion_CleansingBrewHpDiffTrigger
-                    dclick mbot_UseItem
-                    cooldown "Cleansing Brew" mbot_UseCleansingBrewTimerCD
-                    settimer mbot_UseCleansingBrewTimer 0
-                endif
-            endif
-        endif
-    
-        ##### Post-Attack: Weapon Abilities
-        if mconfig_Weapon_UseAbility1 = 1 and timer mbot_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
-            while insysmsg "You do cannot perform that ability yet." or insysmsg "You have not yet unlocked that weapon ability." or insysmsg "You do not have the required codex or skills to use that weapon ability."
-            endwhile
-            say "[WeaponAbility1"
-            settimer mbot_UseAbilityTimer 0 
-        elseif mconfig_Weapon_UseAbility2 = 1 and timer mbot_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
-            while insysmsg "You do cannot perform that ability yet." or insysmsg "You have not yet unlocked that weapon ability." or insysmsg "You do not have the required codex or skills to use that weapon ability."
-            endwhile
-            say "[WeaponAbility2"
-            settimer mbot_UseAbilityTimer 0 
-        elseif mconfig_Weapon_UseAbility3 = 1 and timer mbot_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
-            while insysmsg "You do cannot perform that ability yet." or insysmsg "You have not yet unlocked that weapon ability." or insysmsg "You do not have the required codex or skills to use that weapon ability."
-            endwhile 
-            say "[WeaponAbility3"
-            settimer mbot_UseAbilityTimer 0 
-        endif   
-            
-        ##### Post-Attack: Explosion Pot
-        if not queued and mconfig_Potion_AutoExplodePot = 1 and find mbot_CurrentBotTarget ground -1 -1 8 and findtype 3853 self 0 as mbot_explosionPot
-            if timer mbot_AutoExplodePotTimer >= mbot_AutoExplodePotTimerCD and timer mbot_UseItemTimer >= mbot_UseItemTimerCD
-                @ignore mbot_explosionPot
-                dclick mbot_explosionPot
-                settimer mbot_UseItemTimer 0
-                getlabel mbot_explosionPot mbot_explosionPotDesc    
-                if "next" in mbot_explosionPotDesc
-                    if "12 seconds" in mbot_explosionPotDesc
-                        @setvar! mbot_AutoExplodePotTimerCD 12000
-                    elseif "13 seconds" in mbot_explosionPotDesc
-                        @setvar! mbot_AutoExplodePotTimerCD 13000
-                    elseif "14 seconds" in mbot_explosionPotDesc
-                        @setvar! mbot_AutoExplodePotTimerCD 14000
-                    elseif "15 seconds" in mbot_explosionPotDesc
-                        @setvar! mbot_AutoExplodePotTimerCD 15000
-                    endif
-                    settimer mbot_AutoExplodePotTimer 0
-                    cooldown "Purple Pot" mbot_AutoExplodePotTimerCD
-                endif
-                while insysmsg "Target cannot be seen"
-                    overhead "clearing the target cannot be seen"
-                endwhile
+            if insysmsg "What instrument"
+                target mbot_activeInstrument
                 wft 500
-                target mbot_CurrentBotTarget
-                getlabel backpack mbot_PingCheck
-                if insysmsg "Target cannot be seen"
-                    while timer mbot_UseItemTimer < mbot_UseItemTimerCD
-                    endwhile
+            endif
+            if targetexists 
+                hotkey "Target Self"
+                settimer mbot_UsedSkillTimer 0
+            endif
+        endif
+    
+
+        ##### Parry Codex Stance Switching (runs regardless of fight state)
+        if skill "Parry" >= 80
+            if mana >= mconfig_Parry_CodexMinMana and timer mbot_Parry_SwitchCodexTimer >= mbot_Parry_SwitchCodexTimerCD and findtype 11889 backpack as mbot_ParryCodex
+                getlabel mbot_ParryCodex mbot_ParryCodexDesc
+
+                if "Shield Bash" in mbot_ParryCodexDesc
+                    @setvar! mbot_ActiveParryCodex 1
+                elseif "Warding" in mbot_ParryCodexDesc
+                    @setvar! mbot_ActiveParryCodex 2
+                elseif "Testudo" in mbot_ParryCodexDesc
+                    @setvar! mbot_ActiveParryCodex 3
+                elseif "Mirror" in mbot_ParryCodexDesc
+                    @setvar! mbot_ActiveParryCodex 4
+                elseif "Bulwark" in mbot_ParryCodexDesc
+                    @setvar! mbot_ActiveParryCodex 5
+                endif
+            
+                if findbuff "bleed" and mconfig_Parry_SwitchToWardingIfBleeding = 1 and diffhits >= mconfig_Parry_SwitchToWardingIfBleedingHpDiff
+                    @setvar! mbot_parryStanceTarget 2
+                elseif findbuff "disease" and mconfig_Parry_SwitchToWardingIfDisease = 1 and diffhits >= mconfig_Parry_SwitchToWardingIfDiseaseHpDiff
+                    @setvar! mbot_parryStanceTarget 2
+                elseif poisoned and mconfig_Parry_SwitchToWardingIfPoison = 1 and diffhits >= mconfig_Parry_SwitchToWardingIfPoisonHpDiff
+                    @setvar! mbot_parryStanceTarget 2
+                elseif mconfig_Parry_SwitchToBulwarkIfStandingStill = 1 and not cooldown "Bulwark"
+                    @setvar! mbot_parryStanceTarget 5
+                elseif mconfig_Parry_SwitchToShieldBashWhileMoving = 1 and cooldown "Moving"
+                    @setvar! mbot_parryStanceTarget 1
+                else
+                    @setvar! mbot_parryStanceTarget mconfig_Parry_SwitchToDefaultStance
+                endif
+            
+                if mbot_ActiveParryCodex != mbot_parryStanceTarget
+                    if mbot_parryStanceTarget = 1
+                        say "[ShieldsStance1"
+                    elseif mbot_parryStanceTarget = 2
+                        say "[ShieldsStance2"
+                    elseif mbot_parryStanceTarget = 3
+                        say "[ShieldsStance3"
+                    elseif mbot_parryStanceTarget = 4
+                        say "[ShieldsStance4"
+                    elseif mbot_parryStanceTarget = 5
+                        say "[ShieldsStance5"
+                    endif
+                    settimer mbot_Parry_SwitchCodexTimer 0
+                endif
+            endif
+        endif
+
+        ##### Post-Attack Actions (this iteration only, if we attacked)
+        if mbot_CurrentBotTargetAttacked = 1
+
+            if mconfig_Healing_AidCountAlertLessThan20 = 1 and skill "Healing" > 0 and counttype 3617 self as mbot_BOT_AidCount
+                if 20 > mbot_BOT_AidCount
+                overhead "We are low on aids {{mbot_BOT_AidCount}}" 34
+                endif
+            endif
+    
+            ##### Post-Attack: Cleansing Brew
+            if mconfig_Potion_UseCleansingBrewAutomatically = 1 and findtype 50675 backpack 2935 as mbot_UseItem
+                if findbuff "bleed" or findbuff "disease"
+                    if diffhits >= mconfig_Potion_CleansingBrewHpDiffTrigger
+                        dclick mbot_UseItem
+                        cooldown "Cleansing Brew" mbot_UseCleansingBrewTimerCD
+                        settimer mbot_UseCleansingBrewTimer 0
+                    endif
+                endif
+            endif
+    
+            ##### Post-Attack: Weapon Abilities
+            if mconfig_Weapon_UseAbility1 = 1 and timer mbot_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
+                while insysmsg "You do cannot perform that ability yet." or insysmsg "You have not yet unlocked that weapon ability." or insysmsg "You do not have the required codex or skills to use that weapon ability."
+                endwhile
+                say "[WeaponAbility1"
+                settimer mbot_UseAbilityTimer 0 
+            elseif mconfig_Weapon_UseAbility2 = 1 and timer mbot_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
+                while insysmsg "You do cannot perform that ability yet." or insysmsg "You have not yet unlocked that weapon ability." or insysmsg "You do not have the required codex or skills to use that weapon ability."
+                endwhile
+                say "[WeaponAbility2"
+                settimer mbot_UseAbilityTimer 0 
+            elseif mconfig_Weapon_UseAbility3 = 1 and timer mbot_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
+                while insysmsg "You do cannot perform that ability yet." or insysmsg "You have not yet unlocked that weapon ability." or insysmsg "You do not have the required codex or skills to use that weapon ability."
+                endwhile 
+                say "[WeaponAbility3"
+                settimer mbot_UseAbilityTimer 0 
+            endif   
+            
+            ##### Post-Attack: Explosion Pot
+            if not queued and mconfig_Potion_AutoExplodePot = 1 and find mbot_CurrentBotTarget ground -1 -1 8 and findtype 3853 self 0 as mbot_explosionPot
+                if timer mbot_AutoExplodePotTimer >= mbot_AutoExplodePotTimerCD and timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+                    @ignore mbot_explosionPot
                     dclick mbot_explosionPot
-                    wft 500
-                endif
-                if targetexists and findtype 3853 backpack -1 1 1 as mbot_nextExplosionPot
-                    overhead "YEETING POTION" 89
-                    target mbot_nextExplosionPot
-                endif
-                @unignore mbot_explosionPot
-            endif
-        endif
-    
-        ##### Post-Attack: Buff Potions & Chivalry Gate C
-        if not queued and mconfig_Potion_UseAgilityAutomatically = 1 and not findbuff "Agility" and findtype 3848 self as mbot_Potion
-            if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
-                dclick mbot_Potion
-                settimer mbot_UseItemTimer 0
-            endif
-        endif
-        
-        if not queued and mconfig_Potion_UseStrengthAutomatically = 1 and not findbuff "Strength" and findtype 3849 self as mbot_Potion
-            if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
-                dclick mbot_Potion
-                settimer mbot_UseItemTimer 0
-            endif
-        endif
-        
-        if not queued and mconfig_Potion_UseMagicResistAutomatically = 1 and not findbuff "Magic Resist" and findtype 3846 self as mbot_Potion
-            if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
-                dclick mbot_Potion
-                settimer mbot_UseItemTimer 0
-            endif
-        elseif not queued and mconfig_Potion_UseMagicResistAgainIfDebuffedAutomatically = 1 and findbuff "Magic Resist Decrease" and findtype 3846 self as mbot_Potion
-            if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
-                dclick mbot_Potion
-                settimer mbot_UseItemTimer 0
-            endif
-        endif
-
-
-        ##### Chivalry Gate C - Divine Fury / Enemy of One / Consecrate Weapon (respects reserve, combat only)
-        if varexist mbot_HolySymbols
-
-            @setvar! mbot_divineFuryIsUsed 0
-            if mconfig_Chiv_UseDivineFuryAutomatically = 0
-                @setvar! mbot_divineFuryIsUsed 1
-            elseif mconfig_Chiv_UseDivineFuryAutomatically = 1 and timer mbot_DivineFuryTimer < mbot_DivineFuryTimerCD
-                @setvar! mbot_divineFuryIsUsed 1
-            endif
-        
-            if mconfig_Chiv_UseDivineFuryAutomatically = 1 and mconfig_Chiv_MinSymbolsDivineFury <= mbot_HolySymbols and skill "chivalry" >= 85 and timer mbot_DivineFuryTimer >= mbot_DivineFuryTimerCD
-                while insysmsg "Holy symbols remaining"
-                endwhile
-                say "[DivineFury"
-                getlabel backpack mbot_PingCheck
-                if insysmsg "Holy symbols remaining"
-                    cooldown "Divine Fury" mbot_DivineFuryTimerCD
-                    settimer mbot_DivineFuryTimer 0
-                    settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
-                endif
-            elseif mbot_divineFuryIsUsed = 1 and mconfig_Chiv_UseEnemyOfOneAutomatically = 1 and mconfig_Chiv_MinSymbolsEnemyOfOne <= mbot_HolySymbols and skill "chivalry" >= 75 and timer mbot_EnemyOfOneTimer >= mbot_EnemyOfOneTimerCD
-                while insysmsg "Holy symbols remaining"
-                endwhile
-                say "[EnemyOfOne"
-                getlabel backpack mbot_PingCheck
-                if insysmsg "Holy symbols remaining" 
-                    cooldown "Enemy Of One" mbot_EnemyOfOneTimerCD
-                    settimer mbot_EnemyOfOneTimer 0
-                    settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
-                endif  
-            elseif mbot_divineFuryIsUsed = 1 and mconfig_Chiv_UseConsecrateWeaponAutomatically = 1 and mconfig_Chiv_MinSymbolsConsecrateWeapon <= mbot_HolySymbols and skill "chivalry" >= 65 and timer mbot_ConsecrateWeaponTimer >= mbot_ConsecrateWeaponTimerCD
-                while insysmsg "Holy symbols remaining"
-                endwhile
-                say "[ConsecrateWeapon"
-                getlabel backpack mbot_PingCheck
-                if insysmsg "Holy symbols remaining" 
-                    cooldown "Consecrate Weapon" mbot_ConsecrateWeaponTimerCD
-                    settimer mbot_ConsecrateWeaponTimer 0
-                    settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
-                endif
-            endif
-        endif
-        
-        ##### Post-Attack: Taunting
-        if mconfig_Parry_AutoTaunting = 1 or mconfig_Parry_AutoAoeTaunting = 1
-            @setvar! mbot_TriggerAbility 0
-            if cooldown "Taunting" or timer mbot_TauntingTimer < mconfig_Parry_TauntingTimerCD
-                // do nothing
-            elseif diffhits <= mconfig_Parry_AutoTauntHpDiffTrigger
-                @setvar! mbot_TriggerAbility 1
-            endif
-            if mbot_TriggerAbility = 1
-                say "[Taunt"
-                wft 500
-                if targetexists 
-                    while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                    endwhile
-                    if mconfig_Parry_AutoAoeTaunting = 1
-                        hotkey "Target Self"
-                    elseif find mbot_CurrentBotTarget
-                        target mbot_CurrentBotTarget
-                    endif
-                    getlabel backpack mbot_PingCheck
-                    if not targetexists 
-                        if insysmsg "Cannot be seen"
-                            // do nothing
-                        else
-                            cooldown "Taunting" mconfig_Parry_TauntingTimerCD
-                            settimer mbot_TauntingTimer 0
+                    settimer mbot_UseItemTimer 0
+                    getlabel mbot_explosionPot mbot_explosionPotDesc    
+                    if "next" in mbot_explosionPotDesc
+                        if "12 seconds" in mbot_explosionPotDesc
+                            @setvar! mbot_AutoExplodePotTimerCD 12000
+                        elseif "13 seconds" in mbot_explosionPotDesc
+                            @setvar! mbot_AutoExplodePotTimerCD 13000
+                        elseif "14 seconds" in mbot_explosionPotDesc
+                            @setvar! mbot_AutoExplodePotTimerCD 14000
+                        elseif "15 seconds" in mbot_explosionPotDesc
+                            @setvar! mbot_AutoExplodePotTimerCD 15000
                         endif
-                    else
-                        hotkey "Cancel Current Target"
+                        settimer mbot_AutoExplodePotTimer 0
+                        cooldown "Purple Pot" mbot_AutoExplodePotTimerCD
+                    endif
+                    while insysmsg "Target cannot be seen"
+                        overhead "clearing the target cannot be seen"
+                    endwhile
+                    wft 500
+                    target mbot_CurrentBotTarget
+                    getlabel backpack mbot_PingCheck
+                    if insysmsg "Target cannot be seen"
+                        while timer mbot_UseItemTimer < mbot_UseItemTimerCD
+                        endwhile
+                        dclick mbot_explosionPot
+                        wft 500
+                    endif
+                    if targetexists and findtype 3853 backpack -1 1 1 as mbot_nextExplosionPot
+                        overhead "YEETING POTION" 89
+                        target mbot_nextExplosionPot
+                    endif
+                    @unignore mbot_explosionPot
+                endif
+            endif
+    
+            ##### Post-Attack: Buff Potions & Chivalry Gate C
+            if not queued and mconfig_Potion_UseAgilityAutomatically = 1 and not findbuff "Agility" and findtype 3848 self as mbot_Potion
+                if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+                    dclick mbot_Potion
+                    settimer mbot_UseItemTimer 0
+                endif
+            endif
+        
+            if not queued and mconfig_Potion_UseStrengthAutomatically = 1 and not findbuff "Strength" and findtype 3849 self as mbot_Potion
+                if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+                    dclick mbot_Potion
+                    settimer mbot_UseItemTimer 0
+                endif
+            endif
+        
+            if not queued and mconfig_Potion_UseMagicResistAutomatically = 1 and not findbuff "Magic Resist" and findtype 3846 self as mbot_Potion
+                if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+                    dclick mbot_Potion
+                    settimer mbot_UseItemTimer 0
+                endif
+            elseif not queued and mconfig_Potion_UseMagicResistAgainIfDebuffedAutomatically = 1 and findbuff "Magic Resist Decrease" and findtype 3846 self as mbot_Potion
+                if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+                    dclick mbot_Potion
+                    settimer mbot_UseItemTimer 0
+                endif
+            endif
+
+
+            ##### Chivalry Gate C - Divine Fury / Enemy of One / Consecrate Weapon (respects reserve, combat only)
+            if varexist mbot_HolySymbols
+
+                @setvar! mbot_divineFuryIsUsed 0
+                if mconfig_Chiv_UseDivineFuryAutomatically = 0
+                    @setvar! mbot_divineFuryIsUsed 1
+                elseif mconfig_Chiv_UseDivineFuryAutomatically = 1 and timer mbot_DivineFuryTimer < mbot_DivineFuryTimerCD
+                    @setvar! mbot_divineFuryIsUsed 1
+                endif
+        
+                if mconfig_Chiv_UseDivineFuryAutomatically = 1 and mconfig_Chiv_MinSymbolsDivineFury <= mbot_HolySymbols and skill "chivalry" >= 85 and timer mbot_DivineFuryTimer >= mbot_DivineFuryTimerCD
+                    while insysmsg "Holy symbols remaining"
+                    endwhile
+                    say "[DivineFury"
+                    getlabel backpack mbot_PingCheck
+                    if insysmsg "Holy symbols remaining"
+                        cooldown "Divine Fury" mbot_DivineFuryTimerCD
+                        settimer mbot_DivineFuryTimer 0
+                        settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
+                    endif
+                elseif mbot_divineFuryIsUsed = 1 and mconfig_Chiv_UseEnemyOfOneAutomatically = 1 and mconfig_Chiv_MinSymbolsEnemyOfOne <= mbot_HolySymbols and skill "chivalry" >= 75 and timer mbot_EnemyOfOneTimer >= mbot_EnemyOfOneTimerCD
+                    while insysmsg "Holy symbols remaining"
+                    endwhile
+                    say "[EnemyOfOne"
+                    getlabel backpack mbot_PingCheck
+                    if insysmsg "Holy symbols remaining" 
+                        cooldown "Enemy Of One" mbot_EnemyOfOneTimerCD
+                        settimer mbot_EnemyOfOneTimer 0
+                        settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
+                    endif  
+                elseif mbot_divineFuryIsUsed = 1 and mconfig_Chiv_UseConsecrateWeaponAutomatically = 1 and mconfig_Chiv_MinSymbolsConsecrateWeapon <= mbot_HolySymbols and skill "chivalry" >= 65 and timer mbot_ConsecrateWeaponTimer >= mbot_ConsecrateWeaponTimerCD
+                    while insysmsg "Holy symbols remaining"
+                    endwhile
+                    say "[ConsecrateWeapon"
+                    getlabel backpack mbot_PingCheck
+                    if insysmsg "Holy symbols remaining" 
+                        cooldown "Consecrate Weapon" mbot_ConsecrateWeaponTimerCD
+                        settimer mbot_ConsecrateWeaponTimer 0
+                        settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
                     endif
                 endif
             endif
-        endif
         
-    endif
+            ##### Post-Attack: Taunting
+            if mconfig_Parry_AutoTaunting = 1 or mconfig_Parry_AutoAoeTaunting = 1
+                @setvar! mbot_TriggerAbility 0
+                if cooldown "Taunting" or timer mbot_TauntingTimer < mconfig_Parry_TauntingTimerCD
+                    // do nothing
+                elseif diffhits <= mconfig_Parry_AutoTauntHpDiffTrigger
+                    @setvar! mbot_TriggerAbility 1
+                endif
+                if mbot_TriggerAbility = 1
+                    say "[Taunt"
+                    wft 500
+                    if targetexists 
+                        while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
+                        endwhile
+                        if mconfig_Parry_AutoAoeTaunting = 1
+                            hotkey "Target Self"
+                        elseif find mbot_CurrentBotTarget
+                            target mbot_CurrentBotTarget
+                        endif
+                        getlabel backpack mbot_PingCheck
+                        if not targetexists 
+                            if insysmsg "Cannot be seen"
+                                // do nothing
+                            else
+                                cooldown "Taunting" mconfig_Parry_TauntingTimerCD
+                                settimer mbot_TauntingTimer 0
+                            endif
+                        else
+                            hotkey "Cancel Current Target"
+                        endif
+                    endif
+                endif
+            endif
+        
+        endif
     
-    ##### Out of Combat: Bard Passive Song-Buff Maintenance
-    if mbot_BardDetected = 1
+        ##### Out of Combat: Bard Passive Song-Buff Maintenance
+        if mbot_BardDetected = 1
 
-        if skill "Discordance" > 0
-            if not findbuff "song of discordance" and timer mbot_BOT_BardBuffTimer >= 10000
-                while insysmsg "What instrument"
-                endwhile
-                useskill 'Discordance'
-                wft 500
-                if insysmsg "What instrument"
-                    target mbot_activeInstrument
+            if skill "Discordance" > 0
+                if not findbuff "song of discordance" and timer mbot_BOT_BardBuffTimer >= 10000
+                    while insysmsg "What instrument"
+                    endwhile
+                    useskill 'Discordance'
                     wft 500
+                    if insysmsg "What instrument"
+                        target mbot_activeInstrument
+                        wft 500
+                    endif
+                    target backpack
+                    settimer mbot_BOT_BardBuffTimer 0
                 endif
-                target backpack
-                settimer mbot_BOT_BardBuffTimer 0
             endif
+
+            if skill "Provocation" > 0
+                if not findbuff "song of provocation" and timer mbot_BOT_BardBuffTimer >= 10000
+                    while insysmsg "What instrument"
+                    endwhile
+                    useskill 'Provocation'
+                    wft 500
+                    if insysmsg "What instrument"
+                        target mbot_activeInstrument
+                        wft 500
+                    endif
+                    target backpack
+                    settimer mbot_BOT_BardBuffTimer 0
+                endif
+            endif
+
+            if skill "Peacemaking" > 0
+                if not findbuff "song of peacemaking" and timer mbot_BOT_BardBuffTimer >= 10000
+                    while insysmsg "What instrument"
+                    endwhile
+                    useskill 'Peacemaking'
+                    wft 500
+                    if insysmsg "What instrument"
+                        target mbot_activeInstrument
+                        wft 500
+                    endif
+                    target backpack
+                    settimer mbot_BOT_BardBuffTimer 0
+                endif
+            endif
+
         endif
 
-        if skill "Provocation" > 0
-            if not findbuff "song of provocation" and timer mbot_BOT_BardBuffTimer >= 10000
-                while insysmsg "What instrument"
-                endwhile
-                useskill 'Provocation'
-                wft 500
-                if insysmsg "What instrument"
-                    target mbot_activeInstrument
-                    wft 500
-                endif
-                target backpack
-                settimer mbot_BOT_BardBuffTimer 0
-            endif
-        endif
-
-        if skill "Peacemaking" > 0
-            if not findbuff "song of peacemaking" and timer mbot_BOT_BardBuffTimer >= 10000
-                while insysmsg "What instrument"
-                endwhile
-                useskill 'Peacemaking'
-                wft 500
-                if insysmsg "What instrument"
-                    target mbot_activeInstrument
-                    wft 500
-                endif
-                target backpack
-                settimer mbot_BOT_BardBuffTimer 0
-            endif
-        endif
-
+        wait 10
     endif
 
-    wait 10
 endwhile
