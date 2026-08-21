@@ -50,7 +50,6 @@ bot's actual logic.
 - Optimized Chivalry
 - Optimized Barding (testing needed)
 - Optimized main run loop (moved several init-once items outside of the main run loop)
-- PVP detection + automatically stop PVM combat when engaged in PVP (testing needed)
 
 ## Subtractions
 - Tamer support has been removed
