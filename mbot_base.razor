@@ -385,6 +385,9 @@ endif
 
 @setvar! mbot_RedPouchCountTotal 0
 
+##### PvP Warning Tracking
+@setvar! mbot_PvPWarningShown 0
+
 ##### Tracking
 if skill "Tracking" > 0
     if not findbuff "tracking"
@@ -500,12 +503,24 @@ while not dead
 
     ##### Everything Else - disabled during PvP (not survivability-safe)
     if pvp
+        ##### PvP Warning - fire once when PvP mode is first detected
+        # Uses a plain flag instead of timer/settimer - both are disabled while
+        # PvP-flagged, so a timer-based cooldown can't reliably gate this here.
+        if mbot_PvPWarningShown = 0
+            for 3
+                overhead "WARNING: PVP MODE ENABLED" 34
+            endfor
+            @setvar! mbot_PvPWarningShown 1
+        endif
+
         ##### In PvP - clear targeting/fight-mode state, skip combat entirely this iteration
         @setvar! mbot_CurrentBotTarget 0
         @setvar! mbot_BOT_FIGHT 0
         @setvar! mbot_CurrentBotTargetAttacked 0
         @setvar! mbot_CurrentBotTargetGoodLOS 0
     else
+        @setvar! mbot_PvPWarningShown 0
+
         ##### Out of Combat: Chivalry Symbol Count Detection
         if timer mbot_Chiv_SymbolCheckTimer >= mbot_Chiv_SymbolCheckTimerCD
             if not gumpexists 1387930325 and skill "chivalry" >= 50
