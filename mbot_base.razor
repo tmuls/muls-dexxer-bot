@@ -447,6 +447,57 @@ while not dead
         endif
     endif
     
+    ##### Out of Combat: Panacea & Cure/Heal/Refresh Potions
+    if mconfig_Potion_HasPanacea = 1 and timer mbot_UsePanaceaTimer >= mbot_UsePanaceaTimerCD
+        if findbuff "bleed" or findbuff "disease"
+            if findtype 3847 self 0 as mbot_UseItem
+                dclick mbot_UseItem
+                cooldown "Panacea" mbot_UsePanaceaTimerCD
+                settimer mbot_UsePanaceaTimer 0
+            endif
+        endif
+    endif
+    
+    # Potions
+    if not queued and mconfig_Potion_UseCureAutomatically = 1 and poisoned and diffhits >= mconfig_Potion_CureHpDiffTrigger and findtype 3847 self as mbot_Potion
+        if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+            dclick mbot_Potion
+            settimer mbot_UseItemTimer 0
+        endif
+    endif
+    
+    if mconfig_Potion_UseHealAutomatically = 1 and diffhits >= mconfig_Potion_HealHpDiffTrigger and findtype 3852 self as mbot_Potion
+        if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+            getlabel mbot_Potion mbot_PotionDesc
+            if "next usable in" in mbot_PotionDesc
+                // do nothing
+            else
+                dclick mbot_Potion
+                settimer mbot_UseItemTimer 0
+            endif
+        endif
+    endif
+
+    if not queued and mconfig_Potion_UseRefreshAutomatically = 1 and diffstam >= mconfig_Potion_RefreshStamDiffTrigger and findtype 3851 self as mbot_Potion
+        if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+            dclick mbot_Potion
+            settimer mbot_UseItemTimer 0
+        endif
+    endif
+    
+
+    // Trapped
+    ##### Out of Combat: Paralyze Escape (Trapped Pouch)
+    if paralyzed and not queued
+        if findtype "pouch" backpack 38
+            yell "[pouch"
+            getlabel backpack mbot_PingCheck
+        else
+            overhead "Out of Pouches!" 34
+        endif
+    endif
+
+
     ##### Out of Combat: Thief Pouch Alert
     if mconfig_Thief_AlertRedPouchPop = 1 and counttype 3705 backpack 38 as mbot_RedPouchCount
         if mbot_RedPouchCountTotal != 0 and mbot_RedPouchCountTotal != mbot_RedPouchCount
@@ -611,55 +662,6 @@ while not dead
         endif
     endif
     
-    ##### Out of Combat: Panacea & Cure/Heal/Refresh Potions
-    if mconfig_Potion_HasPanacea = 1 and timer mbot_UsePanaceaTimer >= mbot_UsePanaceaTimerCD
-        if findbuff "bleed" or findbuff "disease"
-            if findtype 3847 self 0 as mbot_UseItem
-                dclick mbot_UseItem
-                cooldown "Panacea" mbot_UsePanaceaTimerCD
-                settimer mbot_UsePanaceaTimer 0
-            endif
-        endif
-    endif
-    
-    # Potions
-    if not queued and mconfig_Potion_UseCureAutomatically = 1 and poisoned and diffhits >= mconfig_Potion_CureHpDiffTrigger and findtype 3847 self as mbot_Potion
-        if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
-            dclick mbot_Potion
-            settimer mbot_UseItemTimer 0
-        endif
-    endif
-    
-    if mconfig_Potion_UseHealAutomatically = 1 and diffhits >= mconfig_Potion_HealHpDiffTrigger and findtype 3852 self as mbot_Potion
-        if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
-            getlabel mbot_Potion mbot_PotionDesc
-            if "next usable in" in mbot_PotionDesc
-                // do nothing
-            else
-                dclick mbot_Potion
-                settimer mbot_UseItemTimer 0
-            endif
-        endif
-    endif
-
-    if not queued and mconfig_Potion_UseRefreshAutomatically = 1 and diffstam >= mconfig_Potion_RefreshStamDiffTrigger and findtype 3851 self as mbot_Potion
-        if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
-            dclick mbot_Potion
-            settimer mbot_UseItemTimer 0
-        endif
-    endif
-    
-    // Trapped
-    ##### Out of Combat: Paralyze Escape (Trapped Pouch)
-    if paralyzed and not queued
-        if findtype "pouch" backpack 38
-            yell "[pouch"
-            getlabel backpack mbot_PingCheck
-        else
-            overhead "Out of Pouches!" 34
-        endif
-    endif
-
     ##### Out of Combat: Skinning
     if not queued and mconfig_Skinning_UseKnifeAutomatically = 1 and findtype 11552 backpack as mbot_SkinningKnife
         if findbuff "Actively Meditating"
