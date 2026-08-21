@@ -44,6 +44,7 @@ bot's actual logic.
 - Smart Weapon Equip / Smart Shield Equip - automatically re-equips your
   remembered weapon/shield, or finds a quality replacement from your bags
   (aspect/exceptional/supremely/exceedingly/vanquishing/power/invuln)
+- Auto recall home if you forgot to bring your weapon or shield (not enabled by default)
 - Early poison reapplication - comfortably play at 100 poison skill
 - Configurable weapon hotbar display for both ability hotbar and codex hotbar
 - Optimized Chivalry
