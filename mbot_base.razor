@@ -265,6 +265,7 @@ if mconfig_Weapon_SmartEquip = 1
                 getlabel backpack mbot_PingCheck
                 overhead "Weapon found! Auto-equipping." 66
                 @setvar! mbot_FoundFallbackWeapon 1
+                @setvar! mbot_BOT_CurrentRightHandWeapon mbot_WeaponCandidate
             else
                 @ignore mbot_WeaponCandidate
             endif
@@ -305,6 +306,7 @@ if mconfig_Shield_SmartEquip = 1
                 getlabel backpack mbot_PingCheck
                 overhead "Shield found! Auto-equipping..." 66
                 @setvar! mbot_FoundFallbackShield 1
+                @setvar! mbot_BOT_CurrentLeftHandWeapon mbot_ShieldCandidate
             else
                 @ignore mbot_ShieldCandidate
             endif
