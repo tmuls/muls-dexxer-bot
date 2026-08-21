@@ -831,8 +831,14 @@ while not dead
 
     endif
 
-    ##### Bot Fighting (Fight State Detection + In Combat) - disabled entirely during PvP
-    if not pvp
+    ##### PvP Detection (gates Fight State Detection + the entire Combat Block)
+    if pvp
+        ##### In PvP - clear targeting/fight-mode state, skip combat entirely this iteration
+        @setvar! mbot_CurrentBotTarget 0
+        @setvar! mbot_BOT_FIGHT 0
+        @setvar! mbot_CurrentBotTargetAttacked 0
+        @setvar! mbot_CurrentBotTargetGoodLOS 0
+    else
         ##### Fight State Detection (auto-target mode vs manually-set target)
         @setvar! mbot_CurrentBotTargetAttacked 0
 
