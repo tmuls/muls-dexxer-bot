@@ -506,6 +506,158 @@ while not dead
         @setvar! mbot_CurrentBotTargetAttacked 0
         @setvar! mbot_CurrentBotTargetGoodLOS 0
     else
+        ##### Out of Combat: Chivalry Symbol Count Detection
+        if timer mbot_Chiv_SymbolCheckTimer >= mbot_Chiv_SymbolCheckTimerCD
+            if not gumpexists 1387930325 and skill "chivalry" >= 50
+                say '[chivalryhotbar'
+                waitforgump 1387930325 500
+                if not gumpexists 1387930325
+                    overhead "!!!!!!!!!! CHIVALRY HOTBAR GUMP NOT FOUND !!!!!!!!!!" 34
+                endif
+            endif
+            if gumpexists 1387930325
+                if cooldown PVP
+                    unsetvar mbot_HolySymbols
+                elseif ingump "21/" 1387930325 or ingump "20/" 1387930325 or ingump "19/" 1387930325 or ingump "18/" 1387930325 or ingump "17/" 1387930325 or ingump "16/" 1387930325 or ingump "15/" 1387930325 or ingump "14/" 1387930325 or ingump "13/" 1387930325 or ingump "12/" 1387930325
+                    # 12+ symbols is always enough for these heals - cap here instead of tracking the exact count
+                    @setvar! mbot_HolySymbols 12
+                elseif ingump "11/" 1387930325
+                    @setvar! mbot_HolySymbols 11
+                elseif ingump "10/" 1387930325
+                    @setvar! mbot_HolySymbols 10
+                elseif ingump "9/" 1387930325
+                    @setvar! mbot_HolySymbols 9
+                elseif ingump "8/" 1387930325
+                    @setvar! mbot_HolySymbols 8
+                elseif ingump "7/" 1387930325
+                    @setvar! mbot_HolySymbols 7
+                elseif ingump "6/" 1387930325
+                    @setvar! mbot_HolySymbols 6
+                elseif ingump "5/" 1387930325
+                    @setvar! mbot_HolySymbols 5
+                elseif ingump "4/" 1387930325
+                    @setvar! mbot_HolySymbols 4
+                elseif ingump "3/" 1387930325
+                    @setvar! mbot_HolySymbols 3
+                elseif ingump "2/" 1387930325
+                    @setvar! mbot_HolySymbols 2
+                elseif ingump "1/" 1387930325
+                    @setvar! mbot_HolySymbols 1
+                elseif ingump "0/" 1387930325
+                    @setvar! mbot_HolySymbols 0
+                endif
+            endif
+            settimer mbot_Chiv_SymbolCheckTimer 0
+        endif
+
+        ##### Chivalry Gate A - Noble Sacrifice / Holy Light (emergency heals, no reserve)
+        if varexist mbot_HolySymbols
+
+            @setvar! mbot_BOT_UseNobleSacrifice 0
+            if mconfig_Chiv_UseNobleSacrificeAutomatically = 1 and skill "chivalry" >= 80 and timer mbot_NobleSacrificeTimer >= mbot_NobleSacrificeTimerCD
+                if mconfig_Chiv_MinSymbolsNobleSacrifice <= mbot_HolySymbols
+                    if diffhits >= mconfig_Chiv_AutoUseNobleSacrificeHpDiffTrigger
+                        @setvar! mbot_BOT_UseNobleSacrifice 1
+                    endif
+                endif
+            endif
+
+            @setvar! mbot_BOT_UseHolyLight 0
+            if mconfig_Chiv_UseHolyLightAutomatically = 1 and skill "chivalry" >= 95 and timer mbot_HolyLightTimer >= mbot_HolyLightTimerCD
+                if mconfig_Chiv_MinSymbolsHolyLight <= mbot_HolySymbols
+                    if diffhits >= mconfig_Chiv_AutoHolyLightHpDiffTrigger
+                        @setvar! mbot_BOT_UseHolyLight 1
+                    endif
+                endif
+            endif
+
+            if mbot_BOT_UseNobleSacrifice = 1
+
+                if targetexists
+                    hotkey "Clear Current Target"
+                endif
+
+                say "[NobleSacrifice"
+                wft 500
+                if targetexists
+                    while insysmsg "Holy symbols remaining"
+                    endwhile
+                    hotkey "Target Self"
+                    getlabel backpack mbot_PingCheck
+                    if not targetexists
+                        if insysmsg "Holy symbols remaining"
+                            cooldown "Noble Sacrifice" mbot_NobleSacrificeTimerCD
+                            settimer mbot_NobleSacrificeTimer 0
+                            settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
+                        endif
+                    else
+                        hotkey "Cancel Current Target"
+                    endif
+                endif
+                if skill "Healing" > 0 and findtype 3617 self
+                    while insysmsg "You begin applying"
+                    endwhile
+                    hotkey "Bandage Self"
+                    getlabel backpack mbot_PingCheck
+                    if insysmsg "You begin applying"
+                        settimer mbot_BandageTimer 0
+                    endif
+                endif            
+            elseif mbot_BOT_UseHolyLight = 1
+                while insysmsg "Holy symbols remaining"
+                endwhile
+                say "[HolyLight"
+                getlabel backpack mbot_PingCheck
+                if insysmsg "Holy symbols remaining"
+                    cooldown "Holy Light" mbot_HolyLightTimerCD
+                    settimer mbot_HolyLightTimer 0
+                    settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
+                endif
+            endif
+
+        endif
+
+        ##### Chivalry Gate B - Close Wounds / Cleanse By Fire (respects reserve)
+        if varexist mbot_HolySymbols
+
+            @setvar! mbot_BOT_UseCloseWounds 0
+            if findbuff "disease" or findbuff "bleed"
+                if mconfig_Chiv_UseCloseWoundsAutomatically = 1 and mconfig_Chiv_MinSymbolsCloseWounds <= mbot_HolySymbols and skill "chivalry" >= 70 and timer mbot_CloseWoundsTimer >= mbot_CloseWoundsTimerCD
+                    if diffhits >= mconfig_Chiv_AutoCloseWoundHpDiffTrigger
+                        @setvar! mbot_BOT_UseCloseWounds 1
+                    endif
+                endif
+            endif
+
+            @setvar! mbot_BOT_UseCleanseByFire 0
+            if poisoned and mconfig_Chiv_UseCleanseByFireAutomatically = 1 and mconfig_Chiv_MinSymbolsCleanseByFire <= mbot_HolySymbols and skill "chivalry" >= 60 and timer mbot_CleanseByFireTimer >= mbot_CleanseByFireTimerCD
+                @setvar! mbot_BOT_UseCleanseByFire 1
+            endif
+
+            if mbot_BOT_UseCloseWounds = 1
+                while insysmsg "Holy symbols remaining"
+                endwhile
+                say "[CloseWounds"
+                getlabel backpack mbot_PingCheck
+                if insysmsg "Holy symbols remaining"
+                    cooldown "Close Wounds" mbot_CloseWoundsTimerCD
+                    settimer mbot_CloseWoundsTimer 0
+                    settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
+                endif
+            elseif mbot_BOT_UseCleanseByFire = 1
+                while insysmsg "Holy symbols remaining"
+                endwhile
+                say "[CleanseByFire"
+                getlabel backpack mbot_PingCheck
+                if insysmsg "Holy symbols remaining"
+                    cooldown "Cleanse By Fire" mbot_CleanseByFireTimerCD
+                    settimer mbot_CleanseByFireTimer 0
+                    settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
+                endif
+            endif
+
+        endif
+
         ##### Out of Combat: Thief Pouch Alert
         if mconfig_Thief_AlertRedPouchPop = 1 and counttype 3705 backpack 38 as mbot_RedPouchCount
             if mbot_RedPouchCountTotal != 0 and mbot_RedPouchCountTotal != mbot_RedPouchCount
@@ -687,158 +839,6 @@ while not dead
             endif
         endif
     
-        ##### Out of Combat: Chivalry Symbol Count Detection
-        if timer mbot_Chiv_SymbolCheckTimer >= mbot_Chiv_SymbolCheckTimerCD
-            if not gumpexists 1387930325 and skill "chivalry" >= 50
-                say '[chivalryhotbar'
-                waitforgump 1387930325 500
-                if not gumpexists 1387930325
-                    overhead "!!!!!!!!!! CHIVALRY HOTBAR GUMP NOT FOUND !!!!!!!!!!" 34
-                endif
-            endif
-            if gumpexists 1387930325
-                if cooldown PVP
-                    unsetvar mbot_HolySymbols
-                elseif ingump "21/" 1387930325 or ingump "20/" 1387930325 or ingump "19/" 1387930325 or ingump "18/" 1387930325 or ingump "17/" 1387930325 or ingump "16/" 1387930325 or ingump "15/" 1387930325 or ingump "14/" 1387930325 or ingump "13/" 1387930325 or ingump "12/" 1387930325
-                    # 12+ symbols is always enough for these heals - cap here instead of tracking the exact count
-                    @setvar! mbot_HolySymbols 12
-                elseif ingump "11/" 1387930325
-                    @setvar! mbot_HolySymbols 11
-                elseif ingump "10/" 1387930325
-                    @setvar! mbot_HolySymbols 10
-                elseif ingump "9/" 1387930325
-                    @setvar! mbot_HolySymbols 9
-                elseif ingump "8/" 1387930325
-                    @setvar! mbot_HolySymbols 8
-                elseif ingump "7/" 1387930325
-                    @setvar! mbot_HolySymbols 7
-                elseif ingump "6/" 1387930325
-                    @setvar! mbot_HolySymbols 6
-                elseif ingump "5/" 1387930325
-                    @setvar! mbot_HolySymbols 5
-                elseif ingump "4/" 1387930325
-                    @setvar! mbot_HolySymbols 4
-                elseif ingump "3/" 1387930325
-                    @setvar! mbot_HolySymbols 3
-                elseif ingump "2/" 1387930325
-                    @setvar! mbot_HolySymbols 2
-                elseif ingump "1/" 1387930325
-                    @setvar! mbot_HolySymbols 1
-                elseif ingump "0/" 1387930325
-                    @setvar! mbot_HolySymbols 0
-                endif
-            endif
-            settimer mbot_Chiv_SymbolCheckTimer 0
-        endif
-
-        ##### Chivalry Gate A - Noble Sacrifice / Holy Light (emergency heals, no reserve)
-        if varexist mbot_HolySymbols
-
-            @setvar! mbot_BOT_UseNobleSacrifice 0
-            if mconfig_Chiv_UseNobleSacrificeAutomatically = 1 and skill "chivalry" >= 80 and timer mbot_NobleSacrificeTimer >= mbot_NobleSacrificeTimerCD
-                if mconfig_Chiv_MinSymbolsNobleSacrifice <= mbot_HolySymbols
-                    if diffhits >= mconfig_Chiv_AutoUseNobleSacrificeHpDiffTrigger
-                        @setvar! mbot_BOT_UseNobleSacrifice 1
-                    endif
-                endif
-            endif
-
-            @setvar! mbot_BOT_UseHolyLight 0
-            if mconfig_Chiv_UseHolyLightAutomatically = 1 and skill "chivalry" >= 95 and timer mbot_HolyLightTimer >= mbot_HolyLightTimerCD
-                if mconfig_Chiv_MinSymbolsHolyLight <= mbot_HolySymbols
-                    if diffhits >= mconfig_Chiv_AutoHolyLightHpDiffTrigger
-                        @setvar! mbot_BOT_UseHolyLight 1
-                    endif
-                endif
-            endif
-
-            if mbot_BOT_UseNobleSacrifice = 1
-
-                if targetexists
-                    hotkey "Clear Current Target"
-                endif
-
-                say "[NobleSacrifice"
-                wft 500
-                if targetexists
-                    while insysmsg "Holy symbols remaining"
-                    endwhile
-                    hotkey "Target Self"
-                    getlabel backpack mbot_PingCheck
-                    if not targetexists
-                        if insysmsg "Holy symbols remaining"
-                            cooldown "Noble Sacrifice" mbot_NobleSacrificeTimerCD
-                            settimer mbot_NobleSacrificeTimer 0
-                            settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
-                        endif
-                    else
-                        hotkey "Cancel Current Target"
-                    endif
-                endif
-                if skill "Healing" > 0 and findtype 3617 self
-                    while insysmsg "You begin applying"
-                    endwhile
-                    hotkey "Bandage Self"
-                    getlabel backpack mbot_PingCheck
-                    if insysmsg "You begin applying"
-                        settimer mbot_BandageTimer 0
-                    endif
-                endif            
-            elseif mbot_BOT_UseHolyLight = 1
-                while insysmsg "Holy symbols remaining"
-                endwhile
-                say "[HolyLight"
-                getlabel backpack mbot_PingCheck
-                if insysmsg "Holy symbols remaining"
-                    cooldown "Holy Light" mbot_HolyLightTimerCD
-                    settimer mbot_HolyLightTimer 0
-                    settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
-                endif
-            endif
-
-        endif
-
-        ##### Chivalry Gate B - Close Wounds / Cleanse By Fire (respects reserve)
-        if varexist mbot_HolySymbols
-
-            @setvar! mbot_BOT_UseCloseWounds 0
-            if findbuff "disease" or findbuff "bleed"
-                if mconfig_Chiv_UseCloseWoundsAutomatically = 1 and mconfig_Chiv_MinSymbolsCloseWounds <= mbot_HolySymbols and skill "chivalry" >= 70 and timer mbot_CloseWoundsTimer >= mbot_CloseWoundsTimerCD
-                    if diffhits >= mconfig_Chiv_AutoCloseWoundHpDiffTrigger
-                        @setvar! mbot_BOT_UseCloseWounds 1
-                    endif
-                endif
-            endif
-
-            @setvar! mbot_BOT_UseCleanseByFire 0
-            if poisoned and mconfig_Chiv_UseCleanseByFireAutomatically = 1 and mconfig_Chiv_MinSymbolsCleanseByFire <= mbot_HolySymbols and skill "chivalry" >= 60 and timer mbot_CleanseByFireTimer >= mbot_CleanseByFireTimerCD
-                @setvar! mbot_BOT_UseCleanseByFire 1
-            endif
-
-            if mbot_BOT_UseCloseWounds = 1
-                while insysmsg "Holy symbols remaining"
-                endwhile
-                say "[CloseWounds"
-                getlabel backpack mbot_PingCheck
-                if insysmsg "Holy symbols remaining"
-                    cooldown "Close Wounds" mbot_CloseWoundsTimerCD
-                    settimer mbot_CloseWoundsTimer 0
-                    settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
-                endif
-            elseif mbot_BOT_UseCleanseByFire = 1
-                while insysmsg "Holy symbols remaining"
-                endwhile
-                say "[CleanseByFire"
-                getlabel backpack mbot_PingCheck
-                if insysmsg "Holy symbols remaining"
-                    cooldown "Cleanse By Fire" mbot_CleanseByFireTimerCD
-                    settimer mbot_CleanseByFireTimer 0
-                    settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
-                endif
-            endif
-
-        endif
-
         ##### Fight State Detection (auto-target mode vs manually-set target)
         @setvar! mbot_CurrentBotTargetAttacked 0
 
