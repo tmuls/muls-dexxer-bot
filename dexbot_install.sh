@@ -11,8 +11,11 @@
 set -euo pipefail
 shopt -s nullglob
 
+INSTALLER_VERSION="1"
+
 REPO="tmuls/muls-dexxer-bot"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SELF_PATH="$SCRIPT_DIR/$(basename "${BASH_SOURCE[0]}")"
 TMP_DIR="$SCRIPT_DIR/muls_bot_install_tmp"
 ZIP_PATH="$SCRIPT_DIR/muls_bot_install_release.zip"
 
@@ -51,6 +54,36 @@ find_subdir_ci() {
 echo "Muls Dexxer Bot installer"
 echo
 
+echo "Fetching latest release info..."
+API_JSON="$(curl -sL "https://api.github.com/repos/$REPO/releases/latest")"
+
+ZIP_URL="$(printf '%s' "$API_JSON" | grep -o '"browser_download_url": *"[^"]*\.zip"' | head -1 | sed -E 's/.*"(https[^"]*)"/\1/')"
+INSTALLER_URL="$(printf '%s' "$API_JSON" | grep -o '"browser_download_url": *"[^"]*dexbot_install\.sh"' | head -1 | sed -E 's/.*"(https[^"]*)"/\1/')"
+TAG_NAME="$(printf '%s' "$API_JSON" | grep -o '"tag_name": *"[^"]*"' | head -1 | sed -E 's/.*"tag_name": *"([^"]*)"/\1/')"
+
+if [ -z "$ZIP_URL" ]; then
+    echo "Could not find a release zip asset - aborting. (Rate limited? No internet? Check https://github.com/$REPO/releases)"
+    exit 1
+fi
+
+if [ -n "$INSTALLER_URL" ]; then
+    mkdir -p "$TMP_DIR"
+    LATEST_INSTALLER_PATH="$TMP_DIR/dexbot_install_latest.sh"
+    curl -sL -o "$LATEST_INSTALLER_PATH" "$INSTALLER_URL"
+    latest_installer_ver="$(grep -oE '^INSTALLER_VERSION="[0-9]+"' "$LATEST_INSTALLER_PATH" | grep -oE '[0-9]+' | head -1)"
+    latest_installer_ver="${latest_installer_ver:-0}"
+
+    if [ "$latest_installer_ver" -gt "$INSTALLER_VERSION" ]; then
+        echo "A newer version of this installer is available (v$INSTALLER_VERSION -> v$latest_installer_ver)."
+        echo "Updating and re-running..."
+        cp "$LATEST_INSTALLER_PATH" "$SELF_PATH"
+        chmod +x "$SELF_PATH"
+        rm -rf "$TMP_DIR"
+        echo
+        exec "$SELF_PATH" "$@"
+    fi
+fi
+
 COMBAT_DIR="$(find_subdir_ci "$SCRIPT_DIR" "Combat")"
 DEST_DIR="$(find_subdir_ci "$COMBAT_DIR" "Dexxer")"
 
@@ -76,20 +109,9 @@ echo
 
 mkdir -p "$DEST_DIR"
 
-echo "Fetching latest release info..."
-API_JSON="$(curl -sL "https://api.github.com/repos/$REPO/releases/latest")"
-
-DOWNLOAD_URL="$(printf '%s' "$API_JSON" | grep -o '"browser_download_url": *"[^"]*\.zip"' | head -1 | sed -E 's/.*"(https[^"]*)"/\1/')"
-TAG_NAME="$(printf '%s' "$API_JSON" | grep -o '"tag_name": *"[^"]*"' | head -1 | sed -E 's/.*"tag_name": *"([^"]*)"/\1/')"
-
-if [ -z "$DOWNLOAD_URL" ]; then
-    echo "Could not find a release zip asset - aborting. (Rate limited? No internet? Check https://github.com/$REPO/releases)"
-    exit 1
-fi
-
 echo "Latest release: ${TAG_NAME:-unknown}"
 echo "Downloading..."
-curl -sL -o "$ZIP_PATH" "$DOWNLOAD_URL"
+curl -sL -o "$ZIP_PATH" "$ZIP_URL"
 
 echo "Extracting..."
 mkdir -p "$TMP_DIR"
