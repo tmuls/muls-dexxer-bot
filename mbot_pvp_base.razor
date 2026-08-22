@@ -237,12 +237,10 @@ while not dead
 
         if find mbot_CurrentBotTarget ground -1 -1 mbot_FightingRangeCheck
 
-            if timer mbot_CurrentBotTargetOverheadTimer >= mconfig_Target_CurrentOverheadTimerCD and listexists mconfig_Target_CurrentOverheadText
-                foreach mbot_Overhead in mconfig_Target_CurrentOverheadText
-                    if find mbot_CurrentBotTarget
-                        overhead mbot_Overhead mconfig_Target_CurrentOverheadHue mbot_CurrentBotTarget
-                    endif
-                endfor
+            if mconfig_Target_Overhead_Enabled = 1 and timer mbot_CurrentBotTargetOverheadTimer >= mconfig_Target_CurrentOverheadTimerCD
+                if find mbot_CurrentBotTarget
+                    overhead "{{mconfig_Target_CurrentOverheadText}}" mconfig_Target_CurrentOverheadHue mbot_CurrentBotTarget
+                endif
                 settimer mbot_CurrentBotTargetOverheadTimer 0
             endif
 
@@ -266,12 +264,10 @@ while not dead
                     endwhile
                     target mbot_CurrentBotTarget
                     if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                        if timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
-                            foreach mbot_Overhead in mconfig_Target_UnableToAttackOverheadText
-                                if find mbot_CurrentBotTarget
-                                    overhead mbot_Overhead mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
-                                endif
-                            endfor
+                        if mconfig_Target_Overhead_Enabled = 1 and timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD
+                            if find mbot_CurrentBotTarget
+                                overhead "{{mconfig_Target_UnableToAttackOverheadText}}" mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
+                            endif
                             settimer mbot_CurrentBotTargetOverheadTimer 0
                         endif
                         @setvar! mbot_CurrentBotTarget 0
