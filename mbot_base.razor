@@ -511,7 +511,8 @@ while not dead
             if mbot_HasWeapon = 0
                 if find mbot_BOT_CurrentRightHandWeapon backpack
                     dclick mbot_BOT_CurrentRightHandWeapon
-                    getlabel backpack mbot_PingCheck
+                    while queued
+                    endwhile
                 endif
             endif
 
@@ -524,7 +525,8 @@ while not dead
                     if " aspect" in mbot_WeaponCandidateDesc or "exceptional " in mbot_WeaponCandidateDesc or "supremely" in mbot_WeaponCandidateDesc or "exceedingly" in mbot_WeaponCandidateDesc or "vanquishing" in mbot_WeaponCandidateDesc or "power" in mbot_WeaponCandidateDesc
                         overhead "Weapon found! Auto-equipping." 66
                         dclick mbot_WeaponCandidate
-                        getlabel backpack mbot_PingCheck                        
+                        while queued
+                        endwhile
                         @setvar! mbot_FoundFallbackWeapon 1
                         @setvar! mbot_BOT_CurrentRightHandWeapon mbot_WeaponCandidate
                     else
@@ -532,17 +534,6 @@ while not dead
                     endif
                 endwhile
                 @clearignore
-                if mbot_FoundFallbackWeapon = 0
-                    if mconfig_Weapon_AutoRecallWhenEmpty = 1
-                        for 3
-                            overhead "Weapon not found, auto-recalling home" 33
-                            wait 250
-                        endfor
-                        hotkey "Play Script: Combat\Dexxer\mbot_recall_home"
-                    else
-                        overhead "WARNING: Weapon not found!" 33
-                    endif
-                endif
             endif
         endif
 
@@ -552,7 +543,8 @@ while not dead
             if not findlayer self lefthand
                 if find mbot_BOT_CurrentLeftHandWeapon backpack
                     dclick mbot_BOT_CurrentLeftHandWeapon
-                    getlabel backpack mbot_PingCheck
+                    while queued
+                    endwhile
                 endif
             endif
 
@@ -564,7 +556,8 @@ while not dead
                     getlabel mbot_ShieldCandidate mbot_ShieldCandidateDesc
                     if "exceptional" in mbot_ShieldCandidateDesc or "invulnerable" in mbot_ShieldCandidateDesc or "fortified" in mbot_ShieldCandidateDesc
                         dclick mbot_ShieldCandidate
-                        getlabel backpack mbot_PingCheck
+                        while queued
+                        endwhile
                         overhead "Shield found! Auto-equipping..." 66
                         @setvar! mbot_FoundFallbackShield 1
                         @setvar! mbot_BOT_CurrentLeftHandWeapon mbot_ShieldCandidate
@@ -573,16 +566,42 @@ while not dead
                     endif
                 endwhile
                 @clearignore
-                if mbot_FoundFallbackShield = 0
-                    if mconfig_Shield_AutoRecallWhenEmpty = 1
-                        for 3
-                            overhead "Shield not found, auto-recalling home" 33
-                            wait 250
-                        endfor
-                        hotkey "Play Script: Combat\Dexxer\mbot_recall_home"
-                    else
-                        overhead "WARNING: Shield not found!" 33
-                    endif
+            endif
+        endif
+
+        ##### Weapon/Shield Missing - Auto Recall (simple final check, after both blocks above have had a chance to equip)
+        @setvar! mbot_HasWeapon 0
+        if findlayer self righthand
+            @setvar! mbot_HasWeapon 1
+        elseif findlayer self lefthand
+            @setvar! mbot_HasWeapon 1
+            if findtype 7026|7027|7029|7031|7033|7034|7035|7107|7109|31002|31130 lefthand
+                @setvar! mbot_HasWeapon 0
+            endif
+        endif
+
+        if mbot_HasWeapon = 0
+            if mconfig_Weapon_AutoRecallWhenEmpty = 1
+                for 3
+                    overhead "Weapon not found, auto-recalling home" 33
+                    wait 250
+                endfor
+                hotkey "Play Script: Combat\Dexxer\mbot_recall_home"
+            else
+                overhead "WARNING: Weapon not found!" 33
+            endif
+        else
+            # Pickaxe occupies both hands but only shows in righthand - skip
+            # shield check if one's equipped.
+            if not findtype 3718 righthand and not findlayer self lefthand
+                if mconfig_Shield_AutoRecallWhenEmpty = 1
+                    for 3
+                        overhead "Shield not found, auto-recalling home" 33
+                        wait 250
+                    endfor
+                    hotkey "Play Script: Combat\Dexxer\mbot_recall_home"
+                else
+                    overhead "WARNING: Shield not found!" 33
                 endif
             endif
         endif
