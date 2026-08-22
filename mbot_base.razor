@@ -498,7 +498,6 @@ while not dead
 
     if mbot_SmartEquipShouldRun = 1
         ##### Smart Weapon Equip
-        @setvar! mbot_WeaponMissing 0
         if mconfig_Weapon_SmartEquip = 1
             @setvar! mbot_HasWeapon 0
             if findlayer self righthand
@@ -515,20 +514,6 @@ while not dead
                     getlabel backpack mbot_PingCheck
                     while queued
                     endwhile
-                endif
-            endif
-
-            # Re-check after the equip attempt - mbot_HasWeapon above may be
-            # stale (e.g. read right after a scene load/recall, before the
-            # client re-synced its own equipped-layer data).
-            if mbot_HasWeapon = 0
-                if findlayer self righthand
-                    @setvar! mbot_HasWeapon 1
-                elseif findlayer self lefthand
-                    @setvar! mbot_HasWeapon 1
-                    if findtype 7026|7027|7029|7031|7033|7034|7035|7107|7109|31002|31130 lefthand
-                        @setvar! mbot_HasWeapon 0
-                    endif
                 endif
             endif
 
@@ -551,15 +536,11 @@ while not dead
                     endif
                 endwhile
                 @clearignore
-                if mbot_FoundFallbackWeapon = 0
-                    @setvar! mbot_WeaponMissing 1
-                endif
             endif
         endif
 
         ##### Smart Shield Equip
         # Special 2h ids that are not found in the lefthand layer when equipped (pickaxe)
-        @setvar! mbot_ShieldMissing 0
         if mconfig_Shield_SmartEquip = 1 and not findtype 3718 righthand
             if not findlayer self lefthand
                 if find mbot_BOT_CurrentLeftHandWeapon backpack
@@ -589,14 +570,21 @@ while not dead
                     endif
                 endwhile
                 @clearignore
-                if mbot_FoundFallbackShield = 0
-                    @setvar! mbot_ShieldMissing 1
-                endif
             endif
         endif
 
-        ##### Weapon/Shield Missing - Auto Recall (checked after both blocks above have had a chance to equip)
-        if mbot_WeaponMissing = 1
+        ##### Weapon/Shield Missing - Auto Recall (simple final check, after both blocks above have had a chance to equip)
+        @setvar! mbot_HasWeapon 0
+        if findlayer self righthand
+            @setvar! mbot_HasWeapon 1
+        elseif findlayer self lefthand
+            @setvar! mbot_HasWeapon 1
+            if findtype 7026|7027|7029|7031|7033|7034|7035|7107|7109|31002|31130 lefthand
+                @setvar! mbot_HasWeapon 0
+            endif
+        endif
+
+        if mbot_HasWeapon = 0
             if mconfig_Weapon_AutoRecallWhenEmpty = 1
                 for 3
                     overhead "Weapon not found, auto-recalling home" 33
@@ -606,7 +594,7 @@ while not dead
             else
                 overhead "WARNING: Weapon not found!" 33
             endif
-        elseif mbot_ShieldMissing = 1
+        elseif mconfig_Shield_SmartEquip = 1 and not findtype 3718 righthand and not findlayer self lefthand
             if mconfig_Shield_AutoRecallWhenEmpty = 1
                 for 3
                     overhead "Shield not found, auto-recalling home" 33
