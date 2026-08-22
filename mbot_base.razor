@@ -284,6 +284,7 @@ endif
 
 ##### Smart Equip Timer
 settimer mbot_SmartEquipTimer mconfig_SmartEquip_TimerCD
+@setvar! mbot_SmartEquipHasRun 0
 
 ##### Version Announcement
 if mconfig_General_ShowVersion = 1
@@ -330,7 +331,16 @@ while not dead
         endif
     endif
 
-    if timer mbot_SmartEquipTimer >= mconfig_SmartEquip_TimerCD
+    @setvar! mbot_SmartEquipShouldRun 0
+    if mconfig_SmartEquip_RunOnce = 1
+        if mbot_SmartEquipHasRun = 0
+            @setvar! mbot_SmartEquipShouldRun 1
+        endif
+    elseif timer mbot_SmartEquipTimer >= mconfig_SmartEquip_TimerCD
+        @setvar! mbot_SmartEquipShouldRun 1
+    endif
+
+    if mbot_SmartEquipShouldRun = 1
         ##### Smart Weapon Equip
         if mconfig_Weapon_SmartEquip = 1
             @setvar! mbot_HasWeapon 0
@@ -421,6 +431,7 @@ while not dead
             endif
         endif
 
+        @setvar! mbot_SmartEquipHasRun 1
         settimer mbot_SmartEquipTimer 0
     endif
 
