@@ -12,6 +12,10 @@ removelist mbot_PreviousScript
 createlist mbot_PreviousScript
 pushlist mbot_PreviousScript "Play Script: Combat\Dexxer\mbot_base"
 
+# Bump this whenever a config value is added/removed/renamed, and bump
+# mbot_ExpectedInitVersion in mbot_base.razor to match.
+@setvar! mconfig_InitVersion 1
+
 @setvar! mconfig_General_ShowVersion 0
 
 @setvar! mconfig_Bot_FightAutoTarget 1
