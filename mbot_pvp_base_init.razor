@@ -48,11 +48,23 @@ pushlist mbot_PreviousScript "Play Script: Combat\Dexxer\mbot_pvp_base"
 # Custom Target Overhead Messages
 removelist mconfig_Target_CurrentOverheadText
 createlist mconfig_Target_CurrentOverheadText
+# Jaseowns original
 pushlist mconfig_Target_CurrentOverheadText "▼"
+# Descriptive words
+//pushlist mconfig_Target_CurrentOverheadText "TARGET"
+# Minimal/quiet
+//pushlist mconfig_Target_CurrentOverheadText "•"
 
 removelist mconfig_Target_UnableToAttackOverheadText
 createlist mconfig_Target_UnableToAttackOverheadText
+# Jaseowns original
 pushlist mconfig_Target_UnableToAttackOverheadText "●"
+# Higher-contrast
+//pushlist mconfig_Target_UnableToAttackOverheadText "✖"
+# Descriptive words
+//pushlist mconfig_Target_UnableToAttackOverheadText "CAN'T HIT"
+# Minimal/quiet
+//pushlist mconfig_Target_UnableToAttackOverheadText "x"
 
 //unsetvar mbot_BOT_CurrentRightHandWeapon
 //unsetvar mbot_BOT_CurrentLeftHandWeapon
