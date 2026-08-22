@@ -282,8 +282,8 @@ if skill "Tracking" > 0
     endif
 endif
 
-##### Run once flags
-@setvar! mbot_SmartEquipHasRun 0
+##### Smart Equip Timer
+settimer mbot_SmartEquipTimer mconfig_SmartEquip_TimerCD
 
 ##### Version Announcement
 if mconfig_General_ShowVersion = 1
@@ -330,7 +330,7 @@ while not dead
         endif
     endif
 
-    if mconfig_SmartEquip_RunOnce = 0 or mbot_SmartEquipHasRun = 0
+    if timer mbot_SmartEquipTimer >= mconfig_SmartEquip_TimerCD
         ##### Smart Weapon Equip
         if mconfig_Weapon_SmartEquip = 1
             @setvar! mbot_HasWeapon 0
@@ -421,7 +421,7 @@ while not dead
             endif
         endif
 
-        @setvar! mbot_SmartEquipHasRun 1
+        settimer mbot_SmartEquipTimer 0
     endif
 
     ##### Out of Combat: Weapon Re-equip
