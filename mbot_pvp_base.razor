@@ -1,0 +1,323 @@
+################################################################
+### Muls Dexxer Bot - PvP Base v1.0
+### PvP profile - see mbot_base.razor for the full PvM engine
+#
+# Structured PvP disables timers, cooldown, getlabel, gump reads, and most
+# resource/state checks (hits, mana, stam, poisoned, findbuff, notoriety,
+# dead-on-others) - see outlands-razor-scripting/references/pvp.md. Removed
+# below: Chivalry, all potion automation, self-bandage automation, parry
+# stance switching, weapon poison application, overweight gold drop,
+# tracking. Also out of scope for a PvP profile regardless of restrictions:
+# Taming, Bard, Skinning.
+#
+# Kept but pacing-only dependencies left as-is (single point of failure on
+# a disabled primitive, not multiple combined) - worth field-testing:
+# Weapon Re-equip, Weapon Ability firing, LOS-probe timer, target-death
+# detection, Poison Sting/casting checks.
+#
+# getlabel used only as a sync ping (Ping Sync pattern) has been dropped
+# from Smart Equip - PvP has no substitute, so those calls just don't wait.
+# Paralyze Escape (Trapped Pouch) is left completely untouched - field-
+# confirmed to still work despite pvp.md listing "paralyzed" as disabled.
+################################################################
+
+##### Target State
+@setvar! mbot_CurrentBotTarget 0
+@setvar! mbot_BOT_FIGHT 0
+@setvar! mbot_FightingRangeCheck 12
+
+settimer mbot_CurrentBotTargetOverheadTimer mconfig_Target_CurrentOverheadTimerCD
+settimer mbot_CurrentBotTargetUnableToAttackOverheadTimer mconfig_Target_UnableToAttackOverheadTimerCD
+
+##### Combat Support Timers
+@setvar! mbot_LOSCheckTimerCD 500
+if not timerexists mbot_LOSCheckTimer
+    settimer mbot_LOSCheckTimer mbot_LOSCheckTimerCD
+endif
+
+@setvar! mbot_UseItemTimerCD 650
+settimer mbot_UseItemTimer mbot_UseItemTimerCD
+
+settimer mbot_UseAbilityTimer mconfig_Weapon_UseAbilityTimerCD
+
+##### Weapon State Tracking
+if not varexist mbot_BOT_CurrentRightHandWeapon
+    @setvar! mbot_BOT_CurrentRightHandWeapon 0
+endif
+if findlayer self righthand as mbot_RightHandWeapon
+    @setvar! mbot_BOT_CurrentRightHandWeapon mbot_RightHandWeapon
+endif
+
+if not varexist mbot_BOT_CurrentLeftHandWeapon
+    @setvar! mbot_BOT_CurrentLeftHandWeapon 0
+endif
+if findlayer self lefthand as mbot_LeftHandWeapon
+    @setvar! mbot_BOT_CurrentLeftHandWeapon mbot_LeftHandWeapon
+endif
+
+@setvar! mbot_RedPouchCountTotal 0
+
+##### Run once flags
+@setvar! mbot_SmartEquipHasRun 0
+
+while not dead
+    ##### Out of Combat: Thief Pouch Alert
+    if mconfig_Thief_AlertRedPouchPop = 1 and counttype 3705 backpack 38 as mbot_RedPouchCount
+        if mbot_RedPouchCountTotal != 0 and mbot_RedPouchCountTotal != mbot_RedPouchCount
+            overhead "Warning: THIEF we lost a pouch!" 34
+        else
+            @setvar! mbot_RedPouchCountTotal mbot_RedPouchCount
+        endif
+    endif
+
+    if mconfig_SmartEquip_RunOnce = 0 or mbot_SmartEquipHasRun = 0
+        ##### Smart Weapon Equip
+        if mconfig_Weapon_SmartEquip = 1
+            @setvar! mbot_HasWeapon 0
+            if findlayer self righthand
+                @setvar! mbot_HasWeapon 1
+            elseif findlayer self lefthand
+                @setvar! mbot_HasWeapon 1
+                if findtype 7026|7027|7029|7031|7033|7034|7035|7107|7109|31002|31130 lefthand
+                    @setvar! mbot_HasWeapon 0
+                endif
+            endif
+            if mbot_HasWeapon = 0
+                if find mbot_BOT_CurrentRightHandWeapon backpack
+                    dclick mbot_BOT_CurrentRightHandWeapon
+                endif
+            endif
+
+            if mbot_HasWeapon = 0
+                overhead "Smart weapon equip searching..." 66
+                @clearignore
+                @setvar! mbot_FoundFallbackWeapon 0
+                while mbot_FoundFallbackWeapon = 0 and findtype 31017|31019|31021|31023|31025|31027|31029|31031|31033|31035|31037|31038|31041|31043|31045|31047|31049|31051|31053|31055|3920|5042|5117|30990|30993|30994|30995|31184|31186|67773|67774|67775|67776|67777|67778|3719|3922|3938|5121|5123|5125|30989|30992|30996|30997|30998|31176|31188|3568|3721|3932|5040|5044|5112|5127|5177|5179|5181|30991|30999|31000|31001|31014|31178|31180|31182|3909|3911|3913|3915|3917|3934|3937|5046|5049|5115|5119|5182|5185|5187|30988|31128|31190|67713|67723|67734|67744|67754|67764|22187|31141|31142 backpack as mbot_WeaponCandidate
+                    getlabel mbot_WeaponCandidate mbot_WeaponCandidateDesc
+                    if " aspect" in mbot_WeaponCandidateDesc or "exceptional " in mbot_WeaponCandidateDesc or "supremely" in mbot_WeaponCandidateDesc or "exceedingly" in mbot_WeaponCandidateDesc or "vanquishing" in mbot_WeaponCandidateDesc or "power" in mbot_WeaponCandidateDesc
+                        overhead "Weapon found! Auto-equipping." 66
+                        dclick mbot_WeaponCandidate
+                        @setvar! mbot_FoundFallbackWeapon 1
+                        @setvar! mbot_BOT_CurrentRightHandWeapon mbot_WeaponCandidate
+                    else
+                        @ignore mbot_WeaponCandidate
+                    endif
+                endwhile
+                @clearignore
+                if mbot_FoundFallbackWeapon = 0
+                    if mconfig_Weapon_AutoRecallWhenEmpty = 1
+                        for 3
+                            overhead "Weapon not found, auto-recalling home" 33
+                            wait 250
+                        endfor
+                        hotkey "Play Script: Combat\Dexxer\mbot_recall_home"
+                    else
+                        overhead "WARNING: Weapon not found!" 33
+                    endif
+                endif
+            endif
+        endif
+
+        ##### Smart Shield Equip
+        # Special 2h ids that are not found in the lefthand layer when equipped (pickaxe)
+        if mconfig_Shield_SmartEquip = 1 and not findtype 3718 righthand
+            if not findlayer self lefthand
+                if find mbot_BOT_CurrentLeftHandWeapon backpack
+                    dclick mbot_BOT_CurrentLeftHandWeapon
+                endif
+            endif
+
+            if not findlayer self lefthand
+                overhead "Smart shield equip searching..." 66
+                @clearignore
+                @setvar! mbot_FoundFallbackShield 0
+                while mbot_FoundFallbackShield = 0 and findtype 7026|7027|7029|7031|7033|7034|7035|7107|7109|31002|31130 backpack as mbot_ShieldCandidate
+                    getlabel mbot_ShieldCandidate mbot_ShieldCandidateDesc
+                    if "exceptional" in mbot_ShieldCandidateDesc or "invulnerable" in mbot_ShieldCandidateDesc or "fortified" in mbot_ShieldCandidateDesc
+                        dclick mbot_ShieldCandidate
+                        overhead "Shield found! Auto-equipping..." 66
+                        @setvar! mbot_FoundFallbackShield 1
+                        @setvar! mbot_BOT_CurrentLeftHandWeapon mbot_ShieldCandidate
+                    else
+                        @ignore mbot_ShieldCandidate
+                    endif
+                endwhile
+                @clearignore
+                if mbot_FoundFallbackShield = 0
+                    if mconfig_Shield_AutoRecallWhenEmpty = 1
+                        for 3
+                            overhead "Shield not found, auto-recalling home" 33
+                            wait 250
+                        endfor
+                        hotkey "Play Script: Combat\Dexxer\mbot_recall_home"
+                    else
+                        overhead "WARNING: Shield not found!" 33
+                    endif
+                endif
+            endif
+        endif
+
+        @setvar! mbot_SmartEquipHasRun 1
+    endif
+
+    ##### Out of Combat: Weapon Re-equip
+    if casting
+        settimer mbot_UseItemTimer 0
+    endif
+
+    if not queued and find mbot_BOT_CurrentRightHandWeapon backpack and timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+        if findlayer self righthand as mbot_RightHandWeapon
+            @setvar! mbot_BOT_CurrentRightHandWeapon mbot_RightHandWeapon
+        else
+            dclick mbot_BOT_CurrentRightHandWeapon
+            settimer mbot_UseItemTimer 0
+        endif
+    elseif not queued and find mbot_BOT_CurrentLeftHandWeapon backpack and timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+        if findlayer self lefthand as mbot_LeftHandWeapon
+            @setvar! mbot_BOT_CurrentLeftHandWeapon mbot_LeftHandWeapon
+        else
+            dclick mbot_BOT_CurrentLeftHandWeapon
+            settimer mbot_UseItemTimer 0
+        endif
+    endif
+
+    // Trapped
+    ##### Out of Combat: Paralyze Escape (Trapped Pouch)
+    if paralyzed and not queued
+        if findtype "pouch" backpack 38
+            yell "[pouch"
+            getlabel backpack mbot_PingCheck
+        else
+            overhead "Out of Pouches!" 34
+        endif
+    endif
+
+    ##### Fight State Detection (manual target only - PvP has no auto-target)
+    @setvar! mbot_CurrentBotTargetAttacked 0
+
+    if insysmsg "Target a new 'Last Target'"
+        overhead "Set your target"
+        if insysmsg "Last Target set."
+            overhead "New target selected!" 89 lasttarget
+            @setvar! mbot_CurrentBotTarget lasttarget
+            @setvar! mbot_BOT_FIGHT 1
+        endif
+    endif
+
+    if insysmsg "New Target Set"
+        while insysmsg "New Target Set"
+        endwhile
+        overhead "New target selected!" 89 lasttarget
+        @setvar! mbot_CurrentBotTarget lasttarget
+        @setvar! mbot_BOT_FIGHT 1
+    endif
+
+    if dead mbot_CurrentBotTarget
+        @setvar! mbot_BOT_FIGHT 0
+    endif
+
+    ##### In Combat
+    if mbot_BOT_FIGHT = 1
+
+        ##### In Combat: Target Acquisition
+        if insysmsg "Target a new 'Last Target'"
+            overhead "Set your target"
+            if insysmsg "Last Target set."
+                overhead "New target selected!" 89 lasttarget
+                @setvar! mbot_CurrentBotTarget lasttarget
+            endif
+        endif
+
+        if find mbot_CurrentBotTarget ground -1 -1 mbot_FightingRangeCheck
+
+            if timer mbot_CurrentBotTargetOverheadTimer >= mconfig_Target_CurrentOverheadTimerCD and listexists mconfig_Target_CurrentOverheadText
+                foreach mbot_Overhead in mconfig_Target_CurrentOverheadText
+                    if find mbot_CurrentBotTarget
+                        overhead mbot_Overhead mconfig_Target_CurrentOverheadHue mbot_CurrentBotTarget
+                    endif
+                endfor
+                settimer mbot_CurrentBotTargetOverheadTimer 0
+            endif
+
+            attack mbot_CurrentBotTarget
+
+            # TODO: longshot bro
+            if findtype 5117|3920|31184|31186|30993|31172|31169|9917 righthand or findtype 5117|3920|31184|31186|30993 lefthand
+                @setvar! mbot_DynamicRangeCheck 8
+            elseif findtype 30994|30990|30995|5042 lefthand
+                @setvar! mbot_DynamicRangeCheck 10
+            else
+                @setvar! mbot_DynamicRangeCheck 2
+            endif
+
+            ##### Shared line-of-sight probe
+            if not targetexists and mbot_CurrentBotTargetGoodLOS = 0 and timer mbot_LOSCheckTimer >= mbot_LOSCheckTimerCD
+                useskill "ArmsLore"
+                wft 500
+                if targetexists
+                    while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
+                    endwhile
+                    target mbot_CurrentBotTarget
+                    if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
+                        if timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
+                            foreach mbot_Overhead in mconfig_Target_UnableToAttackOverheadText
+                                if find mbot_CurrentBotTarget
+                                    overhead mbot_Overhead mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
+                                endif
+                            endfor
+                            settimer mbot_CurrentBotTargetOverheadTimer 0
+                        endif
+                        @setvar! mbot_CurrentBotTarget 0
+                    else
+                        @setvar! mbot_CurrentBotTargetGoodLOS 1
+                        @setvar! mbot_CurrentBotTargetAttacked 1
+                    endif
+                endif
+                if targetexists
+                    hotkey "Cancel Current Target"
+                endif
+                settimer mbot_LOSCheckTimer 0
+            endif
+
+            if find mbot_CurrentBotTarget ground -1 -1 mbot_DynamicRangeCheck
+                // assume we got it
+                @setvar! mbot_CurrentBotTargetAttacked 1
+            elseif mbot_CurrentBotTargetGoodLOS = 1 and find mbot_CurrentBotTarget ground -1 -1 mbot_DynamicRangeCheck
+                @setvar! mbot_CurrentBotTargetAttacked 1
+            endif
+        else
+            @setvar! mbot_CurrentBotTarget 0
+            @setvar! mbot_CurrentBotTargetGoodLOS 0
+        endif
+    endif
+
+    ##### Post-Attack Actions (this iteration only, if we attacked)
+    if mbot_CurrentBotTargetAttacked = 1
+
+        if mconfig_Healing_AidCountAlertLessThan20 = 1 and skill "Healing" > 0 and counttype 3617 self as mbot_BOT_AidCount
+            if 20 > mbot_BOT_AidCount
+                overhead "We are low on aids {{mbot_BOT_AidCount}}" 34
+            endif
+        endif
+
+        ##### Post-Attack: Weapon Abilities
+        if mconfig_Weapon_UseAbility1 = 1 and timer mbot_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
+            while insysmsg "You do cannot perform that ability yet." or insysmsg "You have not yet unlocked that weapon ability." or insysmsg "You do not have the required codex or skills to use that weapon ability."
+            endwhile
+            say "[WeaponAbility1"
+            settimer mbot_UseAbilityTimer 0
+        elseif mconfig_Weapon_UseAbility2 = 1 and timer mbot_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
+            while insysmsg "You do cannot perform that ability yet." or insysmsg "You have not yet unlocked that weapon ability." or insysmsg "You do not have the required codex or skills to use that weapon ability."
+            endwhile
+            say "[WeaponAbility2"
+            settimer mbot_UseAbilityTimer 0
+        elseif mconfig_Weapon_UseAbility3 = 1 and timer mbot_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
+            while insysmsg "You do cannot perform that ability yet." or insysmsg "You have not yet unlocked that weapon ability." or insysmsg "You do not have the required codex or skills to use that weapon ability."
+            endwhile
+            say "[WeaponAbility3"
+            settimer mbot_UseAbilityTimer 0
+        endif
+
+    endif
+
+endwhile
