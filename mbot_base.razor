@@ -24,7 +24,7 @@
 #
 ################################################################
 
-@setvar! mbot_version = "v1.0.20260822.1"
+@setvar! mbot_version "v1.0.20260822.1"
 
 ##### Archetype Detection
 @setvar! mbot_BardDetected 0
@@ -867,10 +867,12 @@ while not dead
         # TODO: handle hidden mobs
         if not dead mbot_CurrentBotTarget
         
-            if mconfig_Target_Overhead_Enabled = 1 and timer mbot_CurrentBotTargetOverheadTimer >= mconfig_Target_CurrentOverheadTimerCD
-                if find mbot_CurrentBotTarget
-                    overhead "{{mconfig_Target_CurrentOverheadText}}" mconfig_Target_CurrentOverheadHue mbot_CurrentBotTarget
-                endif
+            if mconfig_Target_Overhead_Enabled = 1 and timer mbot_CurrentBotTargetOverheadTimer >= mconfig_Target_CurrentOverheadTimerCD and listexists mconfig_Target_CurrentOverheadText
+                foreach mbot_Overhead in mconfig_Target_CurrentOverheadText
+                    if find mbot_CurrentBotTarget
+                        overhead mbot_Overhead mconfig_Target_CurrentOverheadHue mbot_CurrentBotTarget
+                    endif
+                endfor
                 settimer mbot_CurrentBotTargetOverheadTimer 0
             endif
 
@@ -896,10 +898,12 @@ while not dead
                 elseif listexists mconfig_Target_IgnoreMobList
                     foreach mbot_IgnoreMob in mconfig_Target_IgnoreMobList
                         if mbot_IgnoreMob in mbot_CurrentBotTargetDesc
-                            if mconfig_Target_Overhead_Enabled = 1 and timer mbot_IgnoreMobOverheadTimer >= mconfig_Target_IgnoreMobOverheadTimerCD
-                                if find mbot_CurrentBotTarget
-                                    overhead "{{mconfig_Target_IgnoreMobOverheadText}}" mconfig_Target_IgnoreMobOverheadHue mbot_CurrentBotTarget
-                                endif
+                            if mconfig_Target_Overhead_Enabled = 1 and timer mbot_IgnoreMobOverheadTimer >= mconfig_Target_IgnoreMobOverheadTimerCD and listexists mconfig_Target_IgnoreMobOverheadText
+                                foreach mbot_Overhead in mconfig_Target_IgnoreMobOverheadText
+                                    if find mbot_CurrentBotTarget
+                                        overhead mbot_Overhead mconfig_Target_IgnoreMobOverheadHue mbot_CurrentBotTarget
+                                    endif
+                                endfor
                                 settimer mbot_IgnoreMobOverheadTimer 0
                             endif
                             @setvar! mbot_IgnoreCurrentBotTarget 1
@@ -945,10 +949,12 @@ while not dead
                             target mbot_CurrentBotTarget
                             getlabel backpack mbot_PingCheck
                             if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                                if mconfig_Target_Overhead_Enabled = 1 and timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD
-                                    if find mbot_CurrentBotTarget
-                                        overhead "{{mconfig_Target_UnableToAttackOverheadText}}" mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
-                                    endif
+                                if mconfig_Target_Overhead_Enabled = 1 and timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
+                                    foreach mbot_Overhead in mconfig_Target_UnableToAttackOverheadText
+                                        if find mbot_CurrentBotTarget
+                                            overhead mbot_Overhead mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
+                                        endif
+                                    endfor
                                     settimer mbot_CurrentBotTargetOverheadTimer 0
                                 endif
                                 @setvar! mbot_CurrentBotTarget 0
@@ -1190,10 +1196,12 @@ while not dead
                                 target mbot_Bard_DiscordCheckNextMob
                                 getlabel backpack mbot_PingCheck
                                 if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                                    if mconfig_Target_Overhead_Enabled = 1 and timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD
-                                        if find mbot_CurrentBotTarget
-                                            overhead "{{mconfig_Target_UnableToAttackOverheadText}}" mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
-                                        endif
+                                    if mconfig_Target_Overhead_Enabled = 1 and timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
+                                        foreach mbot_Overhead in mconfig_Target_UnableToAttackOverheadText
+                                            if find mbot_CurrentBotTarget
+                                                overhead mbot_Overhead mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
+                                            endif
+                                        endfor
                                         settimer mbot_CurrentBotTargetOverheadTimer 0
                                     endif
                                     @setvar! mbot_Bard_DiscordCheckNextMob 0
@@ -1218,10 +1226,12 @@ while not dead
                                 target mbot_CurrentBotTarget
                                 getlabel backpack mbot_PingCheck
                                 if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                                    if mconfig_Target_Overhead_Enabled = 1 and timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD
-                                        if find mbot_CurrentBotTarget
-                                            overhead "{{mconfig_Target_UnableToAttackOverheadText}}" mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
-                                        endif
+                                    if mconfig_Target_Overhead_Enabled = 1 and timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
+                                        foreach mbot_Overhead in mconfig_Target_UnableToAttackOverheadText
+                                            if find mbot_CurrentBotTarget
+                                                overhead mbot_Overhead mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
+                                            endif
+                                        endfor
                                         settimer mbot_CurrentBotTargetOverheadTimer 0
                                     endif
                                     @setvar! mbot_CurrentBotTarget 0
@@ -1246,10 +1256,12 @@ while not dead
                                 target mbot_CurrentBotTarget
                                 getlabel backpack mbot_PingCheck
                                 if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                                    if mconfig_Target_Overhead_Enabled = 1 and timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD
-                                        if find mbot_CurrentBotTarget
-                                            overhead "{{mconfig_Target_UnableToAttackOverheadText}}" mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
-                                        endif
+                                    if mconfig_Target_Overhead_Enabled = 1 and timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
+                                        foreach mbot_Overhead in mconfig_Target_UnableToAttackOverheadText
+                                            if find mbot_CurrentBotTarget
+                                                overhead mbot_Overhead mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
+                                            endif
+                                        endfor
                                         settimer mbot_CurrentBotTargetOverheadTimer 0
                                     endif
                                     @setvar! mbot_CurrentBotTarget 0
@@ -1274,10 +1286,12 @@ while not dead
                                 target mbot_CurrentBotTarget
                                 getlabel backpack mbot_PingCheck
                                 if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                                    if mconfig_Target_Overhead_Enabled = 1 and timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD
-                                        if find mbot_CurrentBotTarget
-                                            overhead "{{mconfig_Target_UnableToAttackOverheadText}}" mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
-                                        endif
+                                    if mconfig_Target_Overhead_Enabled = 1 and timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
+                                        foreach mbot_Overhead in mconfig_Target_UnableToAttackOverheadText
+                                            if find mbot_CurrentBotTarget
+                                                overhead mbot_Overhead mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
+                                            endif
+                                        endfor
                                         settimer mbot_CurrentBotTargetOverheadTimer 0
                                     endif
                                     @setvar! mbot_CurrentBotTarget 0
