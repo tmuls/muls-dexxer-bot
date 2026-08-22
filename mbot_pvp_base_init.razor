@@ -42,22 +42,13 @@ pushlist mbot_PreviousScript "Play Script: Combat\Dexxer\mbot_pvp_base"
 @setvar! mconfig_Target_Overhead_Enabled 1
 @setvar! mconfig_Target_CurrentOverheadTimerCD 3000
 @setvar! mconfig_Target_CurrentOverheadHue 89
-
 @setvar! mconfig_Target_UnableToAttackOverheadTimerCD 3000
 @setvar! mconfig_Target_UnableToAttackOverheadHue 34
 
 # Target overhead configuration
-@setvar! mconfig_Target_CurrentOverheadText "▼"
-#@setvar! mconfig_Target_CurrentOverheadText "TARGET"
-#@setvar! mconfig_Target_CurrentOverheadText "•"
-
-@setvar! mconfig_Target_UnableToAttackOverheadText "●"
-#@setvar! mconfig_Target_UnableToAttackOverheadText "✖"
-#@setvar! mconfig_Target_UnableToAttackOverheadText "CAN'T HIT"
-#@setvar! mconfig_Target_UnableToAttackOverheadText "x"
-
-//unsetvar mbot_BOT_CurrentRightHandWeapon
-//unsetvar mbot_BOT_CurrentLeftHandWeapon
+@setvar! mconfig_Target_CurrentOverheadText "=● ▼▼ HERE ▼▼ ●"
+@setvar! mconfig_Target_UnableToAttackOverheadText "● ▼ CANNOT SEE ▼ ●"
+@setvar! mconfig_Target_IgnoreMobOverheadText "▼ IGNORE ▼"
 
 if listexists mbot_PreviousScript
     foreach myScript in mbot_PreviousScript
