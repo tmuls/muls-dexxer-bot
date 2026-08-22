@@ -64,8 +64,8 @@ while not dead
     endif
 
     ##### Aspect Auto-Activation
-    if mconfig_Aspect_AutoActivate = 1 and timer mbot_AspectActivateTimer >= mbot_AspectActivateTimerCD
-        say "[aspectarmor {{mconfig_Aspect_Armor}}"
+    if mconfig_Aspect_AutoActivateFrost = 1 and timer mbot_AspectActivateTimer >= mbot_AspectActivateTimerCD
+        say "[aspectarmor frost"
         settimer mbot_AspectActivateTimer 0
     endif
 
