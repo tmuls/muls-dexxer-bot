@@ -1,50 +1,13 @@
 ################################################################
 ### Muls Auto Equip - v1.0
+### Based on Piety's auto equip script.
 ### Dresses gear from the backpack using state recorded by
 ### mbot_base.razor's Gear State Tracking section (mbot_AutoEquip_*,
 ### mbot_BOT_CurrentRightHandWeapon/LeftHandWeapon). Run mbot_base at
-### least once first so that state exists. Ported from
-### Gear/jasequip.razor.
+### least once first so that state exists.
 ################################################################
 
-##### Aspect Activation Config
-@setvar! mconfig_AutoEquip_ActivateAspect 1
-@setvar! mconfig_AutoEquip_AspectWeapon "death"
-@setvar! mconfig_AutoEquip_AspectSpellbook "death"
-@setvar! mconfig_AutoEquip_AspectArmor "poison"
-
-##### Priority Layers (armor, before aspect activation)
-removelist mbot_AutoEquipList
-createlist mbot_AutoEquipList
-if varexist mbot_AutoEquip_InnerTorso
-    pushlist mbot_AutoEquipList mbot_AutoEquip_InnerTorso
-endif
-if varexist mbot_AutoEquip_Pants
-    pushlist mbot_AutoEquipList mbot_AutoEquip_Pants
-endif
-if varexist mbot_AutoEquip_Arms
-    pushlist mbot_AutoEquipList mbot_AutoEquip_Arms
-endif
-if varexist mbot_AutoEquip_Head
-    pushlist mbot_AutoEquipList mbot_AutoEquip_Head
-endif
-if varexist mbot_AutoEquip_Gloves
-    pushlist mbot_AutoEquipList mbot_AutoEquip_Gloves
-endif
-if varexist mbot_AutoEquip_Neck
-    pushlist mbot_AutoEquipList mbot_AutoEquip_Neck
-endif
-
-foreach mbot_AutoEquipItem in mbot_AutoEquipList
-    if find mbot_AutoEquipItem backpack as mbot_AutoEquipFound
-        dclick mbot_AutoEquipFound
-        getlabel backpack mbot_PingCheck
-        while queued
-        endwhile
-    endif
-endfor
-
-##### Weapon/Shield (lift+drop, not dclick)
+##### Weapon/Shield/Talisman (lift+drop, not dclick)
 ### mbot_BOT_CurrentRightHandWeapon/LeftHandWeapon still use the old
 ### always-defined-defaults-to-0 tracking style, not Piety's
 ### unsetvar style, so these check != 0 rather than varexist.
@@ -68,17 +31,6 @@ if mbot_BOT_CurrentLeftHandWeapon != 0
     endif
 endif
 
-##### Aspect Activation
-if mconfig_AutoEquip_ActivateAspect = 1
-    say "[aspectweapon {{mconfig_AutoEquip_AspectWeapon}}"
-    getlabel backpack mbot_PingCheck
-    say "[aspectspellbook {{mconfig_AutoEquip_AspectSpellbook}}"
-    getlabel backpack mbot_PingCheck
-    say "[aspectarmor {{mconfig_AutoEquip_AspectArmor}}"
-    getlabel backpack mbot_PingCheck
-endif
-
-##### Talisman (lift+drop, not dclick)
 if varexist mbot_AutoEquip_Talisman
     if find mbot_AutoEquip_Talisman backpack as mbot_AutoEquipFound
         lift mbot_AutoEquipFound
@@ -89,9 +41,27 @@ if varexist mbot_AutoEquip_Talisman
     endif
 endif
 
-##### Remaining Layers (fashion, after aspect activation)
+##### Remaining Layers (dclick)
 removelist mbot_AutoEquipList
 createlist mbot_AutoEquipList
+if varexist mbot_AutoEquip_InnerTorso
+    pushlist mbot_AutoEquipList mbot_AutoEquip_InnerTorso
+endif
+if varexist mbot_AutoEquip_Pants
+    pushlist mbot_AutoEquipList mbot_AutoEquip_Pants
+endif
+if varexist mbot_AutoEquip_Arms
+    pushlist mbot_AutoEquipList mbot_AutoEquip_Arms
+endif
+if varexist mbot_AutoEquip_Head
+    pushlist mbot_AutoEquipList mbot_AutoEquip_Head
+endif
+if varexist mbot_AutoEquip_Gloves
+    pushlist mbot_AutoEquipList mbot_AutoEquip_Gloves
+endif
+if varexist mbot_AutoEquip_Neck
+    pushlist mbot_AutoEquipList mbot_AutoEquip_Neck
+endif
 if varexist mbot_AutoEquip_Shoes
     pushlist mbot_AutoEquipList mbot_AutoEquip_Shoes
 endif
