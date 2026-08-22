@@ -1,0 +1,64 @@
+#######
+# Muls Dexxer Bot Config - PvP profile
+# Based on Ultimate Dexxer Bot Rewrite 2024-2025 by Jaseowns
+# Init and base bot files are NOT compatible.
+# All original variables have been renamed for consistency and to avoid weird compatibility issues
+# DO NOT ask jaseowns for support for this bot.
+# This is my own fork adding my own features and optimizations along with new config variables.
+#
+# PvP-only config - vars for features that don't survive structured PvP
+# (Chivalry, potion automation, self-bandage, parry stance switching,
+# tracking) or that are out of scope for a PvP profile (Taming, Bard,
+# Skinning) are not here. See mbot_pvp_base.razor for what was removed.
+#######
+
+removelist mbot_PreviousScript
+createlist mbot_PreviousScript
+pushlist mbot_PreviousScript "Play Script: Combat\Dexxer\mbot_pvp_base"
+
+@setvar! mconfig_General_ShowVersion 0
+
+# Smart Equip Features
+@setvar! mconfig_SmartEquip_RunOnce 1
+@setvar! mconfig_Weapon_SmartEquip 1
+@setvar! mconfig_Shield_SmartEquip 1
+# Off by default - Sacred Journey/gate recall is blocked for a while after
+# PvP combat, so auto-recalling home when out of weapons isn't reliable here.
+@setvar! mconfig_Weapon_AutoRecallWhenEmpty 0
+@setvar! mconfig_Shield_AutoRecallWhenEmpty 0
+
+# Warning overhead if pouch popped
+@setvar! mconfig_Thief_AlertRedPouchPop 1
+
+# Weapon Abilities
+@setvar! mconfig_Weapon_UseAbility1 0
+@setvar! mconfig_Weapon_UseAbility2 0
+@setvar! mconfig_Weapon_UseAbility3 0
+@setvar! mconfig_Weapon_UseAbilityTimerCD 5000
+
+@setvar! mconfig_Healing_AidCountAlertLessThan20 1
+
+# General Target Overheads
+@setvar! mconfig_Target_CurrentOverheadTimerCD 3000000
+@setvar! mconfig_Target_CurrentOverheadHue 89
+
+@setvar! mconfig_Target_UnableToAttackOverheadTimerCD 3000000
+@setvar! mconfig_Target_UnableToAttackOverheadHue 34
+
+# Custom Target Overhead Messages
+removelist mconfig_Target_CurrentOverheadText
+createlist mconfig_Target_CurrentOverheadText
+pushlist mconfig_Target_CurrentOverheadText "▼"
+
+removelist mconfig_Target_UnableToAttackOverheadText
+createlist mconfig_Target_UnableToAttackOverheadText
+pushlist mconfig_Target_UnableToAttackOverheadText "●"
+
+//unsetvar mbot_BOT_CurrentRightHandWeapon
+//unsetvar mbot_BOT_CurrentLeftHandWeapon
+
+if listexists mbot_PreviousScript
+    foreach myScript in mbot_PreviousScript
+        hotkey myScript
+    endfor
+endif
