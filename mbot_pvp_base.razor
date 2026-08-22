@@ -1,27 +1,9 @@
 ################################################################
 ### Muls Dexxer Bot - PvP Base v1.0
-### PvP profile - see mbot_base.razor for the full PvM engine
-#
-# Structured PvP disables timers, cooldown, getlabel, gump reads, and most
-# resource/state checks (hits, mana, stam, poisoned, findbuff, notoriety,
-# dead-on-others) - see outlands-razor-scripting/references/pvp.md. Removed
-# below: Chivalry, all potion automation, self-bandage automation, parry
-# stance switching, weapon poison application, overweight gold drop,
-# tracking. Also out of scope for a PvP profile regardless of restrictions:
-# Taming, Bard, Skinning.
-#
-# Kept but pacing-only dependencies left as-is (single point of failure on
-# a disabled primitive, not multiple combined) - worth field-testing:
-# Weapon Re-equip, Weapon Ability firing, LOS-probe timer, target-death
-# detection, Poison Sting/casting checks.
-#
-# getlabel used only as a sync ping (Ping Sync pattern) has been dropped
-# from Smart Equip - PvP has no substitute, so those calls just don't wait.
-# Paralyze Escape (Trapped Pouch) is left completely untouched - field-
-# confirmed to still work despite pvp.md listing "paralyzed" as disabled.
+### Concise PvP script - see mbot_base.razor for the full PvM engine
 ################################################################
 
-@setvar! mbot_version = "v1.0.20260822"
+@setvar! mbot_version = "v1.0.20260822.1"
 
 ##### Target State
 @setvar! mbot_CurrentBotTarget 0
