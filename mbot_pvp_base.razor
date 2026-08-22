@@ -60,6 +60,11 @@ endif
 ##### Run once flags
 @setvar! mbot_SmartEquipHasRun 0
 
+##### Version Announcement
+if mconfig_General_ShowVersion = 1
+    sysmsg "Muls Dexxer Bot - PvP Base v1.0 loaded"
+endif
+
 while not dead
     ##### Out of Combat: Thief Pouch Alert
     if mconfig_Thief_AlertRedPouchPop = 1 and counttype 3705 backpack 38 as mbot_RedPouchCount

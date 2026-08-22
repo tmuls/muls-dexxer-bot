@@ -339,6 +339,11 @@ endif
 ##### Run once flags
 @setvar! mbot_SmartEquipHasRun 0
 
+##### Version Announcement
+if mconfig_General_ShowVersion = 1
+    sysmsg "Muls Dexxer Bot v1.0.20260822 loaded"
+endif
+
 while not dead
     ##### Out of Combat: Sysmsg Cleanup & Self-Bandaging
     while insysmsg "You deliver a poison sting"
@@ -519,7 +524,7 @@ while not dead
                     if "poison charge" in weapon_to_poisonDesc
                         foreach reapply_text in poison_check_list
                             if reapply_text in weapon_to_poisonDesc
-                                overhead "Need to reapply poison: {{reapply_text}}.XX charges remain"
+                                overhead "Need to reapply poison: {{reapply_text}} charges remain"
                                 settimer poison_reapply_timer poison_failed_timer_cd
                             endif                        
                         endfor                          
