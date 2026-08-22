@@ -39,20 +39,22 @@ pushlist mbot_PreviousScript "Play Script: Combat\Dexxer\mbot_pvp_base"
 @setvar! mconfig_Healing_AidCountAlertLessThan20 1
 
 # General Target Overheads
-@setvar! mconfig_Target_CurrentOverheadTimerCD 3000000
+@setvar! mconfig_Target_Overhead_Enabled 1
+@setvar! mconfig_Target_CurrentOverheadTimerCD 3000
 @setvar! mconfig_Target_CurrentOverheadHue 89
 
-@setvar! mconfig_Target_UnableToAttackOverheadTimerCD 3000000
+@setvar! mconfig_Target_UnableToAttackOverheadTimerCD 3000
 @setvar! mconfig_Target_UnableToAttackOverheadHue 34
 
-# Custom Target Overhead Messages
-removelist mconfig_Target_CurrentOverheadText
-createlist mconfig_Target_CurrentOverheadText
-pushlist mconfig_Target_CurrentOverheadText "▼"
+# Target overhead configuration
+@setvar! mconfig_Target_CurrentOverheadText "▼"
+#@setvar! mconfig_Target_CurrentOverheadText "TARGET"
+#@setvar! mconfig_Target_CurrentOverheadText "•"
 
-removelist mconfig_Target_UnableToAttackOverheadText
-createlist mconfig_Target_UnableToAttackOverheadText
-pushlist mconfig_Target_UnableToAttackOverheadText "●"
+@setvar! mconfig_Target_UnableToAttackOverheadText "●"
+#@setvar! mconfig_Target_UnableToAttackOverheadText "✖"
+#@setvar! mconfig_Target_UnableToAttackOverheadText "CAN'T HIT"
+#@setvar! mconfig_Target_UnableToAttackOverheadText "x"
 
 //unsetvar mbot_BOT_CurrentRightHandWeapon
 //unsetvar mbot_BOT_CurrentLeftHandWeapon
