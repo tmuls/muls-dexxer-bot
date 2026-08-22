@@ -1,0 +1,14 @@
+#######
+# Muls Auto Equip Config
+# Ported from Gear/jasequip.razor. Per-layer gear serials come from
+# mbot_base.razor's Gear State Tracking, not from config here - run
+# mbot_base at least once first so that state exists.
+#######
+
+# Aspect Activation
+@setvar! mconfig_AutoEquip_ActivateAspect 1
+@setvar! mconfig_AutoEquip_AspectWeapon "death"
+@setvar! mconfig_AutoEquip_AspectSpellbook "death"
+@setvar! mconfig_AutoEquip_AspectArmor "poison"
+
+hotkey "Play Script: Combat\Dexxer\mbot_auto_equip"

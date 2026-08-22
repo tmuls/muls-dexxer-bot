@@ -243,6 +243,150 @@ if findlayer self lefthand as mbot_LeftHandWeapon
     @setvar! mbot_BOT_CurrentLeftHandWeapon mbot_LeftHandWeapon
 endif
 
+##### Gear State Tracking (auto-equip)
+if mconfig_AutoEquip_Enabled = 1
+    @unsetvar mbot_AutoEquip_InnerTorso
+    if findlayer self innertorso as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_InnerTorso mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_Pants
+    if findlayer self pants as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_Pants mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_Arms
+    if findlayer self arms as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_Arms mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_Head
+    if findlayer self head as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_Head mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_Gloves
+    if findlayer self gloves as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_Gloves mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_Neck
+    if findlayer self neck as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_Neck mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_Shoes
+    if findlayer self shoes as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_Shoes mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_Shirt
+    if findlayer self shirt as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_Shirt mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_Ring
+    if findlayer self ring as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_Ring mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_Talisman
+    if findlayer self talisman as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_Talisman mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_Waist
+    if findlayer self waist as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_Waist mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_Bracelet
+    if findlayer self bracelet as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_Bracelet mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_Face
+    if findlayer self face as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_Face mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_MiddleTorso
+    if findlayer self middletorso as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_MiddleTorso mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_Earrings
+    if findlayer self earrings as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_Earrings mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_Cloak
+    if findlayer self cloak as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_Cloak mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_OuterTorso
+    if findlayer self outertorso as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_OuterTorso mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_OuterLegs
+    if findlayer self outerlegs as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_OuterLegs mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_InnerLegs
+    if findlayer self innerlegs as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_InnerLegs mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_OneHandedSecondary
+    if findlayer self onehandedsecondary as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_OneHandedSecondary mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_Quiver
+    if findlayer self quiver as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_Quiver mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_OuterBody
+    if findlayer self outerbody as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_OuterBody mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_Shoulder
+    if findlayer self shoulder as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_Shoulder mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_Underarms
+    if findlayer self underarms as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_Underarms mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_Undergarment
+    if findlayer self undergarment as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_Undergarment mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_UnderLegs
+    if findlayer self underlegs as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_UnderLegs mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_Lightsource
+    if findlayer self lightsource as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_Lightsource mbot_AutoEquipTmp
+    endif
+
+    @unsetvar mbot_AutoEquip_OuterArms
+    if findlayer self outerarms as mbot_AutoEquipTmp
+        @setvar mbot_AutoEquip_OuterArms mbot_AutoEquipTmp
+    endif
+
+endif
+
 ##### Bandage Timer & Red Pouch Tracking
 @setvar! mbot_BandageTimerCD 20000
 if not timerexists mbot_BandageTimer
