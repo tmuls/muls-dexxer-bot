@@ -2,9 +2,10 @@
 # Muls Dexxer Bot Config
 # Based on Ultimate Dexxer Bot Rewrite 2024-2025 by Jaseowns
 # Init and base bot files are NOT compatible.  
+#
 # All original variables have been renamed for consistency and to avoid weird compatibility issues
 # DO NOT ask jaseowns for support for this bot.  
-# This is my own fork adding my own features and optimizations along with new config variables.
+# This is a custom own fork adding my own features and optimizations along with new config options.
 #######
 
 removelist mbot_PreviousScript
@@ -134,28 +135,18 @@ pushlist mbot_PreviousScript "Play Script: Combat\Dexxer\mbot_base"
 @setvar! mconfig_Healing_AidCountAlertLessThan20 1
 
 # General Target Overheads
+@setvar! mconfig_Target_Overhead_Enabled 1
 @setvar! mconfig_Target_CurrentOverheadTimerCD 3000
 @setvar! mconfig_Target_CurrentOverheadHue 89
-
 @setvar! mconfig_Target_UnableToAttackOverheadTimerCD 3000
 @setvar! mconfig_Target_UnableToAttackOverheadHue 34
-
 @setvar! mconfig_Target_IgnoreMobOverheadTimerCD 3000
 @setvar! mconfig_Target_IgnoreMobOverheadHue 77
 
 # Target overhead configuration
-@setvar! mconfig_Target_CurrentOverheadText "▼"
-#@setvar! mconfig_Target_CurrentOverheadText "TARGET"
-#@setvar! mconfig_Target_CurrentOverheadText "•"
-
-@setvar! mconfig_Target_UnableToAttackOverheadText "●"
-#@setvar! mconfig_Target_UnableToAttackOverheadText "✖"
-#@setvar! mconfig_Target_UnableToAttackOverheadText "CAN'T HIT"
-#@setvar! mconfig_Target_UnableToAttackOverheadText "x"
-
-@setvar! mconfig_Target_IgnoreMobOverheadText "-"
-#@setvar! mconfig_Target_IgnoreMobOverheadText "○"
-#@setvar! mconfig_Target_IgnoreMobOverheadText "IGNORE"
+@setvar! mconfig_Target_CurrentOverheadText "=● ▼▼ HERE ▼▼ ●"
+@setvar! mconfig_Target_UnableToAttackOverheadText "● ▼ CANNOT SEE ▼ ●"
+@setvar! mconfig_Target_IgnoreMobOverheadText "▼ IGNORE ▼"
 
 # Custom ignore list
 removelist mconfig_Target_IgnoreMobList
@@ -165,13 +156,8 @@ pushlist mconfig_Target_IgnoreMobList "a kingfisher"
 pushlist mconfig_Target_IgnoreMobList "a raven"
 pushlist mconfig_Target_IgnoreMobList "a goat"
 pushlist mconfig_Target_IgnoreMobList "a black bear"
-//pushlist mconfig_Target_IgnoreMobList "an eagle"
+pushlist mconfig_Target_IgnoreMobList "an eagle"
 
-//unsetvar mbot_BOT_CurrentRightHandWeapon
-//unsetvar mbot_BOT_CurrentLeftHandWeapon
-
-if listexists mbot_PreviousScript
-    foreach myScript in mbot_PreviousScript
-        hotkey myScript
-    endfor
-endif
+foreach myScript in mbot_PreviousScript
+    hotkey myScript
+endfor

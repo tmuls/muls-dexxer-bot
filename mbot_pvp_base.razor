@@ -237,7 +237,7 @@ while not dead
 
         if find mbot_CurrentBotTarget ground -1 -1 mbot_FightingRangeCheck
 
-            if timer mbot_CurrentBotTargetOverheadTimer >= mconfig_Target_CurrentOverheadTimerCD
+            if mconfig_Target_Overhead_Enabled = 1 and timer mbot_CurrentBotTargetOverheadTimer >= mconfig_Target_CurrentOverheadTimerCD
                 if find mbot_CurrentBotTarget
                     overhead mconfig_Target_CurrentOverheadText mconfig_Target_CurrentOverheadHue mbot_CurrentBotTarget
                 endif
@@ -264,7 +264,7 @@ while not dead
                     endwhile
                     target mbot_CurrentBotTarget
                     if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                        if timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD
+                        if mconfig_Target_Overhead_Enabled = 1 and timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD
                             if find mbot_CurrentBotTarget
                                 overhead mconfig_Target_UnableToAttackOverheadText mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
                             endif
