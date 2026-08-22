@@ -24,12 +24,9 @@
 #
 ################################################################
 
-##### Archetype Detection
-@setvar! mbot_TamerDetected 0
-if skill "Animal Taming" >= 80
-    @setvar! mbot_TamerDetected 1
-endif
+@setvar! mbot_version = "v1.0.20260822"
 
+##### Archetype Detection
 @setvar! mbot_BardDetected 0
 if skill "Discordance" > 0 or skill "Peacemaking" > 0 or skill "Provocation" > 0
     @setvar! mbot_BardDetected 1
@@ -246,57 +243,6 @@ if findlayer self lefthand as mbot_LeftHandWeapon
     @setvar! mbot_BOT_CurrentLeftHandWeapon mbot_LeftHandWeapon
 endif
 
-##### Taming Setup (crook activation, "all guard me" timer setup)
-if mbot_TamerDetected = 1
-
-    if not varexist mbot_activeCrook
-        @setvar! mbot_activeCrook 0
-    endif
-    if not find mbot_activeCrook self
-        if skill "Herding" > 0 and findtype 3713 self as firstJrook
-            @setvar! isHerdingActive 0
-            while isHerdingActive = 0
-                if counttype 3713 self > 1
-                    @clearignore
-                    while findtype 3713 self as jrook
-                        getlabel jrook multiDesc
-                        if 'activated' in multiDesc
-                            @setvar! isHerdingActive jrook
-                            break
-                        endif
-                        @ignore jrook
-                    endwhile
-                    @clearignore
-                    if isHerdingActive = 0
-                        dclick firstJrook
-                    endif
-                endif
-
-                if isHerdingActive = 0
-                    getlabel firstJrook desc
-                    if 'activated' in desc
-                        @setvar! isHerdingActive firstJrook
-                    else
-                        dclick firstJrook
-                        getlabel firstJrook desc
-                        @setvar! isHerdingActive firstJrook
-                    endif
-                endif
-            endwhile
-            @setvar! mbot_activeCrook isHerdingActive
-        endif
-    endif
-
-    if mconfig_Taming_SayAllGuard = 1
-
-        if not timerexists mbot_Tamer_SayAllGuardTimer
-            settimer mbot_Tamer_SayAllGuardTimer mconfig_Taming_SayAllGuardTimerCD
-        endif
-
-    endif
-
-endif
-
 ##### Bandage Timer & Red Pouch Tracking
 @setvar! mbot_BandageTimerCD 20000
 if not timerexists mbot_BandageTimer
@@ -338,6 +284,11 @@ endif
 
 ##### Run once flags
 @setvar! mbot_SmartEquipHasRun 0
+
+##### Version Announcement
+if mconfig_General_ShowVersion = 1
+    sysmsg "Muls Dexxer Bot {{mbot_version}}"
+endif
 
 while not dead
     ##### Out of Combat: Sysmsg Cleanup & Self-Bandaging
@@ -494,16 +445,6 @@ while not dead
         endif
     endif
     
-    ##### Out of Combat: Taming - All Guard Trigger
-    if mbot_TamerDetected = 1
-        if mconfig_Taming_SayAllGuard = 1 and followers > 0
-            if timer mbot_Tamer_SayAllGuardTimer >= mconfig_Taming_SayAllGuardTimerCD
-                say "all guard me" 89
-                settimer mbot_Tamer_SayAllGuardTimer 0
-            endif
-        endif
-    endif
-
     ##### Out of Combat: Weapon Poison Application
     if skill "Poisoning" >= 50 and mconfig_Poison_AutomaticallyApply = 1
         if counttype 3850 mbot_PotionSatchel or counttype 3850 backpack
@@ -519,7 +460,7 @@ while not dead
                     if "poison charge" in weapon_to_poisonDesc
                         foreach reapply_text in poison_check_list
                             if reapply_text in weapon_to_poisonDesc
-                                overhead "Need to reapply poison: {{reapply_text}}.XX charges remain"
+                                overhead "Need to reapply poison: {{reapply_text}} charges remain"
                                 settimer poison_reapply_timer poison_failed_timer_cd
                             endif                        
                         endfor                          

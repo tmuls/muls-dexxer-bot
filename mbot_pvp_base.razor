@@ -21,6 +21,8 @@
 # confirmed to still work despite pvp.md listing "paralyzed" as disabled.
 ################################################################
 
+@setvar! mbot_version = "v1.0.20260822"
+
 ##### Target State
 @setvar! mbot_CurrentBotTarget 0
 @setvar! mbot_BOT_FIGHT 0
@@ -59,6 +61,11 @@ endif
 
 ##### Run once flags
 @setvar! mbot_SmartEquipHasRun 0
+
+##### Version Announcement
+if mconfig_General_ShowVersion = 1
+    sysmsg "Muls Dexxer Bot - PvP Base {{mbot_version}}"
+endif
 
 while not dead
     ##### Out of Combat: Thief Pouch Alert
