@@ -498,6 +498,7 @@ while not dead
 
     if mbot_SmartEquipShouldRun = 1
         ##### Smart Weapon Equip
+        @setvar! mbot_WeaponMissing 0
         if mconfig_Weapon_SmartEquip = 1
             @setvar! mbot_HasWeapon 0
             if findlayer self righthand
@@ -512,6 +513,22 @@ while not dead
                 if find mbot_BOT_CurrentRightHandWeapon backpack
                     dclick mbot_BOT_CurrentRightHandWeapon
                     getlabel backpack mbot_PingCheck
+                    while queued
+                    endwhile
+                endif
+            endif
+
+            # Re-check after the equip attempt - mbot_HasWeapon above may be
+            # stale (e.g. read right after a scene load/recall, before the
+            # client re-synced its own equipped-layer data).
+            if mbot_HasWeapon = 0
+                if findlayer self righthand
+                    @setvar! mbot_HasWeapon 1
+                elseif findlayer self lefthand
+                    @setvar! mbot_HasWeapon 1
+                    if findtype 7026|7027|7029|7031|7033|7034|7035|7107|7109|31002|31130 lefthand
+                        @setvar! mbot_HasWeapon 0
+                    endif
                 endif
             endif
 
@@ -524,7 +541,9 @@ while not dead
                     if " aspect" in mbot_WeaponCandidateDesc or "exceptional " in mbot_WeaponCandidateDesc or "supremely" in mbot_WeaponCandidateDesc or "exceedingly" in mbot_WeaponCandidateDesc or "vanquishing" in mbot_WeaponCandidateDesc or "power" in mbot_WeaponCandidateDesc
                         overhead "Weapon found! Auto-equipping." 66
                         dclick mbot_WeaponCandidate
-                        getlabel backpack mbot_PingCheck                        
+                        getlabel backpack mbot_PingCheck
+                        while queued
+                        endwhile
                         @setvar! mbot_FoundFallbackWeapon 1
                         @setvar! mbot_BOT_CurrentRightHandWeapon mbot_WeaponCandidate
                     else
@@ -533,26 +552,21 @@ while not dead
                 endwhile
                 @clearignore
                 if mbot_FoundFallbackWeapon = 0
-                    if mconfig_Weapon_AutoRecallWhenEmpty = 1
-                        for 3
-                            overhead "Weapon not found, auto-recalling home" 33
-                            wait 250
-                        endfor
-                        hotkey "Play Script: Combat\Dexxer\mbot_recall_home"
-                    else
-                        overhead "WARNING: Weapon not found!" 33
-                    endif
+                    @setvar! mbot_WeaponMissing 1
                 endif
             endif
         endif
 
         ##### Smart Shield Equip
         # Special 2h ids that are not found in the lefthand layer when equipped (pickaxe)
+        @setvar! mbot_ShieldMissing 0
         if mconfig_Shield_SmartEquip = 1 and not findtype 3718 righthand
             if not findlayer self lefthand
                 if find mbot_BOT_CurrentLeftHandWeapon backpack
                     dclick mbot_BOT_CurrentLeftHandWeapon
                     getlabel backpack mbot_PingCheck
+                    while queued
+                    endwhile
                 endif
             endif
 
@@ -565,6 +579,8 @@ while not dead
                     if "exceptional" in mbot_ShieldCandidateDesc or "invulnerable" in mbot_ShieldCandidateDesc or "fortified" in mbot_ShieldCandidateDesc
                         dclick mbot_ShieldCandidate
                         getlabel backpack mbot_PingCheck
+                        while queued
+                        endwhile
                         overhead "Shield found! Auto-equipping..." 66
                         @setvar! mbot_FoundFallbackShield 1
                         @setvar! mbot_BOT_CurrentLeftHandWeapon mbot_ShieldCandidate
@@ -574,16 +590,31 @@ while not dead
                 endwhile
                 @clearignore
                 if mbot_FoundFallbackShield = 0
-                    if mconfig_Shield_AutoRecallWhenEmpty = 1
-                        for 3
-                            overhead "Shield not found, auto-recalling home" 33
-                            wait 250
-                        endfor
-                        hotkey "Play Script: Combat\Dexxer\mbot_recall_home"
-                    else
-                        overhead "WARNING: Shield not found!" 33
-                    endif
+                    @setvar! mbot_ShieldMissing 1
                 endif
+            endif
+        endif
+
+        ##### Weapon/Shield Missing - Auto Recall (checked after both blocks above have had a chance to equip)
+        if mbot_WeaponMissing = 1
+            if mconfig_Weapon_AutoRecallWhenEmpty = 1
+                for 3
+                    overhead "Weapon not found, auto-recalling home" 33
+                    wait 250
+                endfor
+                hotkey "Play Script: Combat\Dexxer\mbot_recall_home"
+            else
+                overhead "WARNING: Weapon not found!" 33
+            endif
+        elseif mbot_ShieldMissing = 1
+            if mconfig_Shield_AutoRecallWhenEmpty = 1
+                for 3
+                    overhead "Shield not found, auto-recalling home" 33
+                    wait 250
+                endfor
+                hotkey "Play Script: Combat\Dexxer\mbot_recall_home"
+            else
+                overhead "WARNING: Shield not found!" 33
             endif
         endif
 
