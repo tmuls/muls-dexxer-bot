@@ -430,6 +430,18 @@ endif
 settimer mbot_SmartEquipTimer mconfig_SmartEquip_TimerCD
 @setvar! mbot_SmartEquipHasRun 0
 
+##### Init Version Check
+@setvar! mbot_ExpectedInitVersion 1
+@setvar! mbot_InitVersionOk 1
+if not varexist mconfig_InitVersion
+    @setvar! mbot_InitVersionOk 0
+elseif mconfig_InitVersion != mbot_ExpectedInitVersion
+    @setvar! mbot_InitVersionOk 0
+endif
+if mbot_InitVersionOk = 0
+    overhead "WARNING: mbot_base_init.razor is out of date, this script may not function correctly" 34
+endif
+
 ##### Version Announcement
 if mconfig_General_ShowVersion = 1
     sysmsg "Muls Dexxer Bot {{mbot_version}}"
