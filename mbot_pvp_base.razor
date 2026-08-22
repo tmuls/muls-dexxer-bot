@@ -239,7 +239,7 @@ while not dead
 
             if mconfig_Target_Overhead_Enabled = 1 and timer mbot_CurrentBotTargetOverheadTimer >= mconfig_Target_CurrentOverheadTimerCD
                 if find mbot_CurrentBotTarget
-                    overhead mconfig_Target_CurrentOverheadText mconfig_Target_CurrentOverheadHue mbot_CurrentBotTarget
+                    overhead "{{mconfig_Target_CurrentOverheadText}}" mconfig_Target_CurrentOverheadHue mbot_CurrentBotTarget
                 endif
                 settimer mbot_CurrentBotTargetOverheadTimer 0
             endif
@@ -266,7 +266,7 @@ while not dead
                     if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
                         if mconfig_Target_Overhead_Enabled = 1 and timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD
                             if find mbot_CurrentBotTarget
-                                overhead mconfig_Target_UnableToAttackOverheadText mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
+                                overhead "{{mconfig_Target_UnableToAttackOverheadText}}" mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
                             endif
                             settimer mbot_CurrentBotTargetOverheadTimer 0
                         endif
