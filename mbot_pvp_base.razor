@@ -44,6 +44,10 @@ endif
 ##### Run once flags
 @setvar! mbot_SmartEquipHasRun 0
 
+##### Aspect Auto-Activation
+@setvar! mbot_AspectActivateTimerCD 5000
+settimer mbot_AspectActivateTimer mbot_AspectActivateTimerCD
+
 ##### Version Announcement
 if mconfig_General_ShowVersion = 1
     sysmsg "Muls Dexxer Bot - PvP Base {{mbot_version}}"
@@ -57,6 +61,12 @@ while not dead
         else
             @setvar! mbot_RedPouchCountTotal mbot_RedPouchCount
         endif
+    endif
+
+    ##### Aspect Auto-Activation
+    if mconfig_Aspect_AutoActivateFrost = 1 and timer mbot_AspectActivateTimer >= mbot_AspectActivateTimerCD
+        say "[aspectarmor frost"
+        settimer mbot_AspectActivateTimer 0
     endif
 
     if mconfig_SmartEquip_RunOnce = 0 or mbot_SmartEquipHasRun = 0
