@@ -24,6 +24,8 @@
 #
 ################################################################
 
+@setvar! mbot_version = "v1.0.20260822"
+
 ##### Archetype Detection
 @setvar! mbot_BardDetected 0
 if skill "Discordance" > 0 or skill "Peacemaking" > 0 or skill "Provocation" > 0
@@ -285,7 +287,7 @@ endif
 
 ##### Version Announcement
 if mconfig_General_ShowVersion = 1
-    sysmsg "Muls Dexxer Bot v1.0.20260822 loaded"
+    sysmsg "Muls Dexxer Bot {{mbot_version}}"
 endif
 
 while not dead
