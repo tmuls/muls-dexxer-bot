@@ -297,7 +297,7 @@ endif
 
 
 ##### Smart Shield Equip
-# Special 2h ids that occupy righthand only but still fill both hands (pickaxe)
+# Special 2h ids that are not found in the lefthand layer when equipped (pickaxe)
 if mconfig_Shield_SmartEquip = 1 and not findtype 3718 righthand
     if not findlayer self lefthand
         if find mbot_BOT_CurrentLeftHandWeapon backpack
