@@ -22,7 +22,10 @@ jobs:
         run: echo "VERSION=${TAG#v}" >> "$GITHUB_ENV"
 
       - name: Zip razor files
-        run: zip "muls_dexxer_bot_${VERSION}.zip" *.razor
+        run: |
+          mkdir -p "staging/Combat/Dexxer"
+          cp *.razor "staging/Combat/Dexxer/"
+          (cd staging && zip -r "../muls_dexxer_bot_${VERSION}.zip" "Combat")
 
       - name: Attach zip to release
         env:
