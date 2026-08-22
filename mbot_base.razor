@@ -594,15 +594,19 @@ while not dead
             else
                 overhead "WARNING: Weapon not found!" 33
             endif
-        elseif mconfig_Shield_SmartEquip = 1 and not findtype 3718 righthand and not findlayer self lefthand
-            if mconfig_Shield_AutoRecallWhenEmpty = 1
-                for 3
-                    overhead "Shield not found, auto-recalling home" 33
-                    wait 250
-                endfor
-                hotkey "Play Script: Combat\Dexxer\mbot_recall_home"
-            else
-                overhead "WARNING: Shield not found!" 33
+        else
+            # Pickaxe occupies both hands but only shows in righthand - skip
+            # shield check if one's equipped.
+            if not findtype 3718 righthand and not findlayer self lefthand
+                if mconfig_Shield_AutoRecallWhenEmpty = 1
+                    for 3
+                        overhead "Shield not found, auto-recalling home" 33
+                        wait 250
+                    endfor
+                    hotkey "Play Script: Combat\Dexxer\mbot_recall_home"
+                else
+                    overhead "WARNING: Shield not found!" 33
+                endif
             endif
         endif
 
