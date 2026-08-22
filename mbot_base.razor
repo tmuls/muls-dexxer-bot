@@ -511,7 +511,6 @@ while not dead
             if mbot_HasWeapon = 0
                 if find mbot_BOT_CurrentRightHandWeapon backpack
                     dclick mbot_BOT_CurrentRightHandWeapon
-                    getlabel backpack mbot_PingCheck
                     while queued
                     endwhile
                 endif
@@ -526,7 +525,6 @@ while not dead
                     if " aspect" in mbot_WeaponCandidateDesc or "exceptional " in mbot_WeaponCandidateDesc or "supremely" in mbot_WeaponCandidateDesc or "exceedingly" in mbot_WeaponCandidateDesc or "vanquishing" in mbot_WeaponCandidateDesc or "power" in mbot_WeaponCandidateDesc
                         overhead "Weapon found! Auto-equipping." 66
                         dclick mbot_WeaponCandidate
-                        getlabel backpack mbot_PingCheck
                         while queued
                         endwhile
                         @setvar! mbot_FoundFallbackWeapon 1
@@ -545,7 +543,6 @@ while not dead
             if not findlayer self lefthand
                 if find mbot_BOT_CurrentLeftHandWeapon backpack
                     dclick mbot_BOT_CurrentLeftHandWeapon
-                    getlabel backpack mbot_PingCheck
                     while queued
                     endwhile
                 endif
@@ -559,7 +556,6 @@ while not dead
                     getlabel mbot_ShieldCandidate mbot_ShieldCandidateDesc
                     if "exceptional" in mbot_ShieldCandidateDesc or "invulnerable" in mbot_ShieldCandidateDesc or "fortified" in mbot_ShieldCandidateDesc
                         dclick mbot_ShieldCandidate
-                        getlabel backpack mbot_PingCheck
                         while queued
                         endwhile
                         overhead "Shield found! Auto-equipping..." 66
