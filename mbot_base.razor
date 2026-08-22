@@ -244,16 +244,27 @@ if findlayer self lefthand as mbot_LeftHandWeapon
     @setvar! mbot_BOT_CurrentLeftHandWeapon mbot_LeftHandWeapon
 endif
 
+# Armed check: righthand OR non-shield lefthand (two-handers equip left)
+@setvar! mbot_HasWeapon 0
+if findlayer self righthand
+    @setvar! mbot_HasWeapon 1
+elseif findlayer self lefthand
+    @setvar! mbot_HasWeapon 1
+    if findtype 7026|7027|7029|7031|7033|7034|7035|7107|7109|31002|31130 lefthand
+        @setvar! mbot_HasWeapon 0
+    endif
+endif
+
 ##### Smart Weapon Equip
 if mconfig_Weapon_SmartEquip = 1
-    if not findlayer self righthand
+    if mbot_HasWeapon = 0
         if find mbot_BOT_CurrentRightHandWeapon backpack
             dclick mbot_BOT_CurrentRightHandWeapon
             getlabel backpack mbot_PingCheck
         endif
     endif
 
-    if not findlayer self righthand
+    if mbot_HasWeapon = 0
         overhead "Smart weapon equip searching..." 66
         @clearignore
         @setvar! mbot_FoundFallbackWeapon 0
@@ -286,7 +297,8 @@ endif
 
 
 ##### Smart Shield Equip
-if mconfig_Shield_SmartEquip = 1
+# Special 2h ids that occupy righthand only but still fill both hands (pickaxe)
+if mconfig_Shield_SmartEquip = 1 and not findtype 3718 righthand
     if not findlayer self lefthand
         if find mbot_BOT_CurrentLeftHandWeapon backpack
             dclick mbot_BOT_CurrentLeftHandWeapon
