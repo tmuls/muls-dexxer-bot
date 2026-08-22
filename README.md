@@ -55,6 +55,7 @@ bot's actual logic.
 - Tamer support has been removed
 
 ##  Special Thanks
+- Jaseowns for his awesome scripts and for his [website](https://uoaddicts.com)
 - Orii
 - Genkii
 - Thane
