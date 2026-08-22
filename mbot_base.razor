@@ -244,7 +244,7 @@ if findlayer self lefthand as mbot_LeftHandWeapon
 endif
 
 ##### Gear State Tracking (auto-equip)
-if mconfig_AutoEquip_Enabled = 1
+if mconfig_AutoEquip_Setup_Enabled = 1
     @unsetvar mbot_AutoEquip_InnerTorso
     if findlayer self innertorso as mbot_AutoEquipTmp
         @setvar mbot_AutoEquip_InnerTorso mbot_AutoEquipTmp
