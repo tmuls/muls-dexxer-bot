@@ -1,18 +1,20 @@
 ################################################################
-### Muls Dexxer Bot - v1.0.20260820
+### Muls Dexxer Bot - v1.0.20260822
 ### Based on Jaseowns' Premium Dexxer Bot (June 2026 version)
 #
-# 2026-08-20 Release
-# - Smart Weapon Equip supports all weapons
-# - Fixed poison reapplication
-# - Added Smart Weapon Equip
-# - Added Smart Shield Equip
+# NEW Features
+# - Poison can now be reapplied early
+# - Smart Weapon Equip
+# - Smart Shield Equip
 # - Support automatic full codex hotbar in addition to abilities hot bar
 # - Optimized Chivalry
 # - Optimized Combat Loop
 # - Optimized barding
 # - Optimized main run loop (moved several init-once items outside of the main run loop)
 # - Removed support for tamer archetype
+#
+# Latest release and changelog
+# https://github.com/tmuls/muls-dexxer-bot/releases
 #
 ################################################################
 #
@@ -246,14 +248,23 @@ endif
 
 ##### Smart Weapon Equip
 if mconfig_Weapon_SmartEquip = 1
-    if not findlayer self righthand
+    @setvar! mbot_HasWeapon 0
+    if findlayer self righthand
+        @setvar! mbot_HasWeapon 1
+    elseif findlayer self lefthand
+        @setvar! mbot_HasWeapon 1
+        if findtype 7026|7027|7029|7031|7033|7034|7035|7107|7109|31002|31130 lefthand
+            @setvar! mbot_HasWeapon 0
+        endif
+    endif
+    if mbot_HasWeapon = 0
         if find mbot_BOT_CurrentRightHandWeapon backpack
             dclick mbot_BOT_CurrentRightHandWeapon
             getlabel backpack mbot_PingCheck
         endif
     endif
 
-    if not findlayer self righthand
+    if mbot_HasWeapon = 0
         overhead "Smart weapon equip searching..." 66
         @clearignore
         @setvar! mbot_FoundFallbackWeapon 0
@@ -286,7 +297,8 @@ endif
 
 
 ##### Smart Shield Equip
-if mconfig_Shield_SmartEquip = 1
+# Special 2h ids that are not found in the lefthand layer when equipped (pickaxe)
+if mconfig_Shield_SmartEquip = 1 and not findtype 3718 righthand
     if not findlayer self lefthand
         if find mbot_BOT_CurrentLeftHandWeapon backpack
             dclick mbot_BOT_CurrentLeftHandWeapon
