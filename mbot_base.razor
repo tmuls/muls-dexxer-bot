@@ -45,77 +45,77 @@ endwhile
 
 ##### Smart Weapon/Shield Equip
 if mconfig_Weapon_SmartEquip = 1
-        @setvar! mbot_HasWeapon 0
-        if findlayer self righthand
-            @setvar! mbot_HasWeapon 1
-        elseif findlayer self lefthand
-            @setvar! mbot_HasWeapon 1
-            if findtype 7026|7027|7029|7031|7033|7034|7035|7107|7109|31002|31130 lefthand
-                @setvar! mbot_HasWeapon 0
-            endif
+    @setvar! mbot_HasWeapon 0
+    if findlayer self righthand
+        @setvar! mbot_HasWeapon 1
+    elseif findlayer self lefthand
+        @setvar! mbot_HasWeapon 1
+        if findtype 7026|7027|7029|7031|7033|7034|7035|7107|7109|31002|31130 lefthand
+            @setvar! mbot_HasWeapon 0
         endif
-        @setvar! mbot_FoundSavedWeapon 0
-        if mbot_HasWeapon = 0
-            if find mbot_BOT_CurrentRightHandWeapon backpack
-                dclick mbot_BOT_CurrentRightHandWeapon
-                while queued
-                endwhile
-                @setvar! mbot_FoundSavedWeapon 1
-            endif
-        endif
-
-        if mbot_HasWeapon = 0 and mbot_FoundSavedWeapon = 0
-            overhead "Smart weapon equip searching..." 66
-            @clearignore
-            @setvar! mbot_FoundFallbackWeapon 0
-            while mbot_FoundFallbackWeapon = 0 and findtype 31017|31019|31021|31023|31025|31027|31029|31031|31033|31035|31037|31038|31041|31043|31045|31047|31049|31051|31053|31055|3920|5042|5117|30990|30993|30994|30995|31184|31186|67773|67774|67775|67776|67777|67778|3719|3922|3938|5121|5123|5125|30989|30992|30996|30997|30998|31176|31188|3568|3721|3932|5040|5044|5112|5127|5177|5179|5181|30991|30999|31000|31001|31014|31178|31180|31182|3909|3911|3913|3915|3917|3934|3937|5046|5049|5115|5119|5182|5185|5187|30988|31128|31190|67713|67723|67734|67744|67754|67764|22187|31141|31142 backpack as mbot_WeaponCandidate
-                getlabel mbot_WeaponCandidate mbot_WeaponCandidateDesc
-                if " aspect" in mbot_WeaponCandidateDesc or "exceptional " in mbot_WeaponCandidateDesc or "supremely" in mbot_WeaponCandidateDesc or "exceedingly" in mbot_WeaponCandidateDesc or "vanquishing" in mbot_WeaponCandidateDesc or "power" in mbot_WeaponCandidateDesc
-                    overhead "Weapon found! Auto-equipping." 66
-                    dclick mbot_WeaponCandidate
-                    while queued
-                    endwhile
-                    @setvar! mbot_FoundFallbackWeapon 1
-                    @setvar! mbot_BOT_CurrentRightHandWeapon mbot_WeaponCandidate
-                else
-                    @ignore mbot_WeaponCandidate
-                endif
+    endif
+    @setvar! mbot_FoundSavedWeapon 0
+    if mbot_HasWeapon = 0
+        if find mbot_BOT_CurrentRightHandWeapon backpack
+            dclick mbot_BOT_CurrentRightHandWeapon
+            while queued
             endwhile
-            @clearignore
+            @setvar! mbot_FoundSavedWeapon 1
         endif
     endif
 
-    if mconfig_Shield_SmartEquip = 1 and not findtype 3718 righthand
-        @setvar! mbot_FoundSavedShield 0
-        if not findlayer self lefthand
-            if find mbot_BOT_CurrentLeftHandWeapon backpack
-                dclick mbot_BOT_CurrentLeftHandWeapon
+    if mbot_HasWeapon = 0 and mbot_FoundSavedWeapon = 0
+        overhead "Smart weapon equip searching..." 66
+        @clearignore
+        @setvar! mbot_FoundFallbackWeapon 0
+        while mbot_FoundFallbackWeapon = 0 and findtype 31017|31019|31021|31023|31025|31027|31029|31031|31033|31035|31037|31038|31041|31043|31045|31047|31049|31051|31053|31055|3920|5042|5117|30990|30993|30994|30995|31184|31186|67773|67774|67775|67776|67777|67778|3719|3922|3938|5121|5123|5125|30989|30992|30996|30997|30998|31176|31188|3568|3721|3932|5040|5044|5112|5127|5177|5179|5181|30991|30999|31000|31001|31014|31178|31180|31182|3909|3911|3913|3915|3917|3934|3937|5046|5049|5115|5119|5182|5185|5187|30988|31128|31190|67713|67723|67734|67744|67754|67764|22187|31141|31142 backpack as mbot_WeaponCandidate
+            getlabel mbot_WeaponCandidate mbot_WeaponCandidateDesc
+            if " aspect" in mbot_WeaponCandidateDesc or "exceptional " in mbot_WeaponCandidateDesc or "supremely" in mbot_WeaponCandidateDesc or "exceedingly" in mbot_WeaponCandidateDesc or "vanquishing" in mbot_WeaponCandidateDesc or "power" in mbot_WeaponCandidateDesc
+                overhead "Weapon found! Auto-equipping." 66
+                dclick mbot_WeaponCandidate
                 while queued
                 endwhile
-                @setvar! mbot_FoundSavedShield 1
+                @setvar! mbot_FoundFallbackWeapon 1
+                @setvar! mbot_BOT_CurrentRightHandWeapon mbot_WeaponCandidate
+            else
+                @ignore mbot_WeaponCandidate
             endif
-        endif
+        endwhile
+        @clearignore
+    endif
+endif
 
-        if not findlayer self lefthand and mbot_FoundSavedShield = 0
-            overhead "Smart shield equip searching..." 66
-            @clearignore
-            @setvar! mbot_FoundFallbackShield 0
-            while mbot_FoundFallbackShield = 0 and findtype 7026|7027|7029|7031|7033|7034|7035|7107|7109|31002|31130 backpack as mbot_ShieldCandidate
-                getlabel mbot_ShieldCandidate mbot_ShieldCandidateDesc
-                if "exceptional" in mbot_ShieldCandidateDesc or "invulnerable" in mbot_ShieldCandidateDesc or "fortified" in mbot_ShieldCandidateDesc
-                    dclick mbot_ShieldCandidate
-                    while queued
-                    endwhile
-                    overhead "Shield found! Auto-equipping..." 66
-                    @setvar! mbot_FoundFallbackShield 1
-                    @setvar! mbot_BOT_CurrentLeftHandWeapon mbot_ShieldCandidate
-                else
-                    @ignore mbot_ShieldCandidate
-                endif
+if mconfig_Shield_SmartEquip = 1 and not findtype 3718 righthand
+    @setvar! mbot_FoundSavedShield 0
+    if not findlayer self lefthand
+        if find mbot_BOT_CurrentLeftHandWeapon backpack
+            dclick mbot_BOT_CurrentLeftHandWeapon
+            while queued
             endwhile
-            @clearignore
+            @setvar! mbot_FoundSavedShield 1
         endif
     endif
+
+    if not findlayer self lefthand and mbot_FoundSavedShield = 0
+        overhead "Smart shield equip searching..." 66
+        @clearignore
+        @setvar! mbot_FoundFallbackShield 0
+        while mbot_FoundFallbackShield = 0 and findtype 7026|7027|7029|7031|7033|7034|7035|7107|7109|31002|31130 backpack as mbot_ShieldCandidate
+            getlabel mbot_ShieldCandidate mbot_ShieldCandidateDesc
+            if "exceptional" in mbot_ShieldCandidateDesc or "invulnerable" in mbot_ShieldCandidateDesc or "fortified" in mbot_ShieldCandidateDesc
+                dclick mbot_ShieldCandidate
+                while queued
+                endwhile
+                overhead "Shield found! Auto-equipping..." 66
+                @setvar! mbot_FoundFallbackShield 1
+                @setvar! mbot_BOT_CurrentLeftHandWeapon mbot_ShieldCandidate
+            else
+                @ignore mbot_ShieldCandidate
+            endif
+        endwhile
+        @clearignore
+    endif
+endif
 
 ##### Archetype Detection
 @setvar! mbot_BardDetected 0
