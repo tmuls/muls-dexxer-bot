@@ -26,19 +26,13 @@
 
 @setvar! mbot_version "v1.0.20260822.5"
 
-##### Weapon State Tracking
-if not varexist mbot_BOT_CurrentRightHandWeapon
-    @setvar! mbot_BOT_CurrentRightHandWeapon 0
-endif
-if findlayer self righthand as mbot_RightHandWeapon
-    @setvar! mbot_BOT_CurrentRightHandWeapon mbot_RightHandWeapon
+##### Instant Equip
+if not findlayer self righthand and find mbot_BOT_CurrentRightHandWeapon backpack
+    dclick mbot_BOT_CurrentRightHandWeapon
 endif
 
-if not varexist mbot_BOT_CurrentLeftHandWeapon
-    @setvar! mbot_BOT_CurrentLeftHandWeapon 0
-endif
-if findlayer self lefthand as mbot_LeftHandWeapon
-    @setvar! mbot_BOT_CurrentLeftHandWeapon mbot_LeftHandWeapon
+if not findlayer self lefthand and find mbot_BOT_CurrentLeftHandWeapon backpack
+    dclick mbot_BOT_CurrentLeftHandWeapon
 endif
 
 ##### Instant Target
@@ -46,6 +40,8 @@ hotkey "target closest non-friendly monster"
 if find lasttarget
     attack lasttarget
 endif
+while queued
+endwhile
 
 ##### Archetype Detection
 @setvar! mbot_BardDetected 0
