@@ -40,6 +40,8 @@ hotkey "target closest non-friendly monster"
 if find lasttarget
     attack lasttarget
 endif
+
+#Wait for items to equip before attempting smart equip
 while queued
 endwhile
 
@@ -116,6 +118,10 @@ if mconfig_Shield_SmartEquip = 1 and not findtype 3718 righthand
         @clearignore
     endif
 endif
+
+# Wait for smart equip queue
+while queued
+endwhile
 
 ##### Archetype Detection
 @setvar! mbot_BardDetected 0
