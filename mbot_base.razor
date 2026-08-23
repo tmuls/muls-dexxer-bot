@@ -26,6 +26,25 @@
 
 @setvar! mbot_version "v1.0.20260822.5"
 
+##### Weapon State Tracking
+if not varexist mbot_BOT_CurrentRightHandWeapon
+    @setvar! mbot_BOT_CurrentRightHandWeapon 0
+endif
+if findlayer self righthand as mbot_RightHandWeapon
+    @setvar! mbot_BOT_CurrentRightHandWeapon mbot_RightHandWeapon
+endif
+
+if not varexist mbot_BOT_CurrentLeftHandWeapon
+    @setvar! mbot_BOT_CurrentLeftHandWeapon 0
+endif
+if findlayer self lefthand as mbot_LeftHandWeapon
+    @setvar! mbot_BOT_CurrentLeftHandWeapon mbot_LeftHandWeapon
+endif
+
+##### Instant Target
+hotkey "target closest non-friendly monster"
+attack lasttarget
+
 ##### Archetype Detection
 @setvar! mbot_BardDetected 0
 if skill "Discordance" > 0 or skill "Peacemaking" > 0 or skill "Provocation" > 0
@@ -100,6 +119,9 @@ endif
 @setvar! mbot_UseItemTimerCD 650
 settimer mbot_UseItemTimer mbot_UseItemTimerCD
 
+@setvar! mbot_ReequipTimerCD 3000
+settimer mbot_ReequipTimer mbot_ReequipTimerCD
+
 ##### Potion Triggers & Overhead Display
 if mconfig_Potion_ShowOverheads = 1
     settimer mbot_Potion_Cure_Overhead_IfCountIsLessThan_Timer mconfig_Potion_CureOverheadIfCountIsLessThanTimerCD
@@ -129,14 +151,9 @@ else
     endif
 
     @setvar! mbot_Parry_SwitchCodexTimerCD 1000
+    settimer mbot_Parry_SwitchCodexTimer mbot_Parry_SwitchCodexTimerCD
 
-    if not timerexists mbot_Parry_SwitchCodexTimer
-        settimer mbot_Parry_SwitchCodexTimer mbot_Parry_SwitchCodexTimerCD
-    endif
-
-    if not timerexists mbot_TauntingTimer
-        settimer mbot_TauntingTimer mconfig_Parry_TauntingTimerCD
-    endif
+    settimer mbot_TauntingTimer mconfig_Parry_TauntingTimerCD
 endif
 
 ##### Potion Satchel & Refresh Trigger
@@ -192,22 +209,9 @@ endif
 @setvar! mbot_UsedSkillTimerCD 10000
 settimer mbot_UsedSkillTimer mbot_UsedSkillTimerCD
 
-##### Weapon Ability Hotbar Setup
-if mconfig_Weapon_ForceAbilitiesHotBarToShow = 1 and not gumpexists 3954121934
-    say "[abilitieshotbar"
-    waitforgump 3954121934 1000
-    if not gumpexists 3954121934
-        overhead "!!!!!!!!!! ABILITIES HOTBAR GUMP NOT FOUND !!!!!!!!!!" 34
-    endif
-endif
-
-if mconfig_Weapon_ForceCodexHotBarToShow = 1 and not gumpexists 2016719803
-    say "[codexhotbar"
-    waitforgump 2016719803 1000
-    if not gumpexists 2016719803
-        overhead "!!!!!!!!!! CODEX HOTBAR GUMP NOT FOUND !!!!!!!!!!" 34
-    endif
-endif
+##### Slow Init (deferred, independent one-time tasks - starts 1s after launch, see the run loop)
+settimer mbot_SlowInitTimer 0
+@setvar! mbot_SlowInitHasRun 0
 
 settimer mbot_UseAbilityTimer mconfig_Weapon_UseAbilityTimerCD
 
@@ -226,21 +230,6 @@ endif
 @setvar! mbot_UseCleansingBrewTimerCD 120500
 if not timerexists mbot_UseCleansingBrewTimer
     settimer mbot_UseCleansingBrewTimer mbot_UseCleansingBrewTimerCD
-endif
-
-##### Weapon State Tracking
-if not varexist mbot_BOT_CurrentRightHandWeapon
-    @setvar! mbot_BOT_CurrentRightHandWeapon 0
-endif
-if findlayer self righthand as mbot_RightHandWeapon
-    @setvar! mbot_BOT_CurrentRightHandWeapon mbot_RightHandWeapon
-endif
-
-if not varexist mbot_BOT_CurrentLeftHandWeapon
-    @setvar! mbot_BOT_CurrentLeftHandWeapon 0
-endif
-if findlayer self lefthand as mbot_LeftHandWeapon
-    @setvar! mbot_BOT_CurrentLeftHandWeapon mbot_LeftHandWeapon
 endif
 
 ##### Gear State Tracking (auto-equip)
@@ -395,41 +384,6 @@ endif
 
 @setvar! mbot_RedPouchCountTotal 0
 
-##### Tracking
-if skill "Tracking" > 0
-    if not findbuff "tracking"
-        while insysmsg "You will now hunt all hostile players."
-        endwhile
-
-        settimer mbot_TrackingGumpTimer 0
-        while not gumpexists 4267467659 and timer mbot_TrackingGumpTimer < 1000
-            useskill 'tracking'
-            getlabel backpack mbot_PingCheck
-        endwhile
-
-        if gumpexists 4267467659
-            settimer mbot_TrackingGumpTimer 0
-            while not insysmsg "You will now hunt all hostile players." and timer mbot_TrackingGumpTimer < 1000
-                gumpresponse 8 4267467659
-                waitforgump 4267467659 1000
-            endwhile
-            if insysmsg "You will now hunt all hostile players."
-                gumpresponse 6 4267467659
-                getlabel backpack mbot_PingCheck
-            else
-                overhead "!!!!!!!!!! TRACKING GUMP TIMED OUT - GIVING UP !!!!!!!!!!" 34
-            endif
-        else
-            overhead "!!!!!!!!!! TRACKING GUMP NEVER APPEARED - GIVING UP !!!!!!!!!!" 34
-        endif
-        gumpclose 4267467659
-    endif
-endif
-
-##### Smart Equip Timer
-settimer mbot_SmartEquipTimer mconfig_SmartEquip_TimerCD
-@setvar! mbot_SmartEquipHasRun 0
-
 ##### Init Version Check
 @setvar! mbot_ExpectedInitVersion 1
 @setvar! mbot_InitVersionOk 1
@@ -447,7 +401,62 @@ if mconfig_General_ShowVersion = 1
     sysmsg "Muls Dexxer Bot {{mbot_version}}"
 endif
 
+##### Run once flags
+@setvar! mbot_SmartEquipHasRun 0
+settimer mbot_SmartEquipTimer 0
+
 while not dead
+    ##### Slow Init (deferred, independent one-time tasks)
+    if mbot_SlowInitHasRun = 0 and timer mbot_SlowInitTimer >= 1000
+        if mconfig_Weapon_ForceAbilitiesHotBarToShow = 1 and not gumpexists 3954121934
+            say "[abilitieshotbar"
+            waitforgump 3954121934 1000
+            if not gumpexists 3954121934
+                overhead "!!!!!!!!!! ABILITIES HOTBAR GUMP NOT FOUND !!!!!!!!!!" 34
+            endif
+        endif
+
+        if mconfig_Weapon_ForceCodexHotBarToShow = 1 and not gumpexists 2016719803
+            say "[codexhotbar"
+            waitforgump 2016719803 1000
+            if not gumpexists 2016719803
+                overhead "!!!!!!!!!! CODEX HOTBAR GUMP NOT FOUND !!!!!!!!!!" 34
+            endif
+        endif
+
+        if skill "Tracking" > 0
+            if not findbuff "tracking"
+                while insysmsg "You will now hunt all hostile players."
+                endwhile
+
+                settimer mbot_TrackingGumpTimer 0
+                while not gumpexists 4267467659 and timer mbot_TrackingGumpTimer < 1000
+                    useskill 'tracking'
+                    getlabel backpack mbot_PingCheck
+                endwhile
+
+                if gumpexists 4267467659
+                    settimer mbot_TrackingGumpTimer 0
+                    while not insysmsg "You will now hunt all hostile players." and timer mbot_TrackingGumpTimer < 1000
+                        gumpresponse 8 4267467659
+                        waitforgump 4267467659 1000
+                    endwhile
+                    if insysmsg "You will now hunt all hostile players."
+                        gumpresponse 6 4267467659
+                        getlabel backpack mbot_PingCheck
+                    else
+                        overhead "!!!!!!!!!! TRACKING GUMP TIMED OUT - GIVING UP !!!!!!!!!!" 34
+                    endif
+                else
+                    overhead "!!!!!!!!!! TRACKING GUMP NEVER APPEARED - GIVING UP !!!!!!!!!!" 34
+                endif
+                gumpclose 4267467659
+            endif
+        endif
+
+        @setvar! mbot_SlowInitHasRun 1
+    endif
+
     ##### Out of Combat: Sysmsg Cleanup & Self-Bandaging
     while insysmsg "You deliver a poison sting"
         cooldown "Poison Sting" 5000
@@ -487,17 +496,8 @@ while not dead
         endif
     endif
 
-    @setvar! mbot_SmartEquipShouldRun 0
-    if mconfig_SmartEquip_RunOnce = 1
-        if mbot_SmartEquipHasRun = 0
-            @setvar! mbot_SmartEquipShouldRun 1
-        endif
-    elseif timer mbot_SmartEquipTimer >= mconfig_SmartEquip_TimerCD
-        @setvar! mbot_SmartEquipShouldRun 1
-    endif
-
-    if mbot_SmartEquipShouldRun = 1
-        ##### Smart Weapon Equip
+    ##### Smart Weapon/Shield Equip
+    if mbot_SmartEquipHasRun = 0 or (mconfig_SmartEquip_RunOnce = 0 and timer mbot_SmartEquipTimer >= mconfig_SmartEquip_TimerCD)
         if mconfig_Weapon_SmartEquip = 1
             @setvar! mbot_HasWeapon 0
             if findlayer self righthand
@@ -508,15 +508,17 @@ while not dead
                     @setvar! mbot_HasWeapon 0
                 endif
             endif
+            @setvar! mbot_FoundSavedWeapon 0
             if mbot_HasWeapon = 0
                 if find mbot_BOT_CurrentRightHandWeapon backpack
                     dclick mbot_BOT_CurrentRightHandWeapon
                     while queued
                     endwhile
+                    @setvar! mbot_FoundSavedWeapon 1
                 endif
             endif
 
-            if mbot_HasWeapon = 0
+            if mbot_HasWeapon = 0 and mbot_FoundSavedWeapon = 0
                 overhead "Smart weapon equip searching..." 66
                 @clearignore
                 @setvar! mbot_FoundFallbackWeapon 0
@@ -537,18 +539,18 @@ while not dead
             endif
         endif
 
-        ##### Smart Shield Equip
-        # Special 2h ids that are not found in the lefthand layer when equipped (pickaxe)
         if mconfig_Shield_SmartEquip = 1 and not findtype 3718 righthand
+            @setvar! mbot_FoundSavedShield 0
             if not findlayer self lefthand
                 if find mbot_BOT_CurrentLeftHandWeapon backpack
                     dclick mbot_BOT_CurrentLeftHandWeapon
                     while queued
                     endwhile
+                    @setvar! mbot_FoundSavedShield 1
                 endif
             endif
 
-            if not findlayer self lefthand
+            if not findlayer self lefthand and mbot_FoundSavedShield = 0
                 overhead "Smart shield equip searching..." 66
                 @clearignore
                 @setvar! mbot_FoundFallbackShield 0
@@ -610,24 +612,31 @@ while not dead
         settimer mbot_SmartEquipTimer 0
     endif
 
-    ##### Out of Combat: Weapon Re-equip
+    ##### Re-equip Smart Equip Weapon/Shield if Disarmed
     if casting
-        settimer mbot_UseItemTimer 0
+        settimer mbot_ReequipTimer 0
     endif
 
-    if not queued and find mbot_BOT_CurrentRightHandWeapon backpack and timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+    if mbot_BOT_CurrentRightHandWeapon = 0 and findlayer self righthand as mbot_RightHandWeapon
+        @setvar! mbot_BOT_CurrentRightHandWeapon mbot_RightHandWeapon
+    endif
+    if mbot_BOT_CurrentLeftHandWeapon = 0 and findlayer self lefthand as mbot_LeftHandWeapon
+        @setvar! mbot_BOT_CurrentLeftHandWeapon mbot_LeftHandWeapon
+    endif
+
+    if not queued and find mbot_BOT_CurrentRightHandWeapon backpack and timer mbot_ReequipTimer >= mbot_ReequipTimerCD
         if findlayer self righthand as mbot_RightHandWeapon
             @setvar! mbot_BOT_CurrentRightHandWeapon mbot_RightHandWeapon
         else
             dclick mbot_BOT_CurrentRightHandWeapon
-            settimer mbot_UseItemTimer 0
+            settimer mbot_ReequipTimer 0
         endif
-    elseif not queued and find mbot_BOT_CurrentLeftHandWeapon backpack and timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+    elseif not queued and find mbot_BOT_CurrentLeftHandWeapon backpack and timer mbot_ReequipTimer >= mbot_ReequipTimerCD
         if findlayer self lefthand as mbot_LeftHandWeapon
             @setvar! mbot_BOT_CurrentLeftHandWeapon mbot_LeftHandWeapon
         else
             dclick mbot_BOT_CurrentLeftHandWeapon
-            settimer mbot_UseItemTimer 0
+            settimer mbot_ReequipTimer 0
         endif
     endif
     
