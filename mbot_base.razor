@@ -1740,13 +1740,6 @@ while not dead
         ##### Chivalry Gate C - Divine Fury / Enemy of One / Consecrate Weapon (respects reserve, combat only)
         if varexist mbot_HolySymbols
 
-            @setvar! mbot_divineFuryIsUsed 0
-            if mconfig_Chiv_UseDivineFuryAutomatically = 0
-                @setvar! mbot_divineFuryIsUsed 1
-            elseif mconfig_Chiv_UseDivineFuryAutomatically = 1 and timer mbot_DivineFuryTimer < mbot_DivineFuryTimerCD
-                @setvar! mbot_divineFuryIsUsed 1
-            endif
-        
             if mconfig_Chiv_UseDivineFuryAutomatically = 1 and mconfig_Chiv_MinSymbolsDivineFury <= mbot_HolySymbols and skill "chivalry" >= 85 and timer mbot_DivineFuryTimer >= mbot_DivineFuryTimerCD
                 while insysmsg "Holy symbols remaining"
                 endwhile
@@ -1757,22 +1750,22 @@ while not dead
                     settimer mbot_DivineFuryTimer 0
                     settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
                 endif
-            elseif mbot_divineFuryIsUsed = 1 and mconfig_Chiv_UseEnemyOfOneAutomatically = 1 and mconfig_Chiv_MinSymbolsEnemyOfOne <= mbot_HolySymbols and skill "chivalry" >= 75 and timer mbot_EnemyOfOneTimer >= mbot_EnemyOfOneTimerCD
+            elseif mconfig_Chiv_UseEnemyOfOneAutomatically = 1 and mconfig_Chiv_MinSymbolsEnemyOfOne <= mbot_HolySymbols and skill "chivalry" >= 75 and timer mbot_EnemyOfOneTimer >= mbot_EnemyOfOneTimerCD
                 while insysmsg "Holy symbols remaining"
                 endwhile
                 say "[EnemyOfOne"
                 getlabel backpack mbot_PingCheck
-                if insysmsg "Holy symbols remaining" 
+                if insysmsg "Holy symbols remaining"
                     cooldown "Enemy Of One" mbot_EnemyOfOneTimerCD
                     settimer mbot_EnemyOfOneTimer 0
                     settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
-                endif  
-            elseif mbot_divineFuryIsUsed = 1 and mconfig_Chiv_UseConsecrateWeaponAutomatically = 1 and mconfig_Chiv_MinSymbolsConsecrateWeapon <= mbot_HolySymbols and skill "chivalry" >= 65 and timer mbot_ConsecrateWeaponTimer >= mbot_ConsecrateWeaponTimerCD
+                endif
+            elseif mconfig_Chiv_UseConsecrateWeaponAutomatically = 1 and mconfig_Chiv_MinSymbolsConsecrateWeapon <= mbot_HolySymbols and skill "chivalry" >= 65 and timer mbot_ConsecrateWeaponTimer >= mbot_ConsecrateWeaponTimerCD
                 while insysmsg "Holy symbols remaining"
                 endwhile
                 say "[ConsecrateWeapon"
                 getlabel backpack mbot_PingCheck
-                if insysmsg "Holy symbols remaining" 
+                if insysmsg "Holy symbols remaining"
                     cooldown "Consecrate Weapon" mbot_ConsecrateWeaponTimerCD
                     settimer mbot_ConsecrateWeaponTimer 0
                     settimer mbot_Chiv_SymbolCheckTimer mbot_Chiv_SymbolCheckTimerCD
