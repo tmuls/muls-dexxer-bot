@@ -19,8 +19,8 @@
 ################################################################
 #
 # Jaseowns Premium Bot Comparison
-# 46% smaller file size
-# 65.7% fewer main loop branches -- 851 -> 292 branches (559 removed)
+# 43% smaller file size
+# 71.3% fewer main loop branches -- 875 -> 251 branches (624 removed)
 #
 ################################################################
 
@@ -281,9 +281,9 @@ endif
 @setvar! mbot_UsedSkillTimerCD 10000
 settimer mbot_UsedSkillTimer mbot_UsedSkillTimerCD
 
-##### Delayed Init (deferred, independent one-time tasks - starts 1s after launch, see the run loop)
-settimer mbot_SlowInitTimer 0
-@setvar! mbot_SlowInitHasRun 0
+##### Delayed Run Once (deferred, independent one-time tasks - starts 2s after launch, see the run loop)
+settimer mbot_DelayedRunOnceTimer 0
+@setvar! mbot_DelayedRunOnceHasRun 0
 
 ##### Delayed Start (starts 2s after launch, then runs every pass, see the run loop)
 settimer mbot_DelayedStartTimer 0
@@ -477,8 +477,8 @@ if mconfig_General_ShowVersion = 1
 endif
 
 while not dead
-    ##### Delayed Init (deferred, independent one-time tasks)
-    if mbot_SlowInitHasRun = 0 and timer mbot_SlowInitTimer >= 2000
+    ##### Delayed Run Once
+    if mbot_DelayedRunOnceHasRun = 0 and timer mbot_DelayedRunOnceTimer >= 2000
 
         ##### Weapon/Shield Missing - Auto Recall
         @setvar! mbot_HasWeapon 0
@@ -562,7 +562,7 @@ while not dead
             endif
         endif
 
-        @setvar! mbot_SlowInitHasRun 1
+        @setvar! mbot_DelayedRunOnceHasRun 1
     endif
 
     ##### Delayed Start and Low Priority
