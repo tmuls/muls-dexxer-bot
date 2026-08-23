@@ -19,12 +19,103 @@
 ################################################################
 #
 # Jaseowns Premium Bot Comparison
-# 46% smaller file size
-# 65.7% fewer main loop branches -- 851 -> 292 branches (559 removed)
+# 43% smaller file size
+# 71.3% fewer main loop branches -- 875 -> 251 branches (624 removed)
 #
 ################################################################
 
 @setvar! mbot_version "v1.0.20260822.5"
+#################Instant Target and Smart Equip###########################
+##### Instant Equip
+if not findlayer self righthand and find mbot_BOT_CurrentRightHandWeapon backpack
+    dclick mbot_BOT_CurrentRightHandWeapon
+endif
+
+if not findlayer self lefthand and find mbot_BOT_CurrentLeftHandWeapon backpack
+    dclick mbot_BOT_CurrentLeftHandWeapon
+endif
+
+##### Instant Target
+hotkey "target closest non-friendly monster"
+if find lasttarget
+    attack lasttarget
+endif
+while queued
+endwhile
+
+##### Smart Weapon/Shield Equip
+if mconfig_Weapon_SmartEquip = 1
+    @setvar! mbot_HasWeapon 0
+    if findlayer self righthand
+        @setvar! mbot_HasWeapon 1
+    elseif findlayer self lefthand
+        @setvar! mbot_HasWeapon 1
+        if findtype 7026|7027|7029|7031|7033|7034|7035|7107|7109|31002|31130 lefthand
+            @setvar! mbot_HasWeapon 0
+        endif
+    endif
+    @setvar! mbot_FoundSavedWeapon 0
+    if mbot_HasWeapon = 0
+        if find mbot_BOT_CurrentRightHandWeapon backpack
+            dclick mbot_BOT_CurrentRightHandWeapon
+            while queued
+            endwhile
+            @setvar! mbot_FoundSavedWeapon 1
+        endif
+    endif
+
+    if mbot_HasWeapon = 0 and mbot_FoundSavedWeapon = 0
+        overhead "Smart weapon equip searching..." 66
+        @clearignore
+        @setvar! mbot_FoundFallbackWeapon 0
+        while mbot_FoundFallbackWeapon = 0 and findtype 31017|31019|31021|31023|31025|31027|31029|31031|31033|31035|31037|31038|31041|31043|31045|31047|31049|31051|31053|31055|3920|5042|5117|30990|30993|30994|30995|31184|31186|67773|67774|67775|67776|67777|67778|3719|3922|3938|5121|5123|5125|30989|30992|30996|30997|30998|31176|31188|3568|3721|3932|5040|5044|5112|5127|5177|5179|5181|30991|30999|31000|31001|31014|31178|31180|31182|3909|3911|3913|3915|3917|3934|3937|5046|5049|5115|5119|5182|5185|5187|30988|31128|31190|67713|67723|67734|67744|67754|67764|22187|31141|31142 backpack as mbot_WeaponCandidate
+            getlabel mbot_WeaponCandidate mbot_WeaponCandidateDesc
+            if " aspect" in mbot_WeaponCandidateDesc or "exceptional " in mbot_WeaponCandidateDesc or "supremely" in mbot_WeaponCandidateDesc or "exceedingly" in mbot_WeaponCandidateDesc or "vanquishing" in mbot_WeaponCandidateDesc or "power" in mbot_WeaponCandidateDesc
+                overhead "Weapon found! Auto-equipping." 66
+                dclick mbot_WeaponCandidate
+                while queued
+                endwhile
+                @setvar! mbot_FoundFallbackWeapon 1
+                @setvar! mbot_BOT_CurrentRightHandWeapon mbot_WeaponCandidate
+            else
+                @ignore mbot_WeaponCandidate
+            endif
+        endwhile
+        @clearignore
+    endif
+endif
+
+if mconfig_Shield_SmartEquip = 1 and not findtype 3718 righthand
+    @setvar! mbot_FoundSavedShield 0
+    if not findlayer self lefthand
+        if find mbot_BOT_CurrentLeftHandWeapon backpack
+            dclick mbot_BOT_CurrentLeftHandWeapon
+            while queued
+            endwhile
+            @setvar! mbot_FoundSavedShield 1
+        endif
+    endif
+
+    if not findlayer self lefthand and mbot_FoundSavedShield = 0
+        overhead "Smart shield equip searching..." 66
+        @clearignore
+        @setvar! mbot_FoundFallbackShield 0
+        while mbot_FoundFallbackShield = 0 and findtype 7026|7027|7029|7031|7033|7034|7035|7107|7109|31002|31130 backpack as mbot_ShieldCandidate
+            getlabel mbot_ShieldCandidate mbot_ShieldCandidateDesc
+            if "exceptional" in mbot_ShieldCandidateDesc or "invulnerable" in mbot_ShieldCandidateDesc or "fortified" in mbot_ShieldCandidateDesc
+                dclick mbot_ShieldCandidate
+                while queued
+                endwhile
+                overhead "Shield found! Auto-equipping..." 66
+                @setvar! mbot_FoundFallbackShield 1
+                @setvar! mbot_BOT_CurrentLeftHandWeapon mbot_ShieldCandidate
+            else
+                @ignore mbot_ShieldCandidate
+            endif
+        endwhile
+        @clearignore
+    endif
+endif
 
 ##### Archetype Detection
 @setvar! mbot_BardDetected 0
@@ -100,6 +191,9 @@ endif
 @setvar! mbot_UseItemTimerCD 650
 settimer mbot_UseItemTimer mbot_UseItemTimerCD
 
+@setvar! mbot_ReequipTimerCD 3000
+settimer mbot_ReequipTimer mbot_ReequipTimerCD
+
 ##### Potion Triggers & Overhead Display
 if mconfig_Potion_ShowOverheads = 1
     settimer mbot_Potion_Cure_Overhead_IfCountIsLessThan_Timer mconfig_Potion_CureOverheadIfCountIsLessThanTimerCD
@@ -129,14 +223,9 @@ else
     endif
 
     @setvar! mbot_Parry_SwitchCodexTimerCD 1000
+    settimer mbot_Parry_SwitchCodexTimer mbot_Parry_SwitchCodexTimerCD
 
-    if not timerexists mbot_Parry_SwitchCodexTimer
-        settimer mbot_Parry_SwitchCodexTimer mbot_Parry_SwitchCodexTimerCD
-    endif
-
-    if not timerexists mbot_TauntingTimer
-        settimer mbot_TauntingTimer mconfig_Parry_TauntingTimerCD
-    endif
+    settimer mbot_TauntingTimer mconfig_Parry_TauntingTimerCD
 endif
 
 ##### Potion Satchel & Refresh Trigger
@@ -192,22 +281,12 @@ endif
 @setvar! mbot_UsedSkillTimerCD 10000
 settimer mbot_UsedSkillTimer mbot_UsedSkillTimerCD
 
-##### Weapon Ability Hotbar Setup
-if mconfig_Weapon_ForceAbilitiesHotBarToShow = 1 and not gumpexists 3954121934
-    say "[abilitieshotbar"
-    waitforgump 3954121934 1000
-    if not gumpexists 3954121934
-        overhead "!!!!!!!!!! ABILITIES HOTBAR GUMP NOT FOUND !!!!!!!!!!" 34
-    endif
-endif
+##### Delayed Run Once (deferred, independent one-time tasks - starts 2s after launch, see the run loop)
+settimer mbot_DelayedRunOnceTimer 0
+@setvar! mbot_DelayedRunOnceHasRun 0
 
-if mconfig_Weapon_ForceCodexHotBarToShow = 1 and not gumpexists 2016719803
-    say "[codexhotbar"
-    waitforgump 2016719803 1000
-    if not gumpexists 2016719803
-        overhead "!!!!!!!!!! CODEX HOTBAR GUMP NOT FOUND !!!!!!!!!!" 34
-    endif
-endif
+##### Delayed Start (starts 2s after launch, then runs every pass, see the run loop)
+settimer mbot_DelayedStartTimer 0
 
 settimer mbot_UseAbilityTimer mconfig_Weapon_UseAbilityTimerCD
 
@@ -226,21 +305,6 @@ endif
 @setvar! mbot_UseCleansingBrewTimerCD 120500
 if not timerexists mbot_UseCleansingBrewTimer
     settimer mbot_UseCleansingBrewTimer mbot_UseCleansingBrewTimerCD
-endif
-
-##### Weapon State Tracking
-if not varexist mbot_BOT_CurrentRightHandWeapon
-    @setvar! mbot_BOT_CurrentRightHandWeapon 0
-endif
-if findlayer self righthand as mbot_RightHandWeapon
-    @setvar! mbot_BOT_CurrentRightHandWeapon mbot_RightHandWeapon
-endif
-
-if not varexist mbot_BOT_CurrentLeftHandWeapon
-    @setvar! mbot_BOT_CurrentLeftHandWeapon 0
-endif
-if findlayer self lefthand as mbot_LeftHandWeapon
-    @setvar! mbot_BOT_CurrentLeftHandWeapon mbot_LeftHandWeapon
 endif
 
 ##### Gear State Tracking (auto-equip)
@@ -395,41 +459,6 @@ endif
 
 @setvar! mbot_RedPouchCountTotal 0
 
-##### Tracking
-if skill "Tracking" > 0
-    if not findbuff "tracking"
-        while insysmsg "You will now hunt all hostile players."
-        endwhile
-
-        settimer mbot_TrackingGumpTimer 0
-        while not gumpexists 4267467659 and timer mbot_TrackingGumpTimer < 1000
-            useskill 'tracking'
-            getlabel backpack mbot_PingCheck
-        endwhile
-
-        if gumpexists 4267467659
-            settimer mbot_TrackingGumpTimer 0
-            while not insysmsg "You will now hunt all hostile players." and timer mbot_TrackingGumpTimer < 1000
-                gumpresponse 8 4267467659
-                waitforgump 4267467659 1000
-            endwhile
-            if insysmsg "You will now hunt all hostile players."
-                gumpresponse 6 4267467659
-                getlabel backpack mbot_PingCheck
-            else
-                overhead "!!!!!!!!!! TRACKING GUMP TIMED OUT - GIVING UP !!!!!!!!!!" 34
-            endif
-        else
-            overhead "!!!!!!!!!! TRACKING GUMP NEVER APPEARED - GIVING UP !!!!!!!!!!" 34
-        endif
-        gumpclose 4267467659
-    endif
-endif
-
-##### Smart Equip Timer
-settimer mbot_SmartEquipTimer mconfig_SmartEquip_TimerCD
-@setvar! mbot_SmartEquipHasRun 0
-
 ##### Init Version Check
 @setvar! mbot_ExpectedInitVersion 1
 @setvar! mbot_InitVersionOk 1
@@ -444,11 +473,230 @@ endif
 
 ##### Version Announcement
 if mconfig_General_ShowVersion = 1
-    sysmsg "Muls Dexxer Bot {{mbot_version}}"
+    sysmsg "Muls Dexxer Bot" mbot_version
 endif
 
 while not dead
-    ##### Out of Combat: Sysmsg Cleanup & Self-Bandaging
+    ##### Delayed Run Once
+    if mbot_DelayedRunOnceHasRun = 0 and timer mbot_DelayedRunOnceTimer >= 2000
+
+        ##### Weapon/Shield Missing - Auto Recall
+        @setvar! mbot_HasWeapon 0
+        if findlayer self righthand
+            @setvar! mbot_HasWeapon 1
+        elseif findlayer self lefthand
+            @setvar! mbot_HasWeapon 1
+            if findtype 7026|7027|7029|7031|7033|7034|7035|7107|7109|31002|31130 lefthand
+                @setvar! mbot_HasWeapon 0
+            endif
+        endif
+
+        if mbot_HasWeapon = 0
+            if mconfig_Weapon_AutoRecallWhenEmpty = 1
+                for 3
+                    overhead "Weapon not found, auto-recalling home" 33
+                    wait 250
+                endfor
+                hotkey "Play Script: Combat\Dexxer\mbot_recall_home"
+            else
+                overhead "WARNING: Weapon not found!" 33
+            endif
+        else
+            # Pickaxe occupies both hands but only shows in righthand - skip shield check if pickaxe is equipped.
+            if not findtype 3718 righthand and not findlayer self lefthand
+                if mconfig_Shield_AutoRecallWhenEmpty = 1
+                    for 3
+                        overhead "Shield not found, auto-recalling home" 33
+                        wait 250
+                    endfor
+                    hotkey "Play Script: Combat\Dexxer\mbot_recall_home"
+                else
+                    overhead "WARNING: Shield not found!" 33
+                endif
+            endif
+        endif
+
+        if mconfig_Weapon_ForceAbilitiesHotBarToShow = 1 and not gumpexists 3954121934
+            say "[abilitieshotbar"
+            waitforgump 3954121934 1000
+            if not gumpexists 3954121934
+                overhead "!!!!!!!!!! ABILITIES HOTBAR GUMP NOT FOUND !!!!!!!!!!" 34
+            endif
+        endif
+
+        if mconfig_Weapon_ForceCodexHotBarToShow = 1 and not gumpexists 2016719803
+            say "[codexhotbar"
+            waitforgump 2016719803 1000
+            if not gumpexists 2016719803
+                overhead "!!!!!!!!!! CODEX HOTBAR GUMP NOT FOUND !!!!!!!!!!" 34
+            endif
+        endif
+
+        if skill "Tracking" > 0
+            if not findbuff "tracking"
+                while insysmsg "You will now hunt all hostile players."
+                endwhile
+
+                settimer mbot_TrackingGumpTimer 0
+                while not gumpexists 4267467659 and timer mbot_TrackingGumpTimer < 1000
+                    useskill 'tracking'
+                    getlabel backpack mbot_PingCheck
+                endwhile
+
+                if gumpexists 4267467659
+                    settimer mbot_TrackingGumpTimer 0
+                    while not insysmsg "You will now hunt all hostile players." and timer mbot_TrackingGumpTimer < 1000
+                        gumpresponse 8 4267467659
+                        waitforgump 4267467659 1000
+                    endwhile
+                    if insysmsg "You will now hunt all hostile players."
+                        gumpresponse 6 4267467659
+                        getlabel backpack mbot_PingCheck
+                    else
+                        overhead "!!!!!!!!!! TRACKING GUMP TIMED OUT - GIVING UP !!!!!!!!!!" 34
+                    endif
+                else
+                    overhead "!!!!!!!!!! TRACKING GUMP NEVER APPEARED - GIVING UP !!!!!!!!!!" 34
+                endif
+                gumpclose 4267467659
+            endif
+        endif
+
+        @setvar! mbot_DelayedRunOnceHasRun 1
+    endif
+
+    ##### Delayed Start and Low Priority
+    if timer mbot_DelayedStartTimer >= 3000
+        ##### Auto re-equip
+        if casting
+            settimer mbot_ReequipTimer 0
+        endif
+
+        if not queued and find mbot_BOT_CurrentRightHandWeapon backpack and timer mbot_ReequipTimer >= mbot_ReequipTimerCD
+            dclick mbot_BOT_CurrentRightHandWeapon
+            settimer mbot_ReequipTimer 0
+        elseif not queued and find mbot_BOT_CurrentLeftHandWeapon backpack and timer mbot_ReequipTimer >= mbot_ReequipTimerCD
+            dclick mbot_BOT_CurrentLeftHandWeapon
+            settimer mbot_ReequipTimer 0
+        else
+            if mbot_BOT_CurrentRightHandWeapon = 0 and findlayer self righthand as mbot_RightHandWeapon
+                @setvar! mbot_BOT_CurrentRightHandWeapon mbot_RightHandWeapon
+            endif
+            if mbot_BOT_CurrentLeftHandWeapon = 0 and findlayer self lefthand as mbot_LeftHandWeapon
+                @setvar! mbot_BOT_CurrentLeftHandWeapon mbot_LeftHandWeapon
+            endif
+        endif
+
+        ##### Food
+        if not queued and not findbuff "food" and findtype "tray" backpack as mbot_FoodItem
+            if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+                dclick mbot_FoodItem
+                settimer mbot_UseItemTimer 0
+            endif
+        endif
+
+        ##### Parry Codex Stance Switching (runs regardless of fight state)
+        if skill "Parry" >= 80
+            if findtype 11889 backpack as mbot_ParryCodex
+                getlabel mbot_ParryCodex mbot_ParryCodexDesc
+
+                if "Shield Bash" in mbot_ParryCodexDesc
+                    @setvar! mbot_ActiveParryCodex 1
+                elseif "Warding" in mbot_ParryCodexDesc
+                    @setvar! mbot_ActiveParryCodex 2
+                elseif "Testudo" in mbot_ParryCodexDesc
+                    @setvar! mbot_ActiveParryCodex 3
+                elseif "Mirror" in mbot_ParryCodexDesc
+                    @setvar! mbot_ActiveParryCodex 4
+                elseif "Bulwark" in mbot_ParryCodexDesc
+                    @setvar! mbot_ActiveParryCodex 5
+                endif
+
+                if findbuff "bleed" and mconfig_Parry_SwitchToWardingIfBleeding = 1 and diffhits >= mconfig_Parry_SwitchToWardingIfBleedingHpDiff
+                    @setvar! mbot_parryStanceTarget 2
+                elseif findbuff "disease" and mconfig_Parry_SwitchToWardingIfDisease = 1 and diffhits >= mconfig_Parry_SwitchToWardingIfDiseaseHpDiff
+                    @setvar! mbot_parryStanceTarget 2
+                elseif poisoned and mconfig_Parry_SwitchToWardingIfPoison = 1 and diffhits >= mconfig_Parry_SwitchToWardingIfPoisonHpDiff
+                    @setvar! mbot_parryStanceTarget 2
+                elseif mconfig_Parry_SwitchToBulwarkIfStandingStill = 1 and not cooldown "Bulwark"
+                    @setvar! mbot_parryStanceTarget 5
+                elseif mconfig_Parry_SwitchToShieldBashWhileMoving = 1 and cooldown "Moving"
+                    @setvar! mbot_parryStanceTarget 1
+                else
+                    @setvar! mbot_parryStanceTarget mconfig_Parry_SwitchToDefaultStance
+                endif
+
+                if mbot_ActiveParryCodex != mbot_parryStanceTarget
+                    if mbot_parryStanceTarget = 1
+                        say "[ShieldsStance1"
+                    elseif mbot_parryStanceTarget = 2
+                        say "[ShieldsStance2"
+                    elseif mbot_parryStanceTarget = 3
+                        say "[ShieldsStance3"
+                    elseif mbot_parryStanceTarget = 4
+                        say "[ShieldsStance4"
+                    elseif mbot_parryStanceTarget = 5
+                        say "[ShieldsStance5"
+                    endif
+                    settimer mbot_Parry_SwitchCodexTimer 0
+                endif
+            endif
+        endif
+
+        ##### Bard Passive Song-Buff Maintenance
+        if mbot_BardDetected = 1
+
+            if skill "Discordance" > 0
+                if not findbuff "song of discordance" and timer mbot_BOT_BardBuffTimer >= 10000
+                    while insysmsg "What instrument"
+                    endwhile
+                    useskill 'Discordance'
+                    wft 500
+                    if insysmsg "What instrument"
+                        target mbot_activeInstrument
+                        wft 500
+                    endif
+                    target backpack
+                    settimer mbot_BOT_BardBuffTimer 0
+                endif
+            endif
+
+            if skill "Provocation" > 0
+                if not findbuff "song of provocation" and timer mbot_BOT_BardBuffTimer >= 10000
+                    while insysmsg "What instrument"
+                    endwhile
+                    useskill 'Provocation'
+                    wft 500
+                    if insysmsg "What instrument"
+                        target mbot_activeInstrument
+                        wft 500
+                    endif
+                    target backpack
+                    settimer mbot_BOT_BardBuffTimer 0
+                endif
+            endif
+
+            if skill "Peacemaking" > 0
+                if not findbuff "song of peacemaking" and timer mbot_BOT_BardBuffTimer >= 10000
+                    while insysmsg "What instrument"
+                    endwhile
+                    useskill 'Peacemaking'
+                    wft 500
+                    if insysmsg "What instrument"
+                        target mbot_activeInstrument
+                        wft 500
+                    endif
+                    target backpack
+                    settimer mbot_BOT_BardBuffTimer 0
+                endif
+            endif
+
+        endif
+
+        settimer mbot_DelayedStartTimer 1000
+    endif
+
+    ##### Sysmsg Cleanup & Self-Bandaging
     while insysmsg "You deliver a poison sting"
         cooldown "Poison Sting" 5000
     endwhile
@@ -478,7 +726,7 @@ while not dead
         endif
     endif
     
-    ##### Out of Combat: Thief Pouch Alert
+    ##### Thief Pouch Alert
     if mconfig_Thief_AlertRedPouchPop = 1 and counttype 3705 backpack 38 as mbot_RedPouchCount
         if mbot_RedPouchCountTotal != 0 and mbot_RedPouchCountTotal != mbot_RedPouchCount
             overhead "Warning: THIEF we lost a pouch!" 34
@@ -487,151 +735,7 @@ while not dead
         endif
     endif
 
-    @setvar! mbot_SmartEquipShouldRun 0
-    if mconfig_SmartEquip_RunOnce = 1
-        if mbot_SmartEquipHasRun = 0
-            @setvar! mbot_SmartEquipShouldRun 1
-        endif
-    elseif timer mbot_SmartEquipTimer >= mconfig_SmartEquip_TimerCD
-        @setvar! mbot_SmartEquipShouldRun 1
-    endif
-
-    if mbot_SmartEquipShouldRun = 1
-        ##### Smart Weapon Equip
-        if mconfig_Weapon_SmartEquip = 1
-            @setvar! mbot_HasWeapon 0
-            if findlayer self righthand
-                @setvar! mbot_HasWeapon 1
-            elseif findlayer self lefthand
-                @setvar! mbot_HasWeapon 1
-                if findtype 7026|7027|7029|7031|7033|7034|7035|7107|7109|31002|31130 lefthand
-                    @setvar! mbot_HasWeapon 0
-                endif
-            endif
-            if mbot_HasWeapon = 0
-                if find mbot_BOT_CurrentRightHandWeapon backpack
-                    dclick mbot_BOT_CurrentRightHandWeapon
-                    while queued
-                    endwhile
-                endif
-            endif
-
-            if mbot_HasWeapon = 0
-                overhead "Smart weapon equip searching..." 66
-                @clearignore
-                @setvar! mbot_FoundFallbackWeapon 0
-                while mbot_FoundFallbackWeapon = 0 and findtype 31017|31019|31021|31023|31025|31027|31029|31031|31033|31035|31037|31038|31041|31043|31045|31047|31049|31051|31053|31055|3920|5042|5117|30990|30993|30994|30995|31184|31186|67773|67774|67775|67776|67777|67778|3719|3922|3938|5121|5123|5125|30989|30992|30996|30997|30998|31176|31188|3568|3721|3932|5040|5044|5112|5127|5177|5179|5181|30991|30999|31000|31001|31014|31178|31180|31182|3909|3911|3913|3915|3917|3934|3937|5046|5049|5115|5119|5182|5185|5187|30988|31128|31190|67713|67723|67734|67744|67754|67764|22187|31141|31142 backpack as mbot_WeaponCandidate
-                    getlabel mbot_WeaponCandidate mbot_WeaponCandidateDesc
-                    if " aspect" in mbot_WeaponCandidateDesc or "exceptional " in mbot_WeaponCandidateDesc or "supremely" in mbot_WeaponCandidateDesc or "exceedingly" in mbot_WeaponCandidateDesc or "vanquishing" in mbot_WeaponCandidateDesc or "power" in mbot_WeaponCandidateDesc
-                        overhead "Weapon found! Auto-equipping." 66
-                        dclick mbot_WeaponCandidate
-                        while queued
-                        endwhile
-                        @setvar! mbot_FoundFallbackWeapon 1
-                        @setvar! mbot_BOT_CurrentRightHandWeapon mbot_WeaponCandidate
-                    else
-                        @ignore mbot_WeaponCandidate
-                    endif
-                endwhile
-                @clearignore
-            endif
-        endif
-
-        ##### Smart Shield Equip
-        # Special 2h ids that are not found in the lefthand layer when equipped (pickaxe)
-        if mconfig_Shield_SmartEquip = 1 and not findtype 3718 righthand
-            if not findlayer self lefthand
-                if find mbot_BOT_CurrentLeftHandWeapon backpack
-                    dclick mbot_BOT_CurrentLeftHandWeapon
-                    while queued
-                    endwhile
-                endif
-            endif
-
-            if not findlayer self lefthand
-                overhead "Smart shield equip searching..." 66
-                @clearignore
-                @setvar! mbot_FoundFallbackShield 0
-                while mbot_FoundFallbackShield = 0 and findtype 7026|7027|7029|7031|7033|7034|7035|7107|7109|31002|31130 backpack as mbot_ShieldCandidate
-                    getlabel mbot_ShieldCandidate mbot_ShieldCandidateDesc
-                    if "exceptional" in mbot_ShieldCandidateDesc or "invulnerable" in mbot_ShieldCandidateDesc or "fortified" in mbot_ShieldCandidateDesc
-                        dclick mbot_ShieldCandidate
-                        while queued
-                        endwhile
-                        overhead "Shield found! Auto-equipping..." 66
-                        @setvar! mbot_FoundFallbackShield 1
-                        @setvar! mbot_BOT_CurrentLeftHandWeapon mbot_ShieldCandidate
-                    else
-                        @ignore mbot_ShieldCandidate
-                    endif
-                endwhile
-                @clearignore
-            endif
-        endif
-
-        ##### Weapon/Shield Missing - Auto Recall (simple final check, after both blocks above have had a chance to equip)
-        @setvar! mbot_HasWeapon 0
-        if findlayer self righthand
-            @setvar! mbot_HasWeapon 1
-        elseif findlayer self lefthand
-            @setvar! mbot_HasWeapon 1
-            if findtype 7026|7027|7029|7031|7033|7034|7035|7107|7109|31002|31130 lefthand
-                @setvar! mbot_HasWeapon 0
-            endif
-        endif
-
-        if mbot_HasWeapon = 0
-            if mconfig_Weapon_AutoRecallWhenEmpty = 1
-                for 3
-                    overhead "Weapon not found, auto-recalling home" 33
-                    wait 250
-                endfor
-                hotkey "Play Script: Combat\Dexxer\mbot_recall_home"
-            else
-                overhead "WARNING: Weapon not found!" 33
-            endif
-        else
-            # Pickaxe occupies both hands but only shows in righthand - skip
-            # shield check if one's equipped.
-            if not findtype 3718 righthand and not findlayer self lefthand
-                if mconfig_Shield_AutoRecallWhenEmpty = 1
-                    for 3
-                        overhead "Shield not found, auto-recalling home" 33
-                        wait 250
-                    endfor
-                    hotkey "Play Script: Combat\Dexxer\mbot_recall_home"
-                else
-                    overhead "WARNING: Shield not found!" 33
-                endif
-            endif
-        endif
-
-        @setvar! mbot_SmartEquipHasRun 1
-        settimer mbot_SmartEquipTimer 0
-    endif
-
-    ##### Out of Combat: Weapon Re-equip
-    if casting
-        settimer mbot_UseItemTimer 0
-    endif
-
-    if not queued and find mbot_BOT_CurrentRightHandWeapon backpack and timer mbot_UseItemTimer >= mbot_UseItemTimerCD
-        if findlayer self righthand as mbot_RightHandWeapon
-            @setvar! mbot_BOT_CurrentRightHandWeapon mbot_RightHandWeapon
-        else
-            dclick mbot_BOT_CurrentRightHandWeapon
-            settimer mbot_UseItemTimer 0
-        endif
-    elseif not queued and find mbot_BOT_CurrentLeftHandWeapon backpack and timer mbot_UseItemTimer >= mbot_UseItemTimerCD
-        if findlayer self lefthand as mbot_LeftHandWeapon
-            @setvar! mbot_BOT_CurrentLeftHandWeapon mbot_LeftHandWeapon
-        else
-            dclick mbot_BOT_CurrentLeftHandWeapon
-            settimer mbot_UseItemTimer 0
-        endif
-    endif
-    
-    ##### Out of Combat: Weapon Poison Application
+    ##### Auto Weapon Poison Application
     if skill "Poisoning" >= 50 and mconfig_Poison_AutomaticallyApply = 1
         if counttype 3850 mbot_PotionSatchel or counttype 3850 backpack
             @setvar! weapon_to_poison 0
@@ -674,7 +778,7 @@ while not dead
         endif
     endif
 
-    ##### Out of Combat: Overweight Gold Drop
+    ##### Overweight Gold Drop
     if weight > maxweight and timer mbot_UseItemTimer >= mbot_UseItemTimerCD
         if findtype "gold coin" backpack as item
             while insysmsg "cannot drop anything"
@@ -691,7 +795,7 @@ while not dead
         endif
     endif
     
-    ##### Out of Combat: Potion Overhead Display
+    ##### Potion Overhead Display
     if mconfig_Potion_ShowOverheads = 1
 
         if timer mbot_Potion_Cure_Overhead_IfCountIsLessThan_Timer >= mconfig_Potion_CureOverheadIfCountIsLessThanTimerCD
@@ -747,15 +851,7 @@ while not dead
         
     endif
 
-    ##### Out of Combat: Food
-    if not queued and not findbuff "food" and findtype "tray" backpack as mbot_FoodItem
-        if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
-            dclick mbot_FoodItem
-            settimer mbot_UseItemTimer 0
-        endif
-    endif
-    
-    ##### Out of Combat: Panacea & Cure/Heal/Refresh Potions
+    ##### Panacea & Cure/Heal/Refresh Potions
     if mconfig_Potion_HasPanacea = 1 and timer mbot_UsePanaceaTimer >= mbot_UsePanaceaTimerCD
         if findbuff "bleed" or findbuff "disease"
             if findtype 3847 self 0 as mbot_UseItem
@@ -794,7 +890,7 @@ while not dead
     endif
     
     // Trapped
-    ##### Out of Combat: Paralyze Escape (Trapped Pouch)
+    ##### Paralyze Escape (Trapped Pouch)
     if paralyzed and not queued
         if findtype "pouch" backpack 38
             yell "[pouch"
@@ -804,7 +900,7 @@ while not dead
         endif
     endif
 
-    ##### Out of Combat: Skinning
+    ##### Skinning
     if not queued and mconfig_Skinning_UseKnifeAutomatically = 1 and findtype 11552 backpack as mbot_SkinningKnife
         if findbuff "Actively Meditating"
             //do nothing
@@ -821,7 +917,7 @@ while not dead
         endif
     endif
     
-    ##### Out of Combat: Chivalry Symbol Count Detection
+    ##### Chivalry Symbol Count Detection
     if timer mbot_Chiv_SymbolCheckTimer >= mbot_Chiv_SymbolCheckTimerCD
         if not gumpexists 1387930325 and skill "chivalry" >= 50
             say '[chivalryhotbar'
@@ -1513,7 +1609,7 @@ while not dead
         @setvar! mbot_CurrentBotTargetGoodLOS 0
     endif
     
-    ##### Out of Combat: Emergency AOE Peace (low health, not fighting)
+    ##### Emergency AOE Peace (low health, not fighting)
     if mbot_BOT_FIGHT = 0 and hp < mconfig_Bard_AutoUseAoePeaceWhenLowHealthCheck and skill "Peacemaking" > 0 and timer mbot_UsedSkillTimer >= 5000
         while insysmsg "What instrument"
         endwhile
@@ -1526,55 +1622,6 @@ while not dead
         if targetexists 
             hotkey "Target Self"
             settimer mbot_UsedSkillTimer 0
-        endif
-    endif
-    
-
-    ##### Parry Codex Stance Switching (runs regardless of fight state)
-    if skill "Parry" >= 80
-        if mana >= mconfig_Parry_CodexMinMana and timer mbot_Parry_SwitchCodexTimer >= mbot_Parry_SwitchCodexTimerCD and findtype 11889 backpack as mbot_ParryCodex
-            getlabel mbot_ParryCodex mbot_ParryCodexDesc
-
-            if "Shield Bash" in mbot_ParryCodexDesc
-                @setvar! mbot_ActiveParryCodex 1
-            elseif "Warding" in mbot_ParryCodexDesc
-                @setvar! mbot_ActiveParryCodex 2
-            elseif "Testudo" in mbot_ParryCodexDesc
-                @setvar! mbot_ActiveParryCodex 3
-            elseif "Mirror" in mbot_ParryCodexDesc
-                @setvar! mbot_ActiveParryCodex 4
-            elseif "Bulwark" in mbot_ParryCodexDesc
-                @setvar! mbot_ActiveParryCodex 5
-            endif
-            
-            if findbuff "bleed" and mconfig_Parry_SwitchToWardingIfBleeding = 1 and diffhits >= mconfig_Parry_SwitchToWardingIfBleedingHpDiff
-                @setvar! mbot_parryStanceTarget 2
-            elseif findbuff "disease" and mconfig_Parry_SwitchToWardingIfDisease = 1 and diffhits >= mconfig_Parry_SwitchToWardingIfDiseaseHpDiff
-                @setvar! mbot_parryStanceTarget 2
-            elseif poisoned and mconfig_Parry_SwitchToWardingIfPoison = 1 and diffhits >= mconfig_Parry_SwitchToWardingIfPoisonHpDiff
-                @setvar! mbot_parryStanceTarget 2
-            elseif mconfig_Parry_SwitchToBulwarkIfStandingStill = 1 and not cooldown "Bulwark"
-                @setvar! mbot_parryStanceTarget 5
-            elseif mconfig_Parry_SwitchToShieldBashWhileMoving = 1 and cooldown "Moving"
-                @setvar! mbot_parryStanceTarget 1
-            else
-                @setvar! mbot_parryStanceTarget mconfig_Parry_SwitchToDefaultStance
-            endif
-            
-            if mbot_ActiveParryCodex != mbot_parryStanceTarget
-                if mbot_parryStanceTarget = 1
-                    say "[ShieldsStance1"
-                elseif mbot_parryStanceTarget = 2
-                    say "[ShieldsStance2"
-                elseif mbot_parryStanceTarget = 3
-                    say "[ShieldsStance3"
-                elseif mbot_parryStanceTarget = 4
-                    say "[ShieldsStance4"
-                elseif mbot_parryStanceTarget = 5
-                    say "[ShieldsStance5"
-                endif
-                settimer mbot_Parry_SwitchCodexTimer 0
-            endif
         endif
     endif
 
@@ -1761,56 +1808,6 @@ while not dead
             endif
         endif
         
-    endif
-    
-    ##### Out of Combat: Bard Passive Song-Buff Maintenance
-    if mbot_BardDetected = 1
-
-        if skill "Discordance" > 0
-            if not findbuff "song of discordance" and timer mbot_BOT_BardBuffTimer >= 10000
-                while insysmsg "What instrument"
-                endwhile
-                useskill 'Discordance'
-                wft 500
-                if insysmsg "What instrument"
-                    target mbot_activeInstrument
-                    wft 500
-                endif
-                target backpack
-                settimer mbot_BOT_BardBuffTimer 0
-            endif
-        endif
-
-        if skill "Provocation" > 0
-            if not findbuff "song of provocation" and timer mbot_BOT_BardBuffTimer >= 10000
-                while insysmsg "What instrument"
-                endwhile
-                useskill 'Provocation'
-                wft 500
-                if insysmsg "What instrument"
-                    target mbot_activeInstrument
-                    wft 500
-                endif
-                target backpack
-                settimer mbot_BOT_BardBuffTimer 0
-            endif
-        endif
-
-        if skill "Peacemaking" > 0
-            if not findbuff "song of peacemaking" and timer mbot_BOT_BardBuffTimer >= 10000
-                while insysmsg "What instrument"
-                endwhile
-                useskill 'Peacemaking'
-                wft 500
-                if insysmsg "What instrument"
-                    target mbot_activeInstrument
-                    wft 500
-                endif
-                target backpack
-                settimer mbot_BOT_BardBuffTimer 0
-            endif
-        endif
-
     endif
 
     wait 10
