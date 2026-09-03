@@ -5,24 +5,27 @@
 
 @setvar! mbot_version "v1.0.20260902"
 
-##### Target State
-@setvar! mbot_CurrentBotTarget 0
-@setvar! mbot_BOT_FIGHT 0
-@setvar! mbot_FightingRangeCheck 12
-
-settimer mbot_CurrentBotTargetOverheadTimer mconfig_Target_CurrentOverheadTimerCD
-settimer mbot_CurrentBotTargetUnableToAttackOverheadTimer mconfig_Target_UnableToAttackOverheadTimerCD
-
-##### Combat Support Timers
-@setvar! mbot_LOSCheckTimerCD 500
-if not timerexists mbot_LOSCheckTimer
-    settimer mbot_LOSCheckTimer mbot_LOSCheckTimerCD
-endif
-
 @setvar! mbot_UseItemTimerCD 650
 settimer mbot_UseItemTimer mbot_UseItemTimerCD
 
-settimer mbot_UseAbilityTimer mconfig_Weapon_UseAbilityTimerCD
+@setvar! mbot_BandageTimerCD 20000
+if not timerexists mbot_BandageTimer
+    settimer mbot_BandageTimer mbot_BandageTimerCD
+endif
+
+##### Potion Satchel
+@setvar! mbot_PotionSatchel backpack
+if findlayer self Outerbody as mbot_MaybePotionSatchel
+    @setvar! mbot_PotionSatchel mbot_MaybePotionSatchel
+endif
+
+##### Poison Charge Tracking
+removelist poison_check_list
+createlist poison_check_list
+pushlist poison_check_list " (3."
+pushlist poison_check_list " (2."
+pushlist poison_check_list " (1."
+pushlist poison_check_list " (0."
 
 ##### Weapon State Tracking
 if not varexist mbot_BOT_CurrentRightHandWeapon
@@ -43,10 +46,7 @@ endif
 
 ##### Run once flags
 @setvar! mbot_SmartEquipHasRun 0
-
-##### Aspect Auto-Activation
-@setvar! mbot_AspectActivateTimerCD 5000
-settimer mbot_AspectActivateTimer mbot_AspectActivateTimerCD
+@setvar! mbot_AspectActivateHasRun 0
 
 ##### Version Announcement
 if mconfig_General_ShowVersion = 1
@@ -65,10 +65,62 @@ while not dead
         endif
     endif
 
+    ##### Auto-Target Next Red Player
+    if mconfig_Target_AutoTargetMurdererPlayer = 1
+        hotkey "Next Murderer Player Target"
+        wait 500
+    endif
+
+    ##### Auto Weapon Poison Application
+    if skill "Poisoning" >= 50 and mconfig_Poison_AutomaticallyApply = 1
+        if counttype 3850 mbot_PotionSatchel or counttype 3850 backpack
+            @setvar! weapon_to_poison 0
+            if findlayer self righthand as mbot_RightHandWeapon
+                @setvar! weapon_to_poison mbot_RightHandWeapon
+                @setvar! mbot_BOT_CurrentRightHandWeapon mbot_RightHandWeapon
+            endif
+            if weapon_to_poison != 0
+                getlabel weapon_to_poison weapon_to_poisonDesc
+
+                if insysmsg "You fail to apply a sufficient dose of poison." or insysmsg "grave mistake while"
+                    overhead "Failed to apply Poison" 72
+                elseif insysmsg "You apply the poison."
+                    overhead "Poison applied!" 72
+                endif
+
+                @setvar! mbot_NeedsPoison 0
+                if "poison charge" in weapon_to_poisonDesc
+                    foreach reapply_text in poison_check_list
+                        if reapply_text in weapon_to_poisonDesc
+                            @setvar! mbot_NeedsPoison 1
+                        endif
+                    endfor
+                else
+                    @setvar! mbot_NeedsPoison 1
+                endif
+
+                if mbot_NeedsPoison = 1
+                    overhead "Applying Poison" 72
+                    menu weapon_to_poison 0
+                    wait 1000
+                endif
+            endif
+        else
+            overhead "Out of poison pots!" 34
+        endif
+    endif
+
     ##### Aspect Auto-Activation
-    if mconfig_Aspect_AutoActivateFrost = 1 and timer mbot_AspectActivateTimer >= mbot_AspectActivateTimerCD
-        say "[aspectarmor frost"
-        settimer mbot_AspectActivateTimer 0
+    if mconfig_Aspect_AutoActivateFrost = 1 and mbot_AspectActivateHasRun = 0
+        if findlayer self innertorso as mbot_AspectCheckItem
+            getlabel mbot_AspectCheckItem mbot_AspectCheckDesc
+            if "frost aspect" in mbot_AspectCheckDesc
+                // already applied, nothing to do
+            else
+                say "[aspectarmor frost"
+            endif
+        endif
+        @setvar! mbot_AspectActivateHasRun 1
     endif
 
     if mconfig_SmartEquip_RunOnce = 0 or mbot_SmartEquipHasRun = 0
@@ -106,15 +158,7 @@ while not dead
                 endwhile
                 @clearignore
                 if mbot_FoundFallbackWeapon = 0
-                    if mconfig_Weapon_AutoRecallWhenEmpty = 1
-                        for 3
-                            overhead "Weapon not found, auto-recalling home" 33
-                            wait 250
-                        endfor
-                        hotkey "Play Script: Combat\Dexxer\mbot_recall_home"
-                    else
-                        overhead "WARNING: Weapon not found!" 33
-                    endif
+                    overhead "WARNING: Weapon not found!" 33
                 endif
             endif
         endif
@@ -145,15 +189,7 @@ while not dead
                 endwhile
                 @clearignore
                 if mbot_FoundFallbackShield = 0
-                    if mconfig_Shield_AutoRecallWhenEmpty = 1
-                        for 3
-                            overhead "Shield not found, auto-recalling home" 33
-                            wait 250
-                        endfor
-                        hotkey "Play Script: Combat\Dexxer\mbot_recall_home"
-                    else
-                        overhead "WARNING: Shield not found!" 33
-                    endif
+                    overhead "WARNING: Shield not found!" 33
                 endif
             endif
         endif
@@ -193,132 +229,73 @@ while not dead
         endif
     endif
 
-    ##### Fight State Detection (manual target only - PvP has no auto-target)
-    @setvar! mbot_CurrentBotTargetAttacked 0
+    ##### Sysmsg Cleanup & Self-Bandaging
+    while insysmsg "You begin applying"
+        settimer mbot_BandageTimer 0
+    endwhile
 
-    if insysmsg "Target a new 'Last Target'"
-        overhead "Set your target"
-        if insysmsg "Last Target set."
-            overhead "New target selected!" 89 lasttarget
-            @setvar! mbot_CurrentBotTarget lasttarget
-            @setvar! mbot_BOT_FIGHT 1
+    while insysmsg "You finish applying" or insysmsg "You heal what little" or insysmsg "barely help" or insysmsg "You fail to resurrect" or insysmsg "You are able to resurrect"
+        settimer mbot_BandageTimer mbot_BandageTimerCD
+    endwhile
+
+    if skill "Healing" > 0 and findtype 3617 self
+        if timer mbot_BandageTimer >= mbot_BandageTimerCD and not targetexists
+            if poisoned or findbuff "disease" or findbuff "bleed"
+                hotkey "Bandage Self"
+            elseif diffhits > mconfig_Healing_AutoBandageHpDiffTrigger
+                hotkey "Bandage Self"
+            endif
+            getlabel backpack mbot_PingCheck
+            if insysmsg "You begin applying"
+                settimer mbot_BandageTimer 0
+            endif
+        endif
+    endif
+
+    ##### Potions
+    if not queued and mconfig_Potion_UseCureAutomatically = 1 and poisoned and diffhits >= mconfig_Potion_CureHpDiffTrigger and findtype 3847 self as mbot_Potion
+        if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+            dclick mbot_Potion
+            settimer mbot_UseItemTimer 0
         endif
     endif
 
-    if insysmsg "New Target Set"
-        while insysmsg "New Target Set"
-        endwhile
-        overhead "New target selected!" 89 lasttarget
-        @setvar! mbot_CurrentBotTarget lasttarget
-        @setvar! mbot_BOT_FIGHT 1
-    endif
-
-    if dead mbot_CurrentBotTarget
-        @setvar! mbot_BOT_FIGHT 0
-    endif
-
-    ##### In Combat
-    if mbot_BOT_FIGHT = 1
-
-        ##### In Combat: Target Acquisition
-        if insysmsg "Target a new 'Last Target'"
-            overhead "Set your target"
-            if insysmsg "Last Target set."
-                overhead "New target selected!" 89 lasttarget
-                @setvar! mbot_CurrentBotTarget lasttarget
-            endif
-        endif
-
-        if find mbot_CurrentBotTarget ground -1 -1 mbot_FightingRangeCheck
-
-            if mconfig_Target_Overhead_Enabled = 1 and timer mbot_CurrentBotTargetOverheadTimer >= mconfig_Target_CurrentOverheadTimerCD and listexists mconfig_Target_CurrentOverheadText
-                foreach mbot_Overhead in mconfig_Target_CurrentOverheadText
-                    if find mbot_CurrentBotTarget
-                        overhead mbot_Overhead mconfig_Target_CurrentOverheadHue mbot_CurrentBotTarget
-                    endif
-                endfor
-                settimer mbot_CurrentBotTargetOverheadTimer 0
-            endif
-
-            attack mbot_CurrentBotTarget
-
-            # TODO: longshot bro
-            if findtype 5117|3920|31184|31186|30993|31172|31169|9917 righthand or findtype 5117|3920|31184|31186|30993 lefthand
-                @setvar! mbot_DynamicRangeCheck 8
-            elseif findtype 30994|30990|30995|5042 lefthand
-                @setvar! mbot_DynamicRangeCheck 10
+    if mconfig_Potion_UseHealAutomatically = 1 and diffhits >= mconfig_Potion_HealHpDiffTrigger and findtype 3852 self as mbot_Potion
+        if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+            getlabel mbot_Potion mbot_PotionDesc
+            if "next usable in" in mbot_PotionDesc
+                // do nothing
             else
-                @setvar! mbot_DynamicRangeCheck 2
+                dclick mbot_Potion
+                settimer mbot_UseItemTimer 0
             endif
-
-            ##### Shared line-of-sight probe
-            if not targetexists and mbot_CurrentBotTargetGoodLOS = 0 and timer mbot_LOSCheckTimer >= mbot_LOSCheckTimerCD
-                useskill "ArmsLore"
-                wft 500
-                if targetexists
-                    while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                    endwhile
-                    target mbot_CurrentBotTarget
-                    if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                        if mconfig_Target_Overhead_Enabled = 1 and timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
-                            foreach mbot_Overhead in mconfig_Target_UnableToAttackOverheadText
-                                if find mbot_CurrentBotTarget
-                                    overhead mbot_Overhead mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
-                                endif
-                            endfor
-                            settimer mbot_CurrentBotTargetOverheadTimer 0
-                        endif
-                        @setvar! mbot_CurrentBotTarget 0
-                    else
-                        @setvar! mbot_CurrentBotTargetGoodLOS 1
-                        @setvar! mbot_CurrentBotTargetAttacked 1
-                    endif
-                endif
-                if targetexists
-                    hotkey "Cancel Current Target"
-                endif
-                settimer mbot_LOSCheckTimer 0
-            endif
-
-            if find mbot_CurrentBotTarget ground -1 -1 mbot_DynamicRangeCheck
-                // assume we got it
-                @setvar! mbot_CurrentBotTargetAttacked 1
-            elseif mbot_CurrentBotTargetGoodLOS = 1 and find mbot_CurrentBotTarget ground -1 -1 mbot_DynamicRangeCheck
-                @setvar! mbot_CurrentBotTargetAttacked 1
-            endif
-        else
-            @setvar! mbot_CurrentBotTarget 0
-            @setvar! mbot_CurrentBotTargetGoodLOS 0
         endif
     endif
 
-    ##### Post-Attack Actions (this iteration only, if we attacked)
-    if mbot_CurrentBotTargetAttacked = 1
-
-        if mconfig_Healing_AidCountAlertLessThan20 = 1 and skill "Healing" > 0 and counttype 3617 self as mbot_BOT_AidCount
-            if 20 > mbot_BOT_AidCount
-                overhead "We are low on aids {{mbot_BOT_AidCount}}" 34
-            endif
+    ##### Low Aid Count Warning
+    if mconfig_Healing_AidCountAlertLessThan20 = 1 and skill "Healing" > 0 and counttype 3617 self as mbot_BOT_AidCount
+        if 20 > mbot_BOT_AidCount
+            overhead "We are low on aids {{mbot_BOT_AidCount}}" 34
         endif
+    endif
 
-        ##### Post-Attack: Weapon Abilities
-        if mconfig_Weapon_UseAbility1 = 1 and timer mbot_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
-            while insysmsg "You do cannot perform that ability yet." or insysmsg "You have not yet unlocked that weapon ability." or insysmsg "You do not have the required codex or skills to use that weapon ability."
-            endwhile
-            say "[WeaponAbility1"
-            settimer mbot_UseAbilityTimer 0
-        elseif mconfig_Weapon_UseAbility2 = 1 and timer mbot_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
-            while insysmsg "You do cannot perform that ability yet." or insysmsg "You have not yet unlocked that weapon ability." or insysmsg "You do not have the required codex or skills to use that weapon ability."
-            endwhile
-            say "[WeaponAbility2"
-            settimer mbot_UseAbilityTimer 0
-        elseif mconfig_Weapon_UseAbility3 = 1 and timer mbot_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
-            while insysmsg "You do cannot perform that ability yet." or insysmsg "You have not yet unlocked that weapon ability." or insysmsg "You do not have the required codex or skills to use that weapon ability."
-            endwhile
-            say "[WeaponAbility3"
-            settimer mbot_UseAbilityTimer 0
-        endif
+    ##### Buff Potions
+    if not queued and mconfig_Potion_UseAgilityAutomatically = 1 and not findbuff "Agility" and findtype 3848 self as mbot_Potion
+        dclick mbot_Potion
+        wait 700
+    endif
 
+    if not queued and mconfig_Potion_UseStrengthAutomatically = 1 and not findbuff "Strength" and findtype 3849 self as mbot_Potion
+        dclick mbot_Potion
+        wait 700
+    endif
+
+    if not queued and mconfig_Potion_UseMagicResistAutomatically = 1 and not findbuff "Magic Resist" and findtype 3846 self as mbot_Potion
+        dclick mbot_Potion
+        wait 700
+    elseif not queued and mconfig_Potion_UseMagicResistAgainIfDebuffedAutomatically = 1 and findbuff "Magic Resist Decrease" and findtype 3846 self as mbot_Potion
+        dclick mbot_Potion
+        wait 700
     endif
 
 endwhile

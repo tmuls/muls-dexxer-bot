@@ -7,9 +7,9 @@
 # This is my own fork adding my own features and optimizations along with new config variables.
 #
 # PvP-only config - vars for features that don't survive structured PvP
-# (Chivalry, potion automation, self-bandage, parry stance switching,
-# tracking) or that are out of scope for a PvP profile (Taming, Bard,
-# Skinning) are not here. See mbot_pvp_base.razor for what was removed.
+# (Chivalry, parry stance switching, tracking) or that are out of scope for
+# a PvP profile (Taming, Bard, Skinning) are not here. See mbot_pvp_base.razor
+# for what was removed.
 #######
 
 removelist mbot_PreviousScript
@@ -22,10 +22,6 @@ pushlist mbot_PreviousScript "Play Script: Combat\Dexxer\mbot_pvp_base"
 @setvar! mconfig_SmartEquip_RunOnce 1
 @setvar! mconfig_Weapon_SmartEquip 1
 @setvar! mconfig_Shield_SmartEquip 1
-# Off by default - Sacred Journey/gate recall is blocked for a while after
-# PvP combat, so auto-recalling home when out of weapons isn't reliable here.
-@setvar! mconfig_Weapon_AutoRecallWhenEmpty 0
-@setvar! mconfig_Shield_AutoRecallWhenEmpty 0
 
 # Warning overhead if pouch popped
 @setvar! mconfig_Thief_AlertRedPouchPop 1
@@ -33,33 +29,28 @@ pushlist mbot_PreviousScript "Play Script: Combat\Dexxer\mbot_pvp_base"
 # Auto-activates Frost armor aspect
 @setvar! mconfig_Aspect_AutoActivateFrost 0
 
-# Weapon Abilities
-@setvar! mconfig_Weapon_UseAbility1 0
-@setvar! mconfig_Weapon_UseAbility2 0
-@setvar! mconfig_Weapon_UseAbility3 0
-@setvar! mconfig_Weapon_UseAbilityTimerCD 5000
+# Self-Bandaging
+@setvar! mconfig_Healing_AutoBandageHpDiffTrigger 1
+
+# Cure/Heal Potions
+@setvar! mconfig_Potion_UseCureAutomatically 1
+@setvar! mconfig_Potion_CureHpDiffTrigger 5
+@setvar! mconfig_Potion_UseHealAutomatically 1
+@setvar! mconfig_Potion_HealHpDiffTrigger 20
+
+# Buff Potions
+@setvar! mconfig_Potion_UseAgilityAutomatically 1
+@setvar! mconfig_Potion_UseStrengthAutomatically 1
+@setvar! mconfig_Potion_UseMagicResistAutomatically 1
+@setvar! mconfig_Potion_UseMagicResistAgainIfDebuffedAutomatically 1
+
+# Auto Weapon Poison Application
+@setvar! mconfig_Poison_AutomaticallyApply 1
+
+# Cycles target to next red player (target only, no attack)
+@setvar! mconfig_Target_AutoTargetMurdererPlayer 0
 
 @setvar! mconfig_Healing_AidCountAlertLessThan20 1
-
-# General Target Overheads
-@setvar! mconfig_Target_Overhead_Enabled 1
-@setvar! mconfig_Target_CurrentOverheadTimerCD 3000
-@setvar! mconfig_Target_CurrentOverheadHue 89
-@setvar! mconfig_Target_UnableToAttackOverheadTimerCD 3000
-@setvar! mconfig_Target_UnableToAttackOverheadHue 34
-
-# Target overhead configuration
-removelist mconfig_Target_CurrentOverheadText
-createlist mconfig_Target_CurrentOverheadText
-pushlist mconfig_Target_CurrentOverheadText "● ▼▼ HERE ▼▼ ●"
-
-removelist mconfig_Target_UnableToAttackOverheadText
-createlist mconfig_Target_UnableToAttackOverheadText
-pushlist mconfig_Target_UnableToAttackOverheadText "● ▼ CANNOT SEE ▼ ●"
-
-removelist mconfig_Target_IgnoreMobOverheadText
-createlist mconfig_Target_IgnoreMobOverheadText
-pushlist mconfig_Target_IgnoreMobOverheadText "▼ IGNORE ▼"
 
 if listexists mbot_PreviousScript
     foreach myScript in mbot_PreviousScript
