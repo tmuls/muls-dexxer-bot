@@ -64,9 +64,9 @@ while not dead
         endif
     endif
 
-    ##### Auto-Target Nearest Red (target only - no auto-attack, see PvP restrictions)
-    if mconfig_Target_AutoTargetNearestRed = 1
-        target closest red
+    ##### Auto-Target Next Red Player (target only - no auto-attack, see PvP restrictions)
+    if mconfig_Target_AutoTargetMurdererPlayer = 1
+        hotkey "Next Murderer Player Target"
         wait 500
     endif
 
