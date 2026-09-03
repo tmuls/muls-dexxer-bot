@@ -46,6 +46,7 @@ endif
 
 ##### Run once flags
 @setvar! mbot_SmartEquipHasRun 0
+@setvar! mbot_AspectActivateHasRun 0
 
 ##### Version Announcement
 if mconfig_General_ShowVersion = 1
@@ -109,14 +110,17 @@ while not dead
         endif
     endif
 
-    ##### Aspect Auto-Activation (no timer while PvP-flagged - driven by the armor's own label)
-    if mconfig_Aspect_AutoActivateFrost = 1 and findlayer self innertorso as mbot_AspectCheckItem
-        getlabel mbot_AspectCheckItem mbot_AspectCheckDesc
-        if "frost aspect" in mbot_AspectCheckDesc
-            // already applied, nothing to do
-        else
-            say "[aspectarmor frost"
+    ##### Aspect Auto-Activation (runs once - no timer while PvP-flagged, driven by the armor's own label)
+    if mconfig_Aspect_AutoActivateFrost = 1 and mbot_AspectActivateHasRun = 0
+        if findlayer self innertorso as mbot_AspectCheckItem
+            getlabel mbot_AspectCheckItem mbot_AspectCheckDesc
+            if "frost aspect" in mbot_AspectCheckDesc
+                // already applied, nothing to do
+            else
+                say "[aspectarmor frost"
+            endif
         endif
+        @setvar! mbot_AspectActivateHasRun 1
     endif
 
     if mconfig_SmartEquip_RunOnce = 0 or mbot_SmartEquipHasRun = 0
