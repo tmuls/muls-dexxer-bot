@@ -158,15 +158,7 @@ while not dead
                 endwhile
                 @clearignore
                 if mbot_FoundFallbackWeapon = 0
-                    if mconfig_Weapon_AutoRecallWhenEmpty = 1
-                        for 3
-                            overhead "Weapon not found, auto-recalling home" 33
-                            wait 250
-                        endfor
-                        hotkey "Play Script: Combat\Dexxer\mbot_recall_home"
-                    else
-                        overhead "WARNING: Weapon not found!" 33
-                    endif
+                    overhead "WARNING: Weapon not found!" 33
                 endif
             endif
         endif
@@ -197,15 +189,7 @@ while not dead
                 endwhile
                 @clearignore
                 if mbot_FoundFallbackShield = 0
-                    if mconfig_Shield_AutoRecallWhenEmpty = 1
-                        for 3
-                            overhead "Shield not found, auto-recalling home" 33
-                            wait 250
-                        endfor
-                        hotkey "Play Script: Combat\Dexxer\mbot_recall_home"
-                    else
-                        overhead "WARNING: Shield not found!" 33
-                    endif
+                    overhead "WARNING: Shield not found!" 33
                 endif
             endif
         endif
