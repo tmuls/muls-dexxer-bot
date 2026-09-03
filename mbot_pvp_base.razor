@@ -65,13 +65,13 @@ while not dead
         endif
     endif
 
-    ##### Auto-Target Next Red Player (target only - no auto-attack, see PvP restrictions)
+    ##### Auto-Target Next Red Player
     if mconfig_Target_AutoTargetMurdererPlayer = 1
         hotkey "Next Murderer Player Target"
         wait 500
     endif
 
-    ##### Auto Weapon Poison Application (no timer while PvP-flagged - driven by the weapon's own label)
+    ##### Auto Weapon Poison Application
     if skill "Poisoning" >= 50 and mconfig_Poison_AutomaticallyApply = 1
         if counttype 3850 mbot_PotionSatchel or counttype 3850 backpack
             @setvar! weapon_to_poison 0
@@ -110,7 +110,7 @@ while not dead
         endif
     endif
 
-    ##### Aspect Auto-Activation (runs once - no timer while PvP-flagged, driven by the armor's own label)
+    ##### Aspect Auto-Activation
     if mconfig_Aspect_AutoActivateFrost = 1 and mbot_AspectActivateHasRun = 0
         if findlayer self innertorso as mbot_AspectCheckItem
             getlabel mbot_AspectCheckItem mbot_AspectCheckDesc
@@ -279,7 +279,7 @@ while not dead
         endif
     endif
 
-    ##### Buff Potions (waits between each so multiple can land in one pass)
+    ##### Buff Potions
     if not queued and mconfig_Potion_UseAgilityAutomatically = 1 and not findbuff "Agility" and findtype 3848 self as mbot_Potion
         dclick mbot_Potion
         wait 700
