@@ -47,10 +47,6 @@ endif
 ##### Run once flags
 @setvar! mbot_SmartEquipHasRun 0
 
-##### Aspect Auto-Activation
-@setvar! mbot_AspectActivateTimerCD 5000
-settimer mbot_AspectActivateTimer mbot_AspectActivateTimerCD
-
 ##### Version Announcement
 if mconfig_General_ShowVersion = 1
     sysmsg "Muls Dexxer Bot - PvP Base {{mbot_version}}"
@@ -107,10 +103,12 @@ while not dead
         endif
     endif
 
-    ##### Aspect Auto-Activation
-    if mconfig_Aspect_AutoActivateFrost = 1 and timer mbot_AspectActivateTimer >= mbot_AspectActivateTimerCD
-        say "[aspectarmor frost"
-        settimer mbot_AspectActivateTimer 0
+    ##### Aspect Auto-Activation (no timer while PvP-flagged - driven by the armor's own label)
+    if mconfig_Aspect_AutoActivateFrost = 1 and findlayer self innertorso as mbot_AspectCheckItem
+        getlabel mbot_AspectCheckItem mbot_AspectCheckDesc
+        if not "frost aspect" in mbot_AspectCheckDesc
+            say "[aspectarmor frost"
+        endif
     endif
 
     if mconfig_SmartEquip_RunOnce = 0 or mbot_SmartEquipHasRun = 0
