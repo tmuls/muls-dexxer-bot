@@ -5,20 +5,6 @@
 
 @setvar! mbot_version "v1.0.20260902"
 
-##### Target State
-@setvar! mbot_CurrentBotTarget 0
-@setvar! mbot_BOT_FIGHT 0
-@setvar! mbot_FightingRangeCheck 12
-
-settimer mbot_CurrentBotTargetOverheadTimer mconfig_Target_CurrentOverheadTimerCD
-settimer mbot_CurrentBotTargetUnableToAttackOverheadTimer mconfig_Target_UnableToAttackOverheadTimerCD
-
-##### Combat Support Timers
-@setvar! mbot_LOSCheckTimerCD 500
-if not timerexists mbot_LOSCheckTimer
-    settimer mbot_LOSCheckTimer mbot_LOSCheckTimerCD
-endif
-
 @setvar! mbot_UseItemTimerCD 650
 settimer mbot_UseItemTimer mbot_UseItemTimerCD
 
@@ -193,132 +179,29 @@ while not dead
         endif
     endif
 
-    ##### Fight State Detection (manual target only - PvP has no auto-target)
-    @setvar! mbot_CurrentBotTargetAttacked 0
-
-    if insysmsg "Target a new 'Last Target'"
-        overhead "Set your target"
-        if insysmsg "Last Target set."
-            overhead "New target selected!" 89 lasttarget
-            @setvar! mbot_CurrentBotTarget lasttarget
-            @setvar! mbot_BOT_FIGHT 1
+    ##### Weapon Support (no targeting/attacking - runs every pass)
+    if mconfig_Healing_AidCountAlertLessThan20 = 1 and skill "Healing" > 0 and counttype 3617 self as mbot_BOT_AidCount
+        if 20 > mbot_BOT_AidCount
+            overhead "We are low on aids {{mbot_BOT_AidCount}}" 34
         endif
     endif
 
-    if insysmsg "New Target Set"
-        while insysmsg "New Target Set"
+    ##### Weapon Abilities
+    if mconfig_Weapon_UseAbility1 = 1 and timer mbot_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
+        while insysmsg "You do cannot perform that ability yet." or insysmsg "You have not yet unlocked that weapon ability." or insysmsg "You do not have the required codex or skills to use that weapon ability."
         endwhile
-        overhead "New target selected!" 89 lasttarget
-        @setvar! mbot_CurrentBotTarget lasttarget
-        @setvar! mbot_BOT_FIGHT 1
-    endif
-
-    if dead mbot_CurrentBotTarget
-        @setvar! mbot_BOT_FIGHT 0
-    endif
-
-    ##### In Combat
-    if mbot_BOT_FIGHT = 1
-
-        ##### In Combat: Target Acquisition
-        if insysmsg "Target a new 'Last Target'"
-            overhead "Set your target"
-            if insysmsg "Last Target set."
-                overhead "New target selected!" 89 lasttarget
-                @setvar! mbot_CurrentBotTarget lasttarget
-            endif
-        endif
-
-        if find mbot_CurrentBotTarget ground -1 -1 mbot_FightingRangeCheck
-
-            if mconfig_Target_Overhead_Enabled = 1 and timer mbot_CurrentBotTargetOverheadTimer >= mconfig_Target_CurrentOverheadTimerCD and listexists mconfig_Target_CurrentOverheadText
-                foreach mbot_Overhead in mconfig_Target_CurrentOverheadText
-                    if find mbot_CurrentBotTarget
-                        overhead mbot_Overhead mconfig_Target_CurrentOverheadHue mbot_CurrentBotTarget
-                    endif
-                endfor
-                settimer mbot_CurrentBotTargetOverheadTimer 0
-            endif
-
-            attack mbot_CurrentBotTarget
-
-            # TODO: longshot bro
-            if findtype 5117|3920|31184|31186|30993|31172|31169|9917 righthand or findtype 5117|3920|31184|31186|30993 lefthand
-                @setvar! mbot_DynamicRangeCheck 8
-            elseif findtype 30994|30990|30995|5042 lefthand
-                @setvar! mbot_DynamicRangeCheck 10
-            else
-                @setvar! mbot_DynamicRangeCheck 2
-            endif
-
-            ##### Shared line-of-sight probe
-            if not targetexists and mbot_CurrentBotTargetGoodLOS = 0 and timer mbot_LOSCheckTimer >= mbot_LOSCheckTimerCD
-                useskill "ArmsLore"
-                wft 500
-                if targetexists
-                    while insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                    endwhile
-                    target mbot_CurrentBotTarget
-                    if insysmsg "Target cannot be seen" or insysmsg "That is too far away."
-                        if mconfig_Target_Overhead_Enabled = 1 and timer mbot_CurrentBotTargetUnableToAttackOverheadTimer >= mconfig_Target_UnableToAttackOverheadTimerCD and listexists mconfig_Target_UnableToAttackOverheadText
-                            foreach mbot_Overhead in mconfig_Target_UnableToAttackOverheadText
-                                if find mbot_CurrentBotTarget
-                                    overhead mbot_Overhead mconfig_Target_UnableToAttackOverheadHue mbot_CurrentBotTarget
-                                endif
-                            endfor
-                            settimer mbot_CurrentBotTargetOverheadTimer 0
-                        endif
-                        @setvar! mbot_CurrentBotTarget 0
-                    else
-                        @setvar! mbot_CurrentBotTargetGoodLOS 1
-                        @setvar! mbot_CurrentBotTargetAttacked 1
-                    endif
-                endif
-                if targetexists
-                    hotkey "Cancel Current Target"
-                endif
-                settimer mbot_LOSCheckTimer 0
-            endif
-
-            if find mbot_CurrentBotTarget ground -1 -1 mbot_DynamicRangeCheck
-                // assume we got it
-                @setvar! mbot_CurrentBotTargetAttacked 1
-            elseif mbot_CurrentBotTargetGoodLOS = 1 and find mbot_CurrentBotTarget ground -1 -1 mbot_DynamicRangeCheck
-                @setvar! mbot_CurrentBotTargetAttacked 1
-            endif
-        else
-            @setvar! mbot_CurrentBotTarget 0
-            @setvar! mbot_CurrentBotTargetGoodLOS 0
-        endif
-    endif
-
-    ##### Post-Attack Actions (this iteration only, if we attacked)
-    if mbot_CurrentBotTargetAttacked = 1
-
-        if mconfig_Healing_AidCountAlertLessThan20 = 1 and skill "Healing" > 0 and counttype 3617 self as mbot_BOT_AidCount
-            if 20 > mbot_BOT_AidCount
-                overhead "We are low on aids {{mbot_BOT_AidCount}}" 34
-            endif
-        endif
-
-        ##### Post-Attack: Weapon Abilities
-        if mconfig_Weapon_UseAbility1 = 1 and timer mbot_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
-            while insysmsg "You do cannot perform that ability yet." or insysmsg "You have not yet unlocked that weapon ability." or insysmsg "You do not have the required codex or skills to use that weapon ability."
-            endwhile
-            say "[WeaponAbility1"
-            settimer mbot_UseAbilityTimer 0
-        elseif mconfig_Weapon_UseAbility2 = 1 and timer mbot_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
-            while insysmsg "You do cannot perform that ability yet." or insysmsg "You have not yet unlocked that weapon ability." or insysmsg "You do not have the required codex or skills to use that weapon ability."
-            endwhile
-            say "[WeaponAbility2"
-            settimer mbot_UseAbilityTimer 0
-        elseif mconfig_Weapon_UseAbility3 = 1 and timer mbot_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
-            while insysmsg "You do cannot perform that ability yet." or insysmsg "You have not yet unlocked that weapon ability." or insysmsg "You do not have the required codex or skills to use that weapon ability."
-            endwhile
-            say "[WeaponAbility3"
-            settimer mbot_UseAbilityTimer 0
-        endif
-
+        say "[WeaponAbility1"
+        settimer mbot_UseAbilityTimer 0
+    elseif mconfig_Weapon_UseAbility2 = 1 and timer mbot_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
+        while insysmsg "You do cannot perform that ability yet." or insysmsg "You have not yet unlocked that weapon ability." or insysmsg "You do not have the required codex or skills to use that weapon ability."
+        endwhile
+        say "[WeaponAbility2"
+        settimer mbot_UseAbilityTimer 0
+    elseif mconfig_Weapon_UseAbility3 = 1 and timer mbot_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
+        while insysmsg "You do cannot perform that ability yet." or insysmsg "You have not yet unlocked that weapon ability." or insysmsg "You do not have the required codex or skills to use that weapon ability."
+        endwhile
+        say "[WeaponAbility3"
+        settimer mbot_UseAbilityTimer 0
     endif
 
 endwhile
