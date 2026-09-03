@@ -112,7 +112,9 @@ while not dead
     ##### Aspect Auto-Activation (no timer while PvP-flagged - driven by the armor's own label)
     if mconfig_Aspect_AutoActivateFrost = 1 and findlayer self innertorso as mbot_AspectCheckItem
         getlabel mbot_AspectCheckItem mbot_AspectCheckDesc
-        if not "frost aspect" in mbot_AspectCheckDesc
+        if "frost aspect" in mbot_AspectCheckDesc
+            // already applied, nothing to do
+        else
             say "[aspectarmor frost"
         endif
     endif
