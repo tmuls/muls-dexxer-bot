@@ -13,6 +13,20 @@ if not timerexists mbot_BandageTimer
     settimer mbot_BandageTimer mbot_BandageTimerCD
 endif
 
+##### Potion Satchel
+@setvar! mbot_PotionSatchel backpack
+if findlayer self Outerbody as mbot_MaybePotionSatchel
+    @setvar! mbot_PotionSatchel mbot_MaybePotionSatchel
+endif
+
+##### Poison Charge Tracking
+removelist poison_check_list
+createlist poison_check_list
+pushlist poison_check_list " (3."
+pushlist poison_check_list " (2."
+pushlist poison_check_list " (1."
+pushlist poison_check_list " (0."
+
 ##### Weapon State Tracking
 if not varexist mbot_BOT_CurrentRightHandWeapon
     @setvar! mbot_BOT_CurrentRightHandWeapon 0
@@ -51,6 +65,45 @@ while not dead
             overhead "Warning: THIEF we lost a pouch!" 34
         else
             @setvar! mbot_RedPouchCountTotal mbot_RedPouchCount
+        endif
+    endif
+
+    ##### Auto Weapon Poison Application (no timer while PvP-flagged - driven by the weapon's own label)
+    if skill "Poisoning" >= 50 and mconfig_Poison_AutomaticallyApply = 1
+        if counttype 3850 mbot_PotionSatchel or counttype 3850 backpack
+            @setvar! weapon_to_poison 0
+            if findlayer self righthand as mbot_RightHandWeapon
+                @setvar! weapon_to_poison mbot_RightHandWeapon
+                @setvar! mbot_BOT_CurrentRightHandWeapon mbot_RightHandWeapon
+            endif
+            if weapon_to_poison != 0
+                getlabel weapon_to_poison weapon_to_poisonDesc
+
+                if insysmsg "You fail to apply a sufficient dose of poison." or insysmsg "grave mistake while"
+                    overhead "Failed to apply Poison" 72
+                elseif insysmsg "You apply the poison."
+                    overhead "Poison applied!" 72
+                endif
+
+                @setvar! mbot_NeedsPoison 0
+                if "poison charge" in weapon_to_poisonDesc
+                    foreach reapply_text in poison_check_list
+                        if reapply_text in weapon_to_poisonDesc
+                            @setvar! mbot_NeedsPoison 1
+                        endif
+                    endfor
+                else
+                    @setvar! mbot_NeedsPoison 1
+                endif
+
+                if mbot_NeedsPoison = 1
+                    overhead "Applying Poison" 72
+                    menu weapon_to_poison 0
+                    wait 1000
+                endif
+            endif
+        else
+            overhead "Out of poison pots!" 34
         endif
     endif
 
@@ -230,6 +283,25 @@ while not dead
         if 20 > mbot_BOT_AidCount
             overhead "We are low on aids {{mbot_BOT_AidCount}}" 34
         endif
+    endif
+
+    ##### Buff Potions (waits between each so multiple can land in one pass)
+    if not queued and mconfig_Potion_UseAgilityAutomatically = 1 and not findbuff "Agility" and findtype 3848 self as mbot_Potion
+        dclick mbot_Potion
+        wait 700
+    endif
+
+    if not queued and mconfig_Potion_UseStrengthAutomatically = 1 and not findbuff "Strength" and findtype 3849 self as mbot_Potion
+        dclick mbot_Potion
+        wait 700
+    endif
+
+    if not queued and mconfig_Potion_UseMagicResistAutomatically = 1 and not findbuff "Magic Resist" and findtype 3846 self as mbot_Potion
+        dclick mbot_Potion
+        wait 700
+    elseif not queued and mconfig_Potion_UseMagicResistAgainIfDebuffedAutomatically = 1 and findbuff "Magic Resist Decrease" and findtype 3846 self as mbot_Potion
+        dclick mbot_Potion
+        wait 700
     endif
 
 endwhile
