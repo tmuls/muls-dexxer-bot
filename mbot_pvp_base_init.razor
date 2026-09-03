@@ -7,9 +7,9 @@
 # This is my own fork adding my own features and optimizations along with new config variables.
 #
 # PvP-only config - vars for features that don't survive structured PvP
-# (Chivalry, potion automation, self-bandage, parry stance switching,
-# tracking) or that are out of scope for a PvP profile (Taming, Bard,
-# Skinning) are not here. See mbot_pvp_base.razor for what was removed.
+# (Chivalry, parry stance switching, tracking) or that are out of scope for
+# a PvP profile (Taming, Bard, Skinning) are not here. See mbot_pvp_base.razor
+# for what was removed.
 #######
 
 removelist mbot_PreviousScript
@@ -32,6 +32,15 @@ pushlist mbot_PreviousScript "Play Script: Combat\Dexxer\mbot_pvp_base"
 
 # Auto-activates Frost armor aspect
 @setvar! mconfig_Aspect_AutoActivateFrost 0
+
+# Self-Bandaging
+@setvar! mconfig_Healing_AutoBandageHpDiffTrigger 1
+
+# Cure/Heal Potions
+@setvar! mconfig_Potion_UseCureAutomatically 1
+@setvar! mconfig_Potion_CureHpDiffTrigger 5
+@setvar! mconfig_Potion_UseHealAutomatically 1
+@setvar! mconfig_Potion_HealHpDiffTrigger 20
 
 @setvar! mconfig_Healing_AidCountAlertLessThan20 1
 

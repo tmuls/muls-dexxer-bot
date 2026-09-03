@@ -8,6 +8,11 @@
 @setvar! mbot_UseItemTimerCD 650
 settimer mbot_UseItemTimer mbot_UseItemTimerCD
 
+@setvar! mbot_BandageTimerCD 20000
+if not timerexists mbot_BandageTimer
+    settimer mbot_BandageTimer mbot_BandageTimerCD
+endif
+
 ##### Weapon State Tracking
 if not varexist mbot_BOT_CurrentRightHandWeapon
     @setvar! mbot_BOT_CurrentRightHandWeapon 0
@@ -174,6 +179,49 @@ while not dead
             getlabel backpack mbot_PingCheck
         else
             overhead "Out of Pouches!" 34
+        endif
+    endif
+
+    ##### Sysmsg Cleanup & Self-Bandaging
+    while insysmsg "You begin applying"
+        settimer mbot_BandageTimer 0
+    endwhile
+
+    while insysmsg "You finish applying" or insysmsg "You heal what little" or insysmsg "barely help" or insysmsg "You fail to resurrect" or insysmsg "You are able to resurrect"
+        settimer mbot_BandageTimer mbot_BandageTimerCD
+    endwhile
+
+    if skill "Healing" > 0 and findtype 3617 self
+        if timer mbot_BandageTimer >= mbot_BandageTimerCD and not targetexists
+            if poisoned or findbuff "disease" or findbuff "bleed"
+                hotkey "Bandage Self"
+            elseif diffhits > mconfig_Healing_AutoBandageHpDiffTrigger
+                hotkey "Bandage Self"
+            endif
+            getlabel backpack mbot_PingCheck
+            if insysmsg "You begin applying"
+                settimer mbot_BandageTimer 0
+            endif
+        endif
+    endif
+
+    ##### Potions
+    if not queued and mconfig_Potion_UseCureAutomatically = 1 and poisoned and diffhits >= mconfig_Potion_CureHpDiffTrigger and findtype 3847 self as mbot_Potion
+        if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+            dclick mbot_Potion
+            settimer mbot_UseItemTimer 0
+        endif
+    endif
+
+    if mconfig_Potion_UseHealAutomatically = 1 and diffhits >= mconfig_Potion_HealHpDiffTrigger and findtype 3852 self as mbot_Potion
+        if timer mbot_UseItemTimer >= mbot_UseItemTimerCD
+            getlabel mbot_Potion mbot_PotionDesc
+            if "next usable in" in mbot_PotionDesc
+                // do nothing
+            else
+                dclick mbot_Potion
+                settimer mbot_UseItemTimer 0
+            endif
         endif
     endif
 
