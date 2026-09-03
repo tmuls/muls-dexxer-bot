@@ -8,8 +8,6 @@
 @setvar! mbot_UseItemTimerCD 650
 settimer mbot_UseItemTimer mbot_UseItemTimerCD
 
-settimer mbot_UseAbilityTimer mconfig_Weapon_UseAbilityTimerCD
-
 ##### Weapon State Tracking
 if not varexist mbot_BOT_CurrentRightHandWeapon
     @setvar! mbot_BOT_CurrentRightHandWeapon 0
@@ -179,29 +177,11 @@ while not dead
         endif
     endif
 
-    ##### Weapon Support (no targeting/attacking - runs every pass)
+    ##### Low Aid Count Warning
     if mconfig_Healing_AidCountAlertLessThan20 = 1 and skill "Healing" > 0 and counttype 3617 self as mbot_BOT_AidCount
         if 20 > mbot_BOT_AidCount
             overhead "We are low on aids {{mbot_BOT_AidCount}}" 34
         endif
-    endif
-
-    ##### Weapon Abilities
-    if mconfig_Weapon_UseAbility1 = 1 and timer mbot_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
-        while insysmsg "You do cannot perform that ability yet." or insysmsg "You have not yet unlocked that weapon ability." or insysmsg "You do not have the required codex or skills to use that weapon ability."
-        endwhile
-        say "[WeaponAbility1"
-        settimer mbot_UseAbilityTimer 0
-    elseif mconfig_Weapon_UseAbility2 = 1 and timer mbot_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
-        while insysmsg "You do cannot perform that ability yet." or insysmsg "You have not yet unlocked that weapon ability." or insysmsg "You do not have the required codex or skills to use that weapon ability."
-        endwhile
-        say "[WeaponAbility2"
-        settimer mbot_UseAbilityTimer 0
-    elseif mconfig_Weapon_UseAbility3 = 1 and timer mbot_UseAbilityTimer >= mconfig_Weapon_UseAbilityTimerCD
-        while insysmsg "You do cannot perform that ability yet." or insysmsg "You have not yet unlocked that weapon ability." or insysmsg "You do not have the required codex or skills to use that weapon ability."
-        endwhile
-        say "[WeaponAbility3"
-        settimer mbot_UseAbilityTimer 0
     endif
 
 endwhile
