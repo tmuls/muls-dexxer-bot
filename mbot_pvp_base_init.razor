@@ -51,11 +51,10 @@ pushlist mbot_PreviousScript "Play Script: Combat\Dexxer\mbot_pvp_base"
 # Auto Weapon Poison Application
 @setvar! mconfig_Poison_AutomaticallyApply 1
 
-@setvar! mconfig_Healing_AidCountAlertLessThan20 1
+# Auto-targets the nearest red-notoriety player (target only, no auto-attack)
+@setvar! mconfig_Target_AutoTargetNearestRed 0
 
-removelist mconfig_Target_IgnoreMobOverheadText
-createlist mconfig_Target_IgnoreMobOverheadText
-pushlist mconfig_Target_IgnoreMobOverheadText "▼ IGNORE ▼"
+@setvar! mconfig_Healing_AidCountAlertLessThan20 1
 
 if listexists mbot_PreviousScript
     foreach myScript in mbot_PreviousScript
