@@ -27,7 +27,7 @@ jobs:
           cp *.razor "staging/Combat/Dexxer/"
           (cd staging && zip -r "../muls_dexxer_bot_${VERSION}.zip" "Combat")
 
-      - name: Attach zip to release
+      - name: Attach assets to release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "${{ github.event.release.tag_name }}" "muls_dexxer_bot_${VERSION}.zip"
+        run: gh release upload "${{ github.event.release.tag_name }}" "muls_dexxer_bot_${VERSION}.zip" "dexbot_install.sh"

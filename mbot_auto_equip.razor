@@ -1,0 +1,138 @@
+################################################################
+### Muls Auto Equip - v1.0
+### Based on Piety's auto equip script.
+### Dresses gear from the backpack using state recorded by
+### mbot_base.razor's Gear State Tracking section (mbot_AutoEquip_*,
+### mbot_BOT_CurrentRightHandWeapon/LeftHandWeapon). Run mbot_base at
+### least once first so that state exists.
+################################################################
+
+##### Weapon/Shield/Talisman (lift+drop, not dclick)
+### mbot_BOT_CurrentRightHandWeapon/LeftHandWeapon still use the old
+### always-defined-defaults-to-0 tracking style, not Piety's
+### unsetvar style, so these check != 0 rather than varexist.
+if mbot_BOT_CurrentRightHandWeapon != 0
+    if find mbot_BOT_CurrentRightHandWeapon backpack as mbot_AutoEquipFound
+        lift mbot_AutoEquipFound
+        drop self firstvalid
+        getlabel backpack mbot_PingCheck
+        while queued
+        endwhile
+    endif
+endif
+
+if mbot_BOT_CurrentLeftHandWeapon != 0
+    if find mbot_BOT_CurrentLeftHandWeapon backpack as mbot_AutoEquipFound
+        lift mbot_AutoEquipFound
+        drop self firstvalid
+        getlabel backpack mbot_PingCheck
+        while queued
+        endwhile
+    endif
+endif
+
+if varexist mbot_AutoEquip_Talisman
+    if find mbot_AutoEquip_Talisman backpack as mbot_AutoEquipFound
+        lift mbot_AutoEquipFound
+        drop self firstvalid
+        getlabel backpack mbot_PingCheck
+        while queued
+        endwhile
+    endif
+endif
+
+##### Remaining Layers (dclick)
+removelist mbot_AutoEquipList
+createlist mbot_AutoEquipList
+if varexist mbot_AutoEquip_InnerTorso
+    pushlist mbot_AutoEquipList mbot_AutoEquip_InnerTorso
+endif
+if varexist mbot_AutoEquip_Pants
+    pushlist mbot_AutoEquipList mbot_AutoEquip_Pants
+endif
+if varexist mbot_AutoEquip_Arms
+    pushlist mbot_AutoEquipList mbot_AutoEquip_Arms
+endif
+if varexist mbot_AutoEquip_Head
+    pushlist mbot_AutoEquipList mbot_AutoEquip_Head
+endif
+if varexist mbot_AutoEquip_Gloves
+    pushlist mbot_AutoEquipList mbot_AutoEquip_Gloves
+endif
+if varexist mbot_AutoEquip_Neck
+    pushlist mbot_AutoEquipList mbot_AutoEquip_Neck
+endif
+if varexist mbot_AutoEquip_Shoes
+    pushlist mbot_AutoEquipList mbot_AutoEquip_Shoes
+endif
+if varexist mbot_AutoEquip_Shirt
+    pushlist mbot_AutoEquipList mbot_AutoEquip_Shirt
+endif
+if varexist mbot_AutoEquip_Ring
+    pushlist mbot_AutoEquipList mbot_AutoEquip_Ring
+endif
+if varexist mbot_AutoEquip_Waist
+    pushlist mbot_AutoEquipList mbot_AutoEquip_Waist
+endif
+if varexist mbot_AutoEquip_Bracelet
+    pushlist mbot_AutoEquipList mbot_AutoEquip_Bracelet
+endif
+if varexist mbot_AutoEquip_Face
+    pushlist mbot_AutoEquipList mbot_AutoEquip_Face
+endif
+if varexist mbot_AutoEquip_MiddleTorso
+    pushlist mbot_AutoEquipList mbot_AutoEquip_MiddleTorso
+endif
+if varexist mbot_AutoEquip_Earrings
+    pushlist mbot_AutoEquipList mbot_AutoEquip_Earrings
+endif
+if varexist mbot_AutoEquip_Cloak
+    pushlist mbot_AutoEquipList mbot_AutoEquip_Cloak
+endif
+if varexist mbot_AutoEquip_OuterTorso
+    pushlist mbot_AutoEquipList mbot_AutoEquip_OuterTorso
+endif
+if varexist mbot_AutoEquip_OuterLegs
+    pushlist mbot_AutoEquipList mbot_AutoEquip_OuterLegs
+endif
+if varexist mbot_AutoEquip_InnerLegs
+    pushlist mbot_AutoEquipList mbot_AutoEquip_InnerLegs
+endif
+if varexist mbot_AutoEquip_OneHandedSecondary
+    pushlist mbot_AutoEquipList mbot_AutoEquip_OneHandedSecondary
+endif
+if varexist mbot_AutoEquip_Quiver
+    pushlist mbot_AutoEquipList mbot_AutoEquip_Quiver
+endif
+if varexist mbot_AutoEquip_OuterBody
+    pushlist mbot_AutoEquipList mbot_AutoEquip_OuterBody
+endif
+if varexist mbot_AutoEquip_Shoulder
+    pushlist mbot_AutoEquipList mbot_AutoEquip_Shoulder
+endif
+if varexist mbot_AutoEquip_Underarms
+    pushlist mbot_AutoEquipList mbot_AutoEquip_Underarms
+endif
+if varexist mbot_AutoEquip_Undergarment
+    pushlist mbot_AutoEquipList mbot_AutoEquip_Undergarment
+endif
+if varexist mbot_AutoEquip_UnderLegs
+    pushlist mbot_AutoEquipList mbot_AutoEquip_UnderLegs
+endif
+if varexist mbot_AutoEquip_Lightsource
+    pushlist mbot_AutoEquipList mbot_AutoEquip_Lightsource
+endif
+if varexist mbot_AutoEquip_OuterArms
+    pushlist mbot_AutoEquipList mbot_AutoEquip_OuterArms
+endif
+
+foreach mbot_AutoEquipItem in mbot_AutoEquipList
+    if find mbot_AutoEquipItem backpack as mbot_AutoEquipFound
+        dclick mbot_AutoEquipFound
+        getlabel backpack mbot_PingCheck
+        while queued
+        endwhile
+    endif
+endfor
+
+overhead "Auto Equip complete"
