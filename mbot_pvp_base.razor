@@ -145,7 +145,7 @@ while not dead
                 overhead "Smart weapon equip searching..." 66
                 @clearignore
                 @setvar! mbot_FoundFallbackWeapon 0
-                while mbot_FoundFallbackWeapon = 0 and findtype 31017|31019|31021|31023|31025|31027|31029|31031|31033|31035|31037|31038|31041|31043|31045|31047|31049|31051|31053|31055|3920|5042|5117|30990|30993|30994|30995|31184|31186|67773|67774|67775|67776|67777|67778|3719|3922|3938|5121|5123|5125|30989|30992|30996|30997|30998|31176|31188|3568|3721|3932|5040|5044|5112|5127|5177|5179|5181|30991|30999|31000|31001|31014|31178|31180|31182|3909|3911|3913|3915|3917|3934|3937|5046|5049|5115|5119|5182|5185|5187|30988|31128|31190|67713|67723|67734|67744|67754|67764|22187|31141|31142 backpack as mbot_WeaponCandidate
+                while mbot_FoundFallbackWeapon = 0 and findtype 31017|31019|31021|31023|31025|31027|31029|31031|31033|31035|31037|31038|31041|31043|31045|31047|31049|31051|31053|31055|3920|5042|5117|30990|30993|30994|30995|31184|31186|67773|67774|67775|67776|67777|67778|3719|3922|3938|5121|5123|5125|30989|30992|30996|30997|30998|31176|31188|3568|3721|3932|5040|5044|5112|5127|5177|5179|5181|30991|30999|31000|31001|31014|31178|31180|31182|3909|3911|3913|3915|3917|3934|3937|5046|5049|5115|5119|5182|5185|5187|30988|31128|31190|67713|67723|67734|67744|67754|67764|22187|31141|31142|31169|31172|9917 backpack as mbot_WeaponCandidate
                     getlabel mbot_WeaponCandidate mbot_WeaponCandidateDesc
                     if " aspect" in mbot_WeaponCandidateDesc or "exceptional " in mbot_WeaponCandidateDesc or "supremely" in mbot_WeaponCandidateDesc or "exceedingly" in mbot_WeaponCandidateDesc or "vanquishing" in mbot_WeaponCandidateDesc or "power" in mbot_WeaponCandidateDesc
                         overhead "Weapon found! Auto-equipping." 66
@@ -164,8 +164,8 @@ while not dead
         endif
 
         ##### Smart Shield Equip
-        # Special 2h ids that are not found in the lefthand layer when equipped (pickaxe)
-        if mconfig_Shield_SmartEquip = 1 and not findtype 3718 righthand
+        # Special 2h ids that are not found in the lefthand layer when equipped (pickaxe, harpoon, trident)
+        if mconfig_Shield_SmartEquip = 1 and not findtype 3718|31169|31172|9917 righthand
             if not findlayer self lefthand
                 if find mbot_BOT_CurrentLeftHandWeapon backpack
                     dclick mbot_BOT_CurrentLeftHandWeapon
